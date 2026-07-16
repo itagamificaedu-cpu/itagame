@@ -55,15 +55,29 @@ atividades — produto da ITA Tecnologia Educacional, **separado** do CEITEC ID 
 
 ## Deploy no VPS
 
+**Já em produção:** https://itagame.itatecnologiaeducacional.tech
+
 Container isolado, rede Docker própria (`itagame_network`), nunca compartilha
-instância de banco com o CEITEC ID System.
+instância de banco com o CEITEC ID System. Roda em `/root/itagame` no VPS
+(`2.24.73.137`), publicado na porta `3010` do host.
 
 ```bash
-# No VPS, dentro da pasta do projeto (após git pull):
+# No VPS, dentro de /root/itagame (após atualizar o código):
 docker compose build itagame_app
 docker compose up -d
 ```
 
-Depois, configurar o Nginx (`itagame.itatecnologiaeducacional.tech` → proxy para a
-porta interna do `itagame_app`) e emitir o certificado SSL com Certbot, confirmando
-antes que o DNS do subdomínio já aponta para o IP do VPS.
+> `.env` no VPS **não pode usar aspas** nos valores — o `env_file` do Docker
+> Compose não remove aspas como um shell faria (isso já causou o erro P1013
+> "scheme is not recognized" na primeira tentativa de deploy).
+
+O Nginx compartilhado (`app-nginx-1`, definido em `/app/nginx.conf` no VPS) tem
+dois blocos para `itagame.itatecnologiaeducacional.tech`: um redirecionando
+HTTP→HTTPS e outro fazendo `proxy_pass` para `http://172.17.0.1:3010` — o mesmo
+padrão usado para n8n/crm/evolution. O certificado SSL foi emitido com
+`certbot certonly --standalone` (exige parar o Nginx compartilhado por alguns
+segundos) depois de confirmar que o DNS do subdomínio (registrado no **Hostinger**,
+não Cloudflare) já apontava para o IP do VPS.
+
+Ainda sem repositório remoto (GitHub) configurado — o deploy até agora foi feito
+transferindo os arquivos direto por `scp`/`tar`, não por `git pull`.

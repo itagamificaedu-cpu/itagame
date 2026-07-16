@@ -5,8 +5,8 @@ services:
     restart: unless-stopped
     networks: [itagame_network]
     env_file: .env
-    expose:
-      - "3000"
+    ports:
+      - "3010:3000"
 
   itagame_db:
     image: postgres:16
