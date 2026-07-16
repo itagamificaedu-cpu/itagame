@@ -2,13 +2,13 @@ import Link from "next/link";
 import { verificarSessao } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 
-const RESUMO_TIPO: Record<string, string> = {
-  quiz: "Quiz",
-  verdadeiro_falso: "Verdadeiro ou falso",
-  completar_frase: "Completar frase",
-  caca_palavras: "Caça-palavras",
-  associar_colunas: "Associar colunas",
-  apresentacao: "Apresentação",
+const RESUMO_TIPO: Record<string, { rotulo: string; icone: string }> = {
+  quiz: { rotulo: "Quiz", icone: "❓" },
+  verdadeiro_falso: { rotulo: "Verdadeiro ou falso", icone: "⚖️" },
+  completar_frase: { rotulo: "Completar frase", icone: "✏️" },
+  caca_palavras: { rotulo: "Caça-palavras", icone: "🔤" },
+  associar_colunas: { rotulo: "Associar colunas", icone: "🔗" },
+  apresentacao: { rotulo: "Apresentação", icone: "📽️" },
 };
 
 export default async function PaginaAtividades() {
@@ -38,30 +38,39 @@ export default async function PaginaAtividades() {
         </div>
 
         {atividades.length === 0 ? (
-          <div className="mt-10 rounded-2xl border border-dashed border-neutral-300 bg-white p-8 text-center text-neutral-500">
-            <p className="font-semibold text-neutral-700">Nenhuma atividade ainda</p>
-            <p className="mt-1 text-sm">Gere sua primeira atividade com IA em poucos minutos.</p>
+          <div className="mt-10 rounded-2xl border border-dashed border-neutral-300 bg-white p-8 text-center">
+            <p className="text-3xl">✨</p>
+            <p className="mt-2 font-semibold text-neutral-700">Nenhuma atividade ainda</p>
+            <p className="mt-1 text-sm text-neutral-500">
+              Gere sua primeira atividade com IA em poucos minutos.
+            </p>
           </div>
         ) : (
           <ul className="mt-8 space-y-3">
-            {atividades.map((atividade) => (
-              <li key={atividade.id}>
-                <Link
-                  href={`/painel/atividades/${atividade.id}`}
-                  className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:border-[#1a3fd4]"
-                >
-                  <div>
-                    <p className="font-semibold text-neutral-900">{atividade.tema}</p>
-                    <p className="mt-0.5 text-sm text-neutral-500">
-                      {atividade.disciplina} · {atividade.serie} · {RESUMO_TIPO[atividade.tipo] ?? atividade.tipo}
-                    </p>
-                  </div>
-                  <span className="text-sm text-neutral-400">
-                    {atividade.criadaEm.toLocaleDateString("pt-BR")}
-                  </span>
-                </Link>
-              </li>
-            ))}
+            {atividades.map((atividade) => {
+              const info = RESUMO_TIPO[atividade.tipo] ?? { rotulo: atividade.tipo, icone: "📄" };
+              return (
+                <li key={atividade.id}>
+                  <Link
+                    href={`/painel/atividades/${atividade.id}`}
+                    className="flex items-center gap-4 rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:border-[#1a3fd4] hover:bg-[#1a3fd4]/5"
+                  >
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#1a3fd4]/10 text-xl">
+                      {info.icone}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-semibold text-neutral-900">{atividade.tema}</p>
+                      <p className="mt-0.5 text-sm text-neutral-500">
+                        {atividade.disciplina} · {atividade.serie} · {info.rotulo}
+                      </p>
+                    </div>
+                    <span className="shrink-0 text-sm text-neutral-400">
+                      {atividade.criadaEm.toLocaleDateString("pt-BR")}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
