@@ -1,0 +1,27 @@
+# Deploy no VPS — rede e volumes isolados, nada compartilhado com o CEITEC ID System
+services:
+  itagame_app:
+    build: .
+    restart: unless-stopped
+    networks: [itagame_network]
+    env_file: .env
+    expose:
+      - "3000"
+
+  itagame_db:
+    image: postgres:16
+    restart: unless-stopped
+    networks: [itagame_network]
+    volumes:
+      - itagame_pgdata:/var/lib/postgresql/data
+    env_file: .env
+    environment:
+      POSTGRES_USER: itagame
+      POSTGRES_DB: itagame
+
+networks:
+  itagame_network:
+    driver: bridge
+
+volumes:
+  itagame_pgdata:

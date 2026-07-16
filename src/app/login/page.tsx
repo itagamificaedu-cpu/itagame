@@ -1,0 +1,71 @@
+"use client";
+
+import { useActionState } from "react";
+import Link from "next/link";
+import { entrar } from "@/app/actions/autenticacao";
+
+export default function PaginaLogin() {
+  const [estado, action, pendente] = useActionState(entrar, undefined);
+
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-neutral-50 px-4">
+      <div className="w-full max-w-sm rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
+        <Link href="/" className="text-xl font-extrabold text-[#1a3fd4]">
+          ItaGame
+        </Link>
+        <h1 className="mt-4 text-2xl font-bold text-neutral-900">Entrar</h1>
+        <p className="mt-1 text-sm text-neutral-500">
+          Acesse seu painel de professor.
+        </p>
+
+        <form action={action} className="mt-6 space-y-4">
+          <div>
+            <label htmlFor="email" className="text-sm font-medium text-neutral-700">
+              E-mail
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#1a3fd4] focus:outline-none focus:ring-1 focus:ring-[#1a3fd4]"
+            />
+            {estado?.erros?.email && (
+              <p className="mt-1 text-xs text-red-600">{estado.erros.email[0]}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="senha" className="text-sm font-medium text-neutral-700">
+              Senha
+            </label>
+            <input
+              id="senha"
+              name="senha"
+              type="password"
+              required
+              className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#1a3fd4] focus:outline-none focus:ring-1 focus:ring-[#1a3fd4]"
+            />
+          </div>
+
+          {estado?.mensagem && <p className="text-sm text-red-600">{estado.mensagem}</p>}
+
+          <button
+            type="submit"
+            disabled={pendente}
+            className="w-full rounded-lg bg-[#1a3fd4] py-2.5 text-sm font-bold text-white transition hover:brightness-110 disabled:opacity-60"
+          >
+            {pendente ? "Entrando..." : "Entrar"}
+          </button>
+        </form>
+
+        <p className="mt-6 text-center text-sm text-neutral-500">
+          Ainda não tem conta?{" "}
+          <Link href="/cadastro" className="font-semibold text-[#1a3fd4]">
+            Criar conta
+          </Link>
+        </p>
+      </div>
+    </main>
+  );
+}

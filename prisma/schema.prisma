@@ -1,0 +1,239 @@
+// Schema inicial do ItaGame — banco isolado (nenhuma tabela/FK compartilhada com o CEITEC ID System)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PapelUsuario {
+  ita_owner
+  escola_admin
+  professor
+  aluno
+}
+
+enum PlanoAssinatura {
+  gratis
+  pro
+}
+
+enum StatusAssinatura {
+  ativa
+  atrasada
+  cancelada
+}
+
+enum TipoAtividade {
+  quiz
+  verdadeiro_falso
+  completar_frase
+  caca_palavras
+  associar_colunas
+  apresentacao
+}
+
+enum StatusSala {
+  aberta
+  em_andamento
+  encerrada
+}
+
+model Escola {
+  id          String   @id @default(cuid())
+  nome        String
+  criadaEm    DateTime @default(now())
+
+  usuarios    Usuario[]
+  assinatura  Assinatura?
+
+  @@map("escolas")
+}
+
+model Usuario {
+  id           String       @id @default(cuid())
+  nome         String
+  email        String       @unique
+  senhaHash    String
+  papel        PapelUsuario
+  avatarUrl    String?
+  criadoEm     DateTime     @default(now())
+
+  escolaId     String?
+  escola       Escola?      @relation(fields: [escolaId], references: [id])
+
+  turmasComoProfessor Turma[]        @relation("ProfessorTurmas")
+  matriculas          Matricula[]
+  atividadesCriadas   Atividade[]
+  missoesCriadas      Missao[]
+  xpTransacoes        XpTransacao[]
+  resgates            ResgateLoja[]
+  assinaturaProfessor Assinatura?    @relation("AssinaturaProfessor")
+
+  @@map("usuarios")
+}
+
+model Turma {
+  id           String   @id @default(cuid())
+  nome         String
+  serie        String
+  criadaEm     DateTime @default(now())
+
+  professorId  String
+  professor    Usuario  @relation("ProfessorTurmas", fields: [professorId], references: [id])
+
+  matriculas   Matricula[]
+  aplicacoes   AplicacaoAtividade[]
+
+  @@map("turmas")
+}
+
+model Matricula {
+  id        String   @id @default(cuid())
+  turmaId   String
+  alunoId   String
+  criadaEm  DateTime @default(now())
+
+  turma     Turma    @relation(fields: [turmaId], references: [id])
+  aluno     Usuario  @relation(fields: [alunoId], references: [id])
+
+  @@unique([turmaId, alunoId])
+  @@map("matriculas")
+}
+
+model Atividade {
+  id                String        @id @default(cuid())
+  tipo              TipoAtividade
+  disciplina        String
+  serie             String
+  tema              String
+  conteudoGerado    Json
+  gabarito          Json
+  competenciasBncc  String[]
+  criadaEm          DateTime      @default(now())
+
+  professorId       String
+  professor         Usuario       @relation(fields: [professorId], references: [id])
+
+  aplicacoes        AplicacaoAtividade[]
+
+  @@map("atividades")
+}
+
+model AplicacaoAtividade {
+  id           String      @id @default(cuid())
+  atividadeId  String
+  turmaId      String
+  aplicadaEm   DateTime    @default(now())
+
+  atividade    Atividade   @relation(fields: [atividadeId], references: [id])
+  turma        Turma       @relation(fields: [turmaId], references: [id])
+
+  salaAoVivo   SalaAoVivo?
+  respostas    RespostaAluno[]
+
+  @@map("aplicacoes_atividade")
+}
+
+model SalaAoVivo {
+  id              String     @id @default(cuid())
+  codigo          String     @unique
+  status          StatusSala @default(aberta)
+  criadaEm        DateTime   @default(now())
+
+  aplicacaoId     String     @unique
+  aplicacao       AplicacaoAtividade @relation(fields: [aplicacaoId], references: [id])
+
+  @@map("salas_ao_vivo")
+}
+
+model RespostaAluno {
+  id             String   @id @default(cuid())
+  aplicacaoId    String
+  alunoId        String
+  respostas      Json
+  pontuacao      Int
+  respondidaEm   DateTime @default(now())
+
+  aplicacao      AplicacaoAtividade @relation(fields: [aplicacaoId], references: [id])
+
+  @@map("respostas_aluno")
+}
+
+model CorrecaoRedacao {
+  id               String   @id @default(cuid())
+  textoEnviado     String
+  feedbackIa       Json
+  notasPorCriterio Json
+  criadaEm         DateTime @default(now())
+
+  @@map("correcoes_redacao")
+}
+
+model XpTransacao {
+  id          String   @id @default(cuid())
+  alunoId     String
+  origem      String
+  quantidade  Int
+  criadaEm    DateTime @default(now())
+
+  aluno       Usuario  @relation(fields: [alunoId], references: [id])
+
+  @@map("xp_transacoes")
+}
+
+model Missao {
+  id             String   @id @default(cuid())
+  titulo         String
+  descricao      String
+  xpRecompensa   Int
+  criadaEm       DateTime @default(now())
+
+  criadaPorId    String
+  criadaPor      Usuario  @relation(fields: [criadaPorId], references: [id])
+
+  @@map("missoes")
+}
+
+model ItemLoja {
+  id         String   @id @default(cuid())
+  nome       String
+  custoXp    Int
+  tipo       String
+  estoque    Int?
+
+  resgates   ResgateLoja[]
+
+  @@map("itens_loja")
+}
+
+model ResgateLoja {
+  id          String   @id @default(cuid())
+  alunoId     String
+  itemId      String
+  resgatadoEm DateTime @default(now())
+
+  aluno       Usuario  @relation(fields: [alunoId], references: [id])
+  item        ItemLoja @relation(fields: [itemId], references: [id])
+
+  @@map("resgates_loja")
+}
+
+model Assinatura {
+  id              String            @id @default(cuid())
+  plano           PlanoAssinatura   @default(gratis)
+  status          StatusAssinatura  @default(ativa)
+  mercadoPagoId   String?
+  validade        DateTime?
+  criadaEm        DateTime          @default(now())
+
+  escolaId        String?           @unique
+  escola          Escola?           @relation(fields: [escolaId], references: [id])
+
+  professorId     String?           @unique
+  professor       Usuario?          @relation("AssinaturaProfessor", fields: [professorId], references: [id])
+
+  @@map("assinaturas")
+}

@@ -1,0 +1,17 @@
+# Apenas o Postgres, para rodar `npm run dev` localmente contra um banco real.
+# Uso: docker compose -f docker-compose.dev.yml up -d
+services:
+  itagame_db:
+    image: postgres:16
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: itagame
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mude_esta_senha}
+      POSTGRES_DB: itagame
+    volumes:
+      - itagame_pgdata_dev:/var/lib/postgresql/data
+
+volumes:
+  itagame_pgdata_dev:
