@@ -15,7 +15,7 @@ const RESUMO_TIPO: Record<string, { rotulo: string; icone: string }> = {
 export default async function PaginaPainel() {
   const usuario = await getUsuarioAtual();
 
-  const [atividadesRecentes, totalAtividades, totalSalas] = usuario
+  const [atividadesRecentes, totalAtividades, totalSalas, assinatura] = usuario
     ? await Promise.all([
         prisma.atividade.findMany({
           where: { professorId: usuario.id },
@@ -24,8 +24,12 @@ export default async function PaginaPainel() {
         }),
         prisma.atividade.count({ where: { professorId: usuario.id } }),
         prisma.salaAoVivo.count({ where: { atividade: { professorId: usuario.id } } }),
+        prisma.assinatura.findUnique({ where: { professorId: usuario.id } }),
       ])
-    : [[], 0, 0];
+    : [[], 0, 0, null];
+
+  const proAtivo =
+    assinatura?.plano === "pro" && assinatura.status === "ativa" && assinatura.validade! > new Date();
 
   const iniciais = (usuario?.nome ?? "P")
     .replace(/\(.*?\)/g, "")
@@ -44,6 +48,16 @@ export default async function PaginaPainel() {
           </Link>
 
           <div className="flex items-center gap-3">
+            <Link
+              href="/painel/assinatura"
+              className={`hidden rounded-full px-3 py-1 text-xs font-bold sm:inline-flex ${
+                proAtivo
+                  ? "bg-[#1a3fd4]/10 text-[#1a3fd4]"
+                  : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200"
+              }`}
+            >
+              {proAtivo ? "👑 Pro" : "Plano gratuito"}
+            </Link>
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1a3fd4] text-sm font-bold text-white">
               {iniciais}
             </div>
