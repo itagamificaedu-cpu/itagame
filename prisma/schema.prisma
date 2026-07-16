@@ -118,6 +118,7 @@ model Atividade {
   professor         Usuario       @relation(fields: [professorId], references: [id])
 
   aplicacoes        AplicacaoAtividade[]
+  salasAoVivo       SalaAoVivo[]
 
   @@map("atividades")
 }
@@ -131,22 +132,54 @@ model AplicacaoAtividade {
   atividade    Atividade   @relation(fields: [atividadeId], references: [id])
   turma        Turma       @relation(fields: [turmaId], references: [id])
 
-  salaAoVivo   SalaAoVivo?
   respostas    RespostaAluno[]
 
   @@map("aplicacoes_atividade")
 }
 
 model SalaAoVivo {
-  id              String     @id @default(cuid())
-  codigo          String     @unique
-  status          StatusSala @default(aberta)
-  criadaEm        DateTime   @default(now())
+  id                String     @id @default(cuid())
+  codigo            String     @unique
+  status            StatusSala @default(aberta)
+  perguntaAtual     Int        @default(-1)
+  perguntaComecouEm DateTime?
+  criadaEm          DateTime   @default(now())
 
-  aplicacaoId     String     @unique
-  aplicacao       AplicacaoAtividade @relation(fields: [aplicacaoId], references: [id])
+  atividadeId       String
+  atividade         Atividade  @relation(fields: [atividadeId], references: [id])
+
+  participantes     ParticipanteSala[]
 
   @@map("salas_ao_vivo")
+}
+
+model ParticipanteSala {
+  id          String   @id @default(cuid())
+  apelido     String
+  pontuacao   Int      @default(0)
+  entrouEm    DateTime @default(now())
+
+  salaId      String
+  sala        SalaAoVivo @relation(fields: [salaId], references: [id])
+
+  respostas   RespostaParticipante[]
+
+  @@unique([salaId, apelido])
+  @@map("participantes_sala")
+}
+
+model RespostaParticipante {
+  id             String   @id @default(cuid())
+  indiceQuestao  Int
+  correta        Boolean
+  pontosGanhos   Int
+  respondidaEm   DateTime @default(now())
+
+  participanteId String
+  participante   ParticipanteSala @relation(fields: [participanteId], references: [id])
+
+  @@unique([participanteId, indiceQuestao])
+  @@map("respostas_participante")
 }
 
 model RespostaAluno {

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { verificarSessao } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
+import { iniciarSala } from "@/app/actions/salas";
 
 type Questao = { enunciado: string; alternativas: string[] };
 type ItemGabarito = { enunciado: string; respostaCorreta: string; explicacao: string | null };
@@ -29,10 +30,22 @@ export default async function PaginaDetalheAtividade({
           ← Minhas atividades
         </Link>
 
-        <h1 className="mt-4 text-2xl font-bold text-neutral-900">{conteudo.titulo}</h1>
-        <p className="mt-1 text-sm text-neutral-500">
-          {atividade.disciplina} · {atividade.serie} · {atividade.tema}
-        </p>
+        <div className="mt-4 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-neutral-900">{conteudo.titulo}</h1>
+            <p className="mt-1 text-sm text-neutral-500">
+              {atividade.disciplina} · {atividade.serie} · {atividade.tema}
+            </p>
+          </div>
+          <form action={iniciarSala.bind(null, atividade.id)}>
+            <button
+              type="submit"
+              className="whitespace-nowrap rounded-lg bg-[#00c264] px-4 py-2 text-sm font-bold text-white hover:brightness-110"
+            >
+              Iniciar sala ao vivo
+            </button>
+          </form>
+        </div>
 
         {atividade.competenciasBncc.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-2">

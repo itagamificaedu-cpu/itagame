@@ -51,3 +51,22 @@ export type EstadoGeracaoAtividade =
       mensagem?: string;
     }
   | undefined;
+
+export const EsquemaEntrarSala = z.object({
+  codigo: z.string().length(6, { error: "O código tem 6 dígitos." }).trim(),
+  apelido: z
+    .string()
+    .min(2, { error: "Informe um apelido." })
+    .max(20, { error: "Apelido muito longo (máx. 20 caracteres)." })
+    .trim(),
+});
+
+export type EstadoEntrarSala =
+  | {
+      erros?: {
+        codigo?: string[];
+        apelido?: string[];
+      };
+      mensagem?: string;
+    }
+  | undefined;
