@@ -28,7 +28,9 @@ export default async function PaginaPainel() {
     : [[], 0, 0];
 
   const iniciais = (usuario?.nome ?? "P")
-    .split(" ")
+    .replace(/\(.*?\)/g, "")
+    .trim()
+    .split(/\s+/)
     .slice(0, 2)
     .map((parte) => parte[0]?.toUpperCase())
     .join("");
