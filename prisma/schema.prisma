@@ -67,6 +67,7 @@ model Usuario {
   turmasComoProfessor Turma[]        @relation("ProfessorTurmas")
   matriculas          Matricula[]
   atividadesCriadas   Atividade[]
+  correcoesRedacao    CorrecaoRedacao[]
   missoesCriadas      Missao[]
   xpTransacoes        XpTransacao[]
   resgates            ResgateLoja[]
@@ -197,10 +198,15 @@ model RespostaAluno {
 
 model CorrecaoRedacao {
   id               String   @id @default(cuid())
+  tema             String
   textoEnviado     String
-  feedbackIa       Json
+  notaGeral        Float
+  feedbackGeral    String
   notasPorCriterio Json
   criadaEm         DateTime @default(now())
+
+  professorId      String
+  professor        Usuario  @relation(fields: [professorId], references: [id])
 
   @@map("correcoes_redacao")
 }

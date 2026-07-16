@@ -70,3 +70,22 @@ export type EstadoEntrarSala =
       mensagem?: string;
     }
   | undefined;
+
+export const EsquemaCorrecaoRedacao = z.object({
+  tema: z.string().min(3, { error: "Informe o tema da redação." }).trim(),
+  texto: z
+    .string()
+    .min(100, { error: "Cole o texto completo da redação (mínimo 100 caracteres)." })
+    .max(12000, { error: "Texto muito longo (máx. 12.000 caracteres)." })
+    .trim(),
+});
+
+export type EstadoCorrecaoRedacao =
+  | {
+      erros?: {
+        tema?: string[];
+        texto?: string[];
+      };
+      mensagem?: string;
+    }
+  | undefined;

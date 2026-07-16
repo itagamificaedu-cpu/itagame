@@ -15,7 +15,7 @@ const RESUMO_TIPO: Record<string, { rotulo: string; icone: string }> = {
 export default async function PaginaPainel() {
   const usuario = await getUsuarioAtual();
 
-  const [atividadesRecentes, totalAtividades, totalSalas, assinatura] = usuario
+  const [atividadesRecentes, totalAtividades, totalSalas, totalRedacoes, assinatura] = usuario
     ? await Promise.all([
         prisma.atividade.findMany({
           where: { professorId: usuario.id },
@@ -24,9 +24,10 @@ export default async function PaginaPainel() {
         }),
         prisma.atividade.count({ where: { professorId: usuario.id } }),
         prisma.salaAoVivo.count({ where: { atividade: { professorId: usuario.id } } }),
+        prisma.correcaoRedacao.count({ where: { professorId: usuario.id } }),
         prisma.assinatura.findUnique({ where: { professorId: usuario.id } }),
       ])
-    : [[], 0, 0, null];
+    : [[], 0, 0, 0, null];
 
   const proAtivo =
     assinatura?.plano === "pro" && assinatura.status === "ativa" && assinatura.validade! > new Date();
@@ -99,10 +100,16 @@ export default async function PaginaPainel() {
             >
               Ver minhas atividades
             </Link>
+            <Link
+              href="/painel/redacoes/nova"
+              className="rounded-lg border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
+            >
+              ✍️ Corrigir redação
+            </Link>
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="rounded-2xl border border-neutral-200 bg-white p-5">
             <p className="text-2xl">📚</p>
             <p className="mt-2 text-2xl font-extrabold text-neutral-900">{totalAtividades}</p>
@@ -117,7 +124,14 @@ export default async function PaginaPainel() {
               {totalSalas === 1 ? "sala ao vivo realizada" : "salas ao vivo realizadas"}
             </p>
           </div>
-          <div className="col-span-2 rounded-2xl border border-dashed border-[#00c264]/40 bg-[#00c264]/5 p-5 sm:col-span-1">
+          <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+            <p className="text-2xl">✍️</p>
+            <p className="mt-2 text-2xl font-extrabold text-neutral-900">{totalRedacoes}</p>
+            <p className="text-sm text-neutral-500">
+              {totalRedacoes === 1 ? "redação corrigida" : "redações corrigidas"}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-dashed border-[#00c264]/40 bg-[#00c264]/5 p-5">
             <p className="text-2xl">🏫</p>
             <p className="mt-2 text-sm font-bold text-neutral-800">Turmas</p>
             <p className="text-sm text-neutral-500">Em breve</p>

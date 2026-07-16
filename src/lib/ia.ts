@@ -99,3 +99,76 @@ export async function gerarAtividadeComIa(params: {
 
   return blocoFerramenta.input as AtividadeGerada;
 }
+
+export const CRITERIOS_REDACAO = ["Gramática", "Coerência", "Argumentação", "Repertório"] as const;
+
+export type NotaCriterio = { criterio: string; nota: number; comentario: string };
+
+export type CorrecaoRedacaoGerada = {
+  notaGeral: number;
+  feedbackGeral: string;
+  notasPorCriterio: NotaCriterio[];
+};
+
+const FERRAMENTA_CORRIGIR_REDACAO: Anthropic.Tool = {
+  name: "salvar_correcao",
+  description: "Salva a correção da redação com nota e comentário por critério.",
+  input_schema: {
+    type: "object",
+    properties: {
+      notaGeral: {
+        type: "number",
+        description: "Média das notas dos 4 critérios, de 0 a 10 (pode ter uma casa decimal)",
+      },
+      feedbackGeral: {
+        type: "string",
+        description: "Parágrafo curto com a impressão geral e as principais recomendações",
+      },
+      notasPorCriterio: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            criterio: { type: "string", enum: [...CRITERIOS_REDACAO] },
+            nota: { type: "number", description: "Nota de 0 a 10 para este critério" },
+            comentario: { type: "string", description: "Comentário específico sobre este critério" },
+          },
+          required: ["criterio", "nota", "comentario"],
+        },
+      },
+    },
+    required: ["notaGeral", "feedbackGeral", "notasPorCriterio"],
+  },
+};
+
+export async function corrigirRedacaoComIa(params: {
+  tema: string;
+  texto: string;
+}): Promise<CorrecaoRedacaoGerada> {
+  const instrucao = `Corrija a redação abaixo, escrita em português do Brasil por um aluno sobre o tema "${params.tema}".
+Avalie separadamente os critérios: ${CRITERIOS_REDACAO.join(", ")} — cada um com nota de 0 a 10 e um comentário específico.
+Dê uma nota geral (média dos critérios) e um feedback geral construtivo, apontando pontos fortes e o que melhorar.
+Seja rigoroso mas encorajador, adequado ao contexto escolar.
+
+Redação do aluno:
+"""
+${params.texto}
+"""
+
+Chame a ferramenta "salvar_correcao" com o resultado.`;
+
+  const resposta = await cliente.messages.create({
+    model: MODELO,
+    max_tokens: 2048,
+    tools: [FERRAMENTA_CORRIGIR_REDACAO],
+    tool_choice: { type: "tool", name: "salvar_correcao" },
+    messages: [{ role: "user", content: instrucao }],
+  });
+
+  const blocoFerramenta = resposta.content.find((bloco) => bloco.type === "tool_use");
+  if (!blocoFerramenta || blocoFerramenta.type !== "tool_use") {
+    throw new Error("A IA não retornou a correção no formato esperado.");
+  }
+
+  return blocoFerramenta.input as CorrecaoRedacaoGerada;
+}
