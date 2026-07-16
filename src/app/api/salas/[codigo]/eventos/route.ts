@@ -31,9 +31,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ codigo:
 
   const stream = new ReadableStream({
     async start(controller) {
+      controller.enqueue(encoder.encode(`: conectado\n\n`));
       let ativo = true;
 
       while (ativo) {
+        try {
         const sala = await prisma.salaAoVivo.findUnique({
           where: { codigo },
           include: {
@@ -105,6 +107,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ codigo:
         }
 
         await new Promise((resolve) => setTimeout(resolve, 1200));
+        } catch (erro) {
+          console.error("Erro no stream da sala", codigo, erro);
+          controller.enqueue(encoder.encode(`event: erro\ndata: ${JSON.stringify(String(erro))}\n\n`));
+          break;
+        }
       }
 
       controller.close();
@@ -116,6 +123,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ codigo:
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache, no-transform",
       Connection: "keep-alive",
+      "X-Accel-Buffering": "no",
     },
   });
 }
