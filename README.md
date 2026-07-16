@@ -59,12 +59,19 @@ atividades — produto da ITA Tecnologia Educacional, **separado** do CEITEC ID 
 
 Container isolado, rede Docker própria (`itagame_network`), nunca compartilha
 instância de banco com o CEITEC ID System. Roda em `/root/itagame` no VPS
-(`2.24.73.137`), publicado na porta `3010` do host.
+(`2.24.73.137`), publicado na porta `3010` do host. Repositório:
+https://github.com/itagamificaedu-cpu/itagame (público, igual ao ceitec-id-sistem
+— sem isso o `git pull` no VPS exigiria credencial, já que não há nenhuma
+configurada lá).
 
 ```bash
-# No VPS, dentro de /root/itagame (após atualizar o código):
-docker compose build itagame_app
-docker compose up -d
+# 1. Commit e push local
+git add .
+git commit -m "descrição"
+git push origin main
+
+# 2. No VPS via SSH
+ssh root@2.24.73.137 "cd /root/itagame && git pull origin main && docker compose build itagame_app && docker compose up -d"
 ```
 
 > `.env` no VPS **não pode usar aspas** nos valores — o `env_file` do Docker
@@ -78,6 +85,3 @@ padrão usado para n8n/crm/evolution. O certificado SSL foi emitido com
 `certbot certonly --standalone` (exige parar o Nginx compartilhado por alguns
 segundos) depois de confirmar que o DNS do subdomínio (registrado no **Hostinger**,
 não Cloudflare) já apontava para o IP do VPS.
-
-Ainda sem repositório remoto (GitHub) configurado — o deploy até agora foi feito
-transferindo os arquivos direto por `scp`/`tar`, não por `git pull`.
