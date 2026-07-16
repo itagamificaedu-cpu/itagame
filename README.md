@@ -41,12 +41,18 @@ atividades — produto da ITA Tecnologia Educacional, **separado** do CEITEC ID 
   Atividade, SalaAoVivo, XP, Loja, Assinatura etc.
 - Cadastro/login/logout de professor com sessão própria (`src/app/actions/autenticacao.ts`,
   `src/lib/sessao.ts`, `src/lib/acessoDados.ts`)
-- `/painel` protegido por `proxy.ts` (placeholder — próximo passo é o gerador de
-  atividades)
+- Gerador de atividades com IA (`src/lib/ia.ts`, `src/app/actions/atividades.ts`) —
+  usa a API da Anthropic (tool-use) para gerar quiz e verdadeiro/falso alinhados à
+  BNCC. Telas em `/painel/atividades` (listar), `/painel/atividades/nova` (gerar)
+  e `/painel/atividades/[id]` (detalhe com gabarito). Requer `ANTHROPIC_API_KEY`
+  no `.env`.
+- `/painel` protegido por `proxy.ts`
 
 ## Próximos passos (ainda não implementados)
 
-- Geração de atividades e correção de redação via API da Anthropic
+- Correção de redação via API da Anthropic
+- Mais tipos de atividade geráveis por IA (completar frase, caça-palavras, associar
+  colunas, apresentação)
 - Sala ao vivo (WebSockets/SSE) com ranking em tempo real
 - Exportação em Word/PDF/PowerPoint
 - Integração com Mercado Pago (preço do plano Pro ainda **não definido** — confirmar
