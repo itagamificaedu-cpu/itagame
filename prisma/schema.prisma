@@ -87,8 +87,20 @@ model Turma {
 
   matriculas   Matricula[]
   aplicacoes   AplicacaoAtividade[]
+  alunos       Aluno[]
 
   @@map("turmas")
+}
+
+model Aluno {
+  id        String   @id @default(cuid())
+  nome      String
+  criadoEm  DateTime @default(now())
+
+  turmaId   String
+  turma     Turma    @relation(fields: [turmaId], references: [id])
+
+  @@map("alunos")
 }
 
 model Matricula {

@@ -99,3 +99,31 @@ export type EstadoCorrecaoRedacao =
       mensagem?: string;
     }
   | undefined;
+
+export const EsquemaCriarTurma = z.object({
+  nome: z.string().min(2, { error: "Informe o nome da turma." }).trim(),
+  serie: z.string().min(1, { error: "Informe a série/ano." }).trim(),
+});
+
+export type EstadoCriarTurma =
+  | {
+      erros?: {
+        nome?: string[];
+        serie?: string[];
+      };
+      mensagem?: string;
+    }
+  | undefined;
+
+export const EsquemaAdicionarAluno = z.object({
+  nome: z.string().min(2, { error: "Informe o nome do aluno." }).trim(),
+});
+
+export type EstadoAdicionarAluno =
+  | {
+      erros?: {
+        nome?: string[];
+      };
+      mensagem?: string;
+    }
+  | undefined;

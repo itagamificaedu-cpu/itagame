@@ -15,19 +15,21 @@ const RESUMO_TIPO: Record<string, { rotulo: string; icone: string }> = {
 export default async function PaginaPainel() {
   const usuario = await getUsuarioAtual();
 
-  const [atividadesRecentes, totalAtividades, totalSalas, totalRedacoes, assinatura] = usuario
-    ? await Promise.all([
-        prisma.atividade.findMany({
-          where: { professorId: usuario.id },
-          orderBy: { criadaEm: "desc" },
-          take: 5,
-        }),
-        prisma.atividade.count({ where: { professorId: usuario.id } }),
-        prisma.salaAoVivo.count({ where: { atividade: { professorId: usuario.id } } }),
-        prisma.correcaoRedacao.count({ where: { professorId: usuario.id } }),
-        prisma.assinatura.findUnique({ where: { professorId: usuario.id } }),
-      ])
-    : [[], 0, 0, 0, null];
+  const [atividadesRecentes, totalAtividades, totalSalas, totalRedacoes, totalTurmas, assinatura] =
+    usuario
+      ? await Promise.all([
+          prisma.atividade.findMany({
+            where: { professorId: usuario.id },
+            orderBy: { criadaEm: "desc" },
+            take: 5,
+          }),
+          prisma.atividade.count({ where: { professorId: usuario.id } }),
+          prisma.salaAoVivo.count({ where: { atividade: { professorId: usuario.id } } }),
+          prisma.correcaoRedacao.count({ where: { professorId: usuario.id } }),
+          prisma.turma.count({ where: { professorId: usuario.id } }),
+          prisma.assinatura.findUnique({ where: { professorId: usuario.id } }),
+        ])
+      : [[], 0, 0, 0, 0, null];
 
   const proAtivo =
     assinatura?.plano === "pro" && assinatura.status === "ativa" && assinatura.validade! > new Date();
@@ -106,6 +108,12 @@ export default async function PaginaPainel() {
             >
               ✍️ Corrigir redação
             </Link>
+            <Link
+              href="/painel/turmas/nova"
+              className="rounded-lg border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
+            >
+              🏫 Nova turma
+            </Link>
           </div>
         </div>
 
@@ -131,11 +139,14 @@ export default async function PaginaPainel() {
               {totalRedacoes === 1 ? "redação corrigida" : "redações corrigidas"}
             </p>
           </div>
-          <div className="rounded-2xl border border-dashed border-[#00c264]/40 bg-[#00c264]/5 p-5">
+          <Link
+            href="/painel/turmas"
+            className="rounded-2xl border border-neutral-200 bg-white p-5 transition hover:border-[#1a3fd4] hover:bg-[#1a3fd4]/5"
+          >
             <p className="text-2xl">🏫</p>
-            <p className="mt-2 text-sm font-bold text-neutral-800">Turmas</p>
-            <p className="text-sm text-neutral-500">Em breve</p>
-          </div>
+            <p className="mt-2 text-2xl font-extrabold text-neutral-900">{totalTurmas}</p>
+            <p className="text-sm text-neutral-500">{totalTurmas === 1 ? "turma" : "turmas"}</p>
+          </Link>
         </div>
 
         <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-6 sm:p-8">
