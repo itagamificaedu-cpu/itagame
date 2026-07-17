@@ -2,10 +2,21 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { verificarSessao } from "@/lib/acessoDados";
 import { gerarAtividadeComIa } from "@/lib/ia";
+import { gerarGradeCacaPalavras } from "@/lib/cacaPalavras";
 import { EsquemaGeracaoAtividade, EstadoGeracaoAtividade } from "@/lib/definicoes";
+
+function embaralhar<T>(itens: T[]): T[] {
+  const copia = [...itens];
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia;
+}
 
 export async function gerarAtividade(
   _estado: EstadoGeracaoAtividade,
@@ -34,19 +45,37 @@ export async function gerarAtividade(
     return { mensagem: "Não consegui gerar a atividade agora. Tente novamente em instantes." };
   }
 
+  const questoesBase = atividadeGerada.questoes.map((questao) => ({
+    enunciado: questao.enunciado,
+    alternativas: questao.alternativas ?? [],
+  }));
+
+  let conteudoGerado: Record<string, unknown> = {
+    titulo: atividadeGerada.titulo,
+    questoes: questoesBase,
+  };
+
+  if (tipo === "associar_colunas") {
+    conteudoGerado = {
+      ...conteudoGerado,
+      colunaB: embaralhar(atividadeGerada.questoes.map((questao) => questao.respostaCorreta)),
+    };
+  }
+
+  if (tipo === "caca_palavras") {
+    const { tamanho, grade } = gerarGradeCacaPalavras(
+      atividadeGerada.questoes.map((questao) => questao.respostaCorreta)
+    );
+    conteudoGerado = { ...conteudoGerado, tamanho, grade };
+  }
+
   const atividade = await prisma.atividade.create({
     data: {
       tipo,
       disciplina,
       serie,
       tema,
-      conteudoGerado: {
-        titulo: atividadeGerada.titulo,
-        questoes: atividadeGerada.questoes.map((questao) => ({
-          enunciado: questao.enunciado,
-          alternativas: questao.alternativas ?? [],
-        })),
-      },
+      conteudoGerado: conteudoGerado as Prisma.InputJsonValue,
       gabarito: atividadeGerada.questoes.map((questao) => ({
         enunciado: questao.enunciado,
         respostaCorreta: questao.respostaCorreta,

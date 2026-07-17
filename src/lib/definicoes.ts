@@ -28,7 +28,17 @@ export type EstadoFormulario =
   | undefined;
 
 export const EsquemaGeracaoAtividade = z.object({
-  tipo: z.enum(["quiz", "verdadeiro_falso"], { error: "Escolha um tipo de atividade." }),
+  tipo: z.enum(
+    [
+      "quiz",
+      "verdadeiro_falso",
+      "completar_frase",
+      "caca_palavras",
+      "associar_colunas",
+      "apresentacao",
+    ],
+    { error: "Escolha um tipo de atividade." }
+  ),
   disciplina: z.string().min(2, { error: "Informe a disciplina." }).trim(),
   serie: z.string().min(1, { error: "Informe a série/ano." }).trim(),
   tema: z.string().min(3, { error: "Informe o tema da atividade." }).trim(),

@@ -5,7 +5,13 @@ const cliente = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 const MODELO = "claude-sonnet-5";
 
-export type TipoAtividadeGeravel = "quiz" | "verdadeiro_falso";
+export type TipoAtividadeGeravel =
+  | "quiz"
+  | "verdadeiro_falso"
+  | "completar_frase"
+  | "caca_palavras"
+  | "associar_colunas"
+  | "apresentacao";
 
 type QuestaoGerada = {
   enunciado: string;
@@ -41,7 +47,8 @@ const FERRAMENTA_SALVAR_ATIVIDADE: Anthropic.Tool = {
             alternativas: {
               type: "array",
               items: { type: "string" },
-              description: "Somente para questões de múltipla escolha (4 opções)",
+              description:
+                "Para quiz: as 4 opções de múltipla escolha. Para apresentação: os tópicos/bullet points do slide. Demais tipos: deixe vazio.",
             },
             respostaCorreta: {
               type: "string",
@@ -61,6 +68,14 @@ const ORIENTACAO_POR_TIPO: Record<TipoAtividadeGeravel, string> = {
   quiz: "Cada questão deve ser de múltipla escolha, com exatamente 4 alternativas plausíveis e apenas uma correta.",
   verdadeiro_falso:
     "Cada questão deve ser uma afirmação para o aluno julgar como verdadeira ou falsa. Não preencha 'alternativas'; em 'respostaCorreta' escreva apenas 'verdadeiro' ou 'falso'.",
+  completar_frase:
+    "Cada questão deve ser uma frase com uma lacuna, representada por '_____', para o aluno completar. Não preencha 'alternativas'; em 'respostaCorreta' escreva apenas a palavra ou expressão que completa a lacuna corretamente.",
+  caca_palavras:
+    "Não gere frases. Cada questão representa uma palavra do caça-palavras: em 'enunciado' escreva uma dica curta (definição ou contexto) sobre a palavra, e em 'respostaCorreta' escreva a palavra em si, em maiúsculas, sem espaços, números ou acentos (uma única palavra, entre 3 e 12 letras). Não preencha 'alternativas'.",
+  associar_colunas:
+    "Cada questão é um par para associação: em 'enunciado' escreva o termo (coluna A) e em 'respostaCorreta' a definição ou conceito correspondente (coluna B), curto e sem ambiguidade com os demais pares. Não preencha 'alternativas'.",
+  apresentacao:
+    "Cada questão representa um slide: em 'enunciado' escreva o título do slide e em 'alternativas' liste de 3 a 5 tópicos/bullet points do slide (frases curtas). Em 'respostaCorreta' escreva uma breve fala sugerida para o professor apresentar esse slide.",
 };
 
 function montarInstrucao(params: {

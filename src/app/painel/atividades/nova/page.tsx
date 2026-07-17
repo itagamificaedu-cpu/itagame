@@ -1,11 +1,21 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { gerarAtividade } from "@/app/actions/atividades";
 
+const ROTULO_QUANTIDADE: Record<string, string> = {
+  quiz: "Quantidade de questões",
+  verdadeiro_falso: "Quantidade de questões",
+  completar_frase: "Quantidade de frases",
+  caca_palavras: "Quantidade de palavras",
+  associar_colunas: "Quantidade de pares",
+  apresentacao: "Quantidade de slides",
+};
+
 export default function PaginaNovaAtividade() {
   const [estado, action, pendente] = useActionState(gerarAtividade, undefined);
+  const [tipo, setTipo] = useState("quiz");
 
   return (
     <main className="min-h-screen bg-neutral-50 px-6 py-10">
@@ -27,11 +37,16 @@ export default function PaginaNovaAtividade() {
             <select
               id="tipo"
               name="tipo"
-              defaultValue="quiz"
+              value={tipo}
+              onChange={(evento) => setTipo(evento.target.value)}
               className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#1a3fd4] focus:outline-none focus:ring-1 focus:ring-[#1a3fd4]"
             >
               <option value="quiz">Quiz (múltipla escolha)</option>
               <option value="verdadeiro_falso">Verdadeiro ou falso</option>
+              <option value="completar_frase">Completar frase</option>
+              <option value="caca_palavras">Caça-palavras</option>
+              <option value="associar_colunas">Associar colunas</option>
+              <option value="apresentacao">Apresentação</option>
             </select>
             {estado?.erros?.tipo && <p className="mt-1 text-xs text-red-600">{estado.erros.tipo[0]}</p>}
           </div>
@@ -87,7 +102,7 @@ export default function PaginaNovaAtividade() {
 
           <div>
             <label htmlFor="quantidadeQuestoes" className="text-sm font-medium text-neutral-700">
-              Quantidade de questões
+              {ROTULO_QUANTIDADE[tipo]}
             </label>
             <input
               id="quantidadeQuestoes"
