@@ -324,15 +324,17 @@ export function CaboDeGuerraCliente({ turmas }: { turmas: Turma[] }) {
   function digitar(equipe: 1 | 2, valor: string) {
     if (!ativoRef.current) return;
     som.tic();
-    const atual = equipe === 1 ? entrada1 : entrada2;
     const setar = equipe === 1 ? setEntrada1 : setEntrada2;
 
     if (valor === "⌫") {
-      setar(atual.slice(0, -1));
+      setar((atual) => atual.slice(0, -1));
     } else if (valor === "✓") {
-      confirmar(equipe, atual);
-    } else if (atual.length < 5) {
-      setar(atual + valor);
+      setar((atual) => {
+        confirmar(equipe, atual);
+        return atual;
+      });
+    } else {
+      setar((atual) => (atual.length < 5 ? atual + valor : atual));
     }
   }
 
