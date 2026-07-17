@@ -72,6 +72,7 @@ model Usuario {
   xpTransacoes        XpTransacao[]
   resgates            ResgateLoja[]
   assinaturaProfessor Assinatura?    @relation("AssinaturaProfessor")
+  salasCaboGuerra     SalaCaboGuerra[]
 
   @@map("usuarios")
 }
@@ -287,4 +288,47 @@ model Assinatura {
   professor       Usuario?          @relation("AssinaturaProfessor", fields: [professorId], references: [id])
 
   @@map("assinaturas")
+}
+
+enum StatusSalaCaboGuerra {
+  aberta
+  em_andamento
+  encerrada
+}
+
+model SalaCaboGuerra {
+  id                String               @id @default(cuid())
+  codigo            String               @unique
+  status            StatusSalaCaboGuerra @default(aberta)
+  nomeEquipe1       String
+  nomeEquipe2       String
+  rodadaAtual       Int                  @default(1)
+  perguntaTexto     String?
+  perguntaResposta  Int?
+  perguntaComecouEm DateTime?
+  rodadaGanhaPor    Int?
+  rodadaTerminouEm  DateTime?
+  pontosEquipe1     Int                  @default(0)
+  pontosEquipe2     Int                  @default(0)
+  criadaEm          DateTime             @default(now())
+
+  professorId       String
+  professor         Usuario              @relation(fields: [professorId], references: [id])
+
+  participantes     ParticipanteCaboGuerra[]
+
+  @@map("salas_cabo_guerra")
+}
+
+model ParticipanteCaboGuerra {
+  id        String   @id @default(cuid())
+  apelido   String
+  equipe    Int
+  entrouEm  DateTime @default(now())
+
+  salaId    String
+  sala      SalaCaboGuerra @relation(fields: [salaId], references: [id])
+
+  @@unique([salaId, apelido])
+  @@map("participantes_cabo_guerra")
 }
