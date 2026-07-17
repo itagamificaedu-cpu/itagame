@@ -74,6 +74,27 @@ export default async function PaginaDetalheAtividade({
           </div>
         )}
 
+        <div className="mt-4 flex flex-wrap gap-2">
+          <a
+            href={`/api/atividades/${atividade.id}/exportar/docx`}
+            className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-600 hover:bg-neutral-100"
+          >
+            ⬇️ Word
+          </a>
+          <a
+            href={`/api/atividades/${atividade.id}/exportar/pdf`}
+            className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-600 hover:bg-neutral-100"
+          >
+            ⬇️ PDF
+          </a>
+          <a
+            href={`/api/atividades/${atividade.id}/exportar/pptx`}
+            className="rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-600 hover:bg-neutral-100"
+          >
+            ⬇️ PowerPoint
+          </a>
+        </div>
+
         <div className="mt-8">
           {atividade.tipo === "caca_palavras" && (
             <BlocoCacaPalavras conteudo={conteudo as ConteudoCacaPalavras} gabarito={gabarito} />
