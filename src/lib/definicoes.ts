@@ -127,3 +127,16 @@ export type EstadoAdicionarAluno =
       mensagem?: string;
     }
   | undefined;
+
+export const EsquemaAdicionarProfessorEscola = z.object({
+  email: z.email({ error: "Informe um e-mail válido." }).trim(),
+});
+
+export type EstadoAdicionarProfessorEscola =
+  | {
+      erros?: {
+        email?: string[];
+      };
+      mensagem?: string;
+    }
+  | undefined;

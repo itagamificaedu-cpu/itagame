@@ -61,6 +61,14 @@ export default async function PaginaPainel() {
             >
               {proAtivo ? "👑 Pro" : "Plano gratuito"}
             </Link>
+            {usuario?.papel === "escola_admin" && (
+              <Link
+                href="/painel/escola"
+                className="hidden rounded-full bg-[#00c264]/10 px-3 py-1 text-xs font-bold text-[#00854a] sm:inline-flex"
+              >
+                🏫 Painel da escola
+              </Link>
+            )}
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1a3fd4] text-sm font-bold text-white">
               {iniciais}
             </div>
