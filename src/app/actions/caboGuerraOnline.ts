@@ -10,12 +10,14 @@ import {
   obterSessaoParticipanteCaboGuerra,
 } from "@/lib/caboGuerraSessao";
 import { nivelDaRodada, gerarPergunta } from "@/lib/caboGuerraPerguntas";
+import { prepararPerguntasPersonalizadas } from "@/lib/caboGuerraPersonalizado";
 import {
   EsquemaCriarSalaCaboGuerra,
   EstadoCriarSalaCaboGuerra,
   EsquemaEntrarCaboGuerra,
   EstadoEntrarCaboGuerra,
 } from "@/lib/definicoes";
+import { Prisma } from "@prisma/client";
 
 function gerarCodigo() {
   return String(crypto.randomInt(100000, 999999));
@@ -56,6 +58,44 @@ export async function criarSalaCaboGuerra(
   redirect(`/painel/cabo-de-guerra-online/${sala.codigo}`);
 }
 
+export async function criarSalaCaboGuerraPersonalizada(atividadeId: string) {
+  const sessao = await verificarSessao();
+
+  const atividade = await prisma.atividade.findUnique({ where: { id: atividadeId } });
+  if (!atividade || atividade.professorId !== sessao.userId || atividade.tipo !== "cabo_de_guerra") {
+    throw new Error("Atividade não encontrada.");
+  }
+
+  const perguntas = prepararPerguntasPersonalizadas(atividade);
+  if (perguntas.length === 0) {
+    throw new Error("Esta atividade não tem perguntas válidas para o Cabo de Guerra.");
+  }
+
+  let sala = null;
+  for (let tentativa = 0; tentativa < 5 && !sala; tentativa++) {
+    try {
+      sala = await prisma.salaCaboGuerra.create({
+        data: {
+          codigo: gerarCodigo(),
+          professorId: sessao.userId,
+          nomeEquipe1: "Equipe Azul",
+          nomeEquipe2: "Equipe Vermelha",
+          totalRodadas: perguntas.length,
+          perguntas: perguntas as unknown as Prisma.InputJsonValue,
+        },
+      });
+    } catch {
+      sala = null;
+    }
+  }
+
+  if (!sala) {
+    throw new Error("Não foi possível criar a sala.");
+  }
+
+  redirect(`/painel/cabo-de-guerra-online/${sala.codigo}`);
+}
+
 export async function iniciarPartidaCaboGuerra(codigo: string) {
   const sessao = await verificarSessao();
 
@@ -64,15 +104,26 @@ export async function iniciarPartidaCaboGuerra(codigo: string) {
     throw new Error("Sala não encontrada.");
   }
 
-  const { texto, resposta } = gerarPergunta(nivelDaRodada(1));
+  const perguntasPersonalizadas = sala.perguntas as
+    | { enunciado: string; alternativas: string[]; indiceCorreto: number }[]
+    | null;
+
+  const primeiraPergunta = perguntasPersonalizadas
+    ? {
+        texto: perguntasPersonalizadas[0].enunciado,
+        resposta: perguntasPersonalizadas[0].indiceCorreto,
+        alternativas: perguntasPersonalizadas[0].alternativas,
+      }
+    : { ...gerarPergunta(nivelDaRodada(1)), alternativas: null };
 
   await prisma.salaCaboGuerra.update({
     where: { id: sala.id },
     data: {
       status: "em_andamento",
       rodadaAtual: 1,
-      perguntaTexto: texto,
-      perguntaResposta: resposta,
+      perguntaTexto: primeiraPergunta.texto,
+      perguntaResposta: primeiraPergunta.resposta,
+      perguntaAlternativas: primeiraPergunta.alternativas ?? Prisma.JsonNull,
       perguntaComecouEm: new Date(),
       rodadaGanhaPor: null,
       rodadaTerminouEm: null,

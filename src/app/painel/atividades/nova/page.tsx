@@ -11,6 +11,7 @@ const ROTULO_QUANTIDADE: Record<string, string> = {
   caca_palavras: "Quantidade de palavras",
   associar_colunas: "Quantidade de pares",
   apresentacao: "Quantidade de slides",
+  cabo_de_guerra: "Quantidade de perguntas",
 };
 
 export default function PaginaNovaAtividade() {
@@ -47,6 +48,7 @@ export default function PaginaNovaAtividade() {
               <option value="caca_palavras">Caça-palavras</option>
               <option value="associar_colunas">Associar colunas</option>
               <option value="apresentacao">Apresentação</option>
+              <option value="cabo_de_guerra">🪢 Cabo de Guerra (times)</option>
             </select>
             {estado?.erros?.tipo && <p className="mt-1 text-xs text-red-600">{estado.erros.tipo[0]}</p>}
           </div>

@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { iniciarPartidaCaboGuerra, encerrarSalaCaboGuerra } from "@/app/actions/caboGuerraOnline";
-import { NOMES_NIVEL, TOTAL_RODADAS, TEMPO_RODADA, type Nivel } from "@/lib/caboGuerraPerguntas";
+import { NOMES_NIVEL, type Nivel } from "@/lib/caboGuerraPerguntas";
 
 type Participante = { id: string; apelido: string };
 
@@ -12,6 +12,8 @@ type EstadoSala = {
   nomeEquipe1: string;
   nomeEquipe2: string;
   rodadaAtual: number;
+  totalRodadas: number;
+  modoPersonalizado: boolean;
   nivel: Nivel;
   pontosEquipe1: number;
   pontosEquipe2: number;
@@ -104,7 +106,9 @@ export function ControleCaboGuerraOnlineCliente({ codigo }: { codigo: string }) 
       <main className="min-h-screen bg-[#0d0d1a] px-6 py-10 text-white">
         <div className="mx-auto max-w-2xl">
           <p className="text-center text-xs font-bold tracking-widest text-neutral-400 uppercase">
-            Rodada {dados.rodadaAtual}/{TOTAL_RODADAS} · {NOMES_NIVEL[dados.nivel]}
+            {dados.modoPersonalizado
+              ? `Pergunta ${dados.rodadaAtual}/${dados.totalRodadas}`
+              : `Rodada ${dados.rodadaAtual}/${dados.totalRodadas} · ${NOMES_NIVEL[dados.nivel]}`}
           </p>
 
           <div className="mt-4 flex items-center justify-between">

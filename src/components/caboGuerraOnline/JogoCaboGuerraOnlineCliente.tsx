@@ -2,17 +2,20 @@
 
 import { useEffect, useRef, useState } from "react";
 import { responderCaboGuerra } from "@/app/actions/caboGuerraOnline";
-import { NOMES_NIVEL, TOTAL_RODADAS, TEMPO_RODADA, type Nivel } from "@/lib/caboGuerraPerguntas";
+import { NOMES_NIVEL, type Nivel } from "@/lib/caboGuerraPerguntas";
 
 type EstadoSala = {
   status: "aberta" | "em_andamento" | "encerrada";
   nomeEquipe1: string;
   nomeEquipe2: string;
   rodadaAtual: number;
+  totalRodadas: number;
+  modoPersonalizado: boolean;
   nivel: Nivel;
   pontosEquipe1: number;
   pontosEquipe2: number;
   perguntaTexto: string | null;
+  perguntaAlternativas: string[] | null;
   tempoRestante: number;
   rodadaGanhaPor: number | null;
   minhaEquipe: number | null;
@@ -67,6 +70,22 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
 
   const travado = dados.rodadaGanhaPor !== null || status !== null;
 
+  async function enviarResposta(valor: string) {
+    if (travado || enviandoRef.current) return;
+    enviandoRef.current = true;
+    const resultado = await responderCaboGuerra(codigo, valor);
+    enviandoRef.current = false;
+    if (resultado.ok) {
+      setStatus(resultado.correta && !resultado.tarde ? "correta" : "errada");
+      if (!resultado.correta || resultado.tarde) {
+        setTimeout(() => {
+          setStatus(null);
+          setEntrada("");
+        }, 700);
+      }
+    }
+  }
+
   async function digitar(valor: string) {
     if (travado || enviandoRef.current) return;
 
@@ -76,24 +95,18 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
     }
 
     if (valor === "✓") {
-      const valorAtual = entrada;
-      if (!valorAtual) return;
-      enviandoRef.current = true;
-      const resultado = await responderCaboGuerra(codigo, valorAtual);
-      enviandoRef.current = false;
-      if (resultado.ok) {
-        setStatus(resultado.correta && !resultado.tarde ? "correta" : "errada");
-        if (!resultado.correta || resultado.tarde) {
-          setTimeout(() => {
-            setStatus(null);
-            setEntrada("");
-          }, 700);
-        }
-      }
+      if (!entrada) return;
+      await enviarResposta(entrada);
       return;
     }
 
     setEntrada((atual) => (atual.length < 5 ? atual + valor : atual));
+  }
+
+  async function escolherAlternativa(indice: number) {
+    if (travado || enviandoRef.current) return;
+    setEntrada(String(indice));
+    await enviarResposta(String(indice));
   }
 
   if (dados.status === "em_andamento") {
@@ -116,7 +129,16 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
               </p>
             </div>
             <p className="text-xs text-neutral-400">
-              Rodada <b className="text-white">{dados.rodadaAtual}</b>/{TOTAL_RODADAS} · {NOMES_NIVEL[dados.nivel]}
+              {dados.modoPersonalizado ? (
+                <>
+                  Pergunta <b className="text-white">{dados.rodadaAtual}</b>/{dados.totalRodadas}
+                </>
+              ) : (
+                <>
+                  Rodada <b className="text-white">{dados.rodadaAtual}</b>/{dados.totalRodadas} ·{" "}
+                  {NOMES_NIVEL[dados.nivel]}
+                </>
+              )}
             </p>
           </div>
           <div className="rounded-xl border-2 border-white/15 bg-white/10 px-4 py-1.5 text-right">
@@ -129,7 +151,13 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
           <p className="text-[0.65rem] font-semibold tracking-widest text-black/45 uppercase">
             Você joga por: {cor === "azul" ? "🔵" : "🔴"} {nomeMinhaEquipe}
           </p>
-          <p className="text-4xl font-extrabold tracking-wide text-[#1a1a2e]">{dados.perguntaTexto ?? "..."}</p>
+          <p
+            className={`font-extrabold tracking-wide text-[#1a1a2e] ${
+              dados.modoPersonalizado ? "text-xl" : "text-4xl"
+            }`}
+          >
+            {dados.perguntaTexto ?? "..."}
+          </p>
         </div>
 
         {dados.rodadaGanhaPor !== null && (
@@ -143,41 +171,67 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
         )}
 
         <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4">
-          <div
-            className={`flex min-h-[52px] w-full max-w-[240px] items-center justify-end gap-2 rounded-lg border-2 bg-black/40 px-3 py-2 ${
-              status === "correta"
-                ? "border-[#69F0AE]"
-                : status === "errada"
-                  ? "animate-pulse border-[#EF5350]"
-                  : "border-white/20"
-            }`}
-          >
-            <span>{status === "correta" ? "✅" : status === "errada" ? "❌" : ""}</span>
-            <span className="text-2xl font-extrabold">{entrada || "_"}</span>
-          </div>
+          {dados.modoPersonalizado ? (
+            <div className="flex w-full max-w-[280px] flex-col gap-2">
+              {(dados.perguntaAlternativas ?? []).map((opcao, indice) => {
+                const selecionada = entrada === String(indice);
+                return (
+                  <button
+                    key={indice}
+                    onClick={() => escolherAlternativa(indice)}
+                    disabled={travado}
+                    className={`rounded-lg px-4 py-3 text-left text-sm font-bold text-white transition active:scale-95 disabled:opacity-60 ${
+                      selecionada && status === "correta"
+                        ? "bg-[#00c264]"
+                        : selecionada && status === "errada"
+                          ? "animate-pulse bg-red-500/70"
+                          : "bg-white/15 hover:bg-white/25"
+                    }`}
+                  >
+                    {opcao}
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <>
+              <div
+                className={`flex min-h-[52px] w-full max-w-[240px] items-center justify-end gap-2 rounded-lg border-2 bg-black/40 px-3 py-2 ${
+                  status === "correta"
+                    ? "border-[#69F0AE]"
+                    : status === "errada"
+                      ? "animate-pulse border-[#EF5350]"
+                      : "border-white/20"
+                }`}
+              >
+                <span>{status === "correta" ? "✅" : status === "errada" ? "❌" : ""}</span>
+                <span className="text-2xl font-extrabold">{entrada || "_"}</span>
+              </div>
 
-          <div className="grid w-full max-w-[240px] grid-cols-3 gap-2">
-            {TECLAS.map((tecla) => {
-              const isOk = tecla === "✓";
-              const isDel = tecla === "⌫";
-              return (
-                <button
-                  key={tecla}
-                  onClick={() => digitar(tecla)}
-                  disabled={travado}
-                  className={`rounded-lg py-4 text-lg font-extrabold text-white transition active:scale-90 disabled:opacity-40 ${
-                    isOk
-                      ? "col-span-3 bg-[#ffd600] text-[#1a1a2e]"
-                      : isDel
-                        ? "bg-red-500/40"
-                        : "bg-white/15 hover:bg-white/25"
-                  }`}
-                >
-                  {isOk ? "↵ ENTER" : tecla}
-                </button>
-              );
-            })}
-          </div>
+              <div className="grid w-full max-w-[240px] grid-cols-3 gap-2">
+                {TECLAS.map((tecla) => {
+                  const isOk = tecla === "✓";
+                  const isDel = tecla === "⌫";
+                  return (
+                    <button
+                      key={tecla}
+                      onClick={() => digitar(tecla)}
+                      disabled={travado}
+                      className={`rounded-lg py-4 text-lg font-extrabold text-white transition active:scale-90 disabled:opacity-40 ${
+                        isOk
+                          ? "col-span-3 bg-[#ffd600] text-[#1a1a2e]"
+                          : isDel
+                            ? "bg-red-500/40"
+                            : "bg-white/15 hover:bg-white/25"
+                      }`}
+                    >
+                      {isOk ? "↵ ENTER" : tecla}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </div>
       </main>
     );

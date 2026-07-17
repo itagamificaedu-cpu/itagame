@@ -33,6 +33,7 @@ enum TipoAtividade {
   caca_palavras
   associar_colunas
   apresentacao
+  cabo_de_guerra
 }
 
 enum StatusSala {
@@ -303,13 +304,16 @@ model SalaCaboGuerra {
   nomeEquipe1       String
   nomeEquipe2       String
   rodadaAtual       Int                  @default(1)
+  totalRodadas      Int                  @default(15)
   perguntaTexto     String?
   perguntaResposta  Int?
+  perguntaAlternativas Json?
   perguntaComecouEm DateTime?
   rodadaGanhaPor    Int?
   rodadaTerminouEm  DateTime?
   pontosEquipe1     Int                  @default(0)
   pontosEquipe2     Int                  @default(0)
+  perguntas         Json?
   criadaEm          DateTime             @default(now())
 
   professorId       String

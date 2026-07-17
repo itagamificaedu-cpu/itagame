@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { verificarSessao } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { iniciarSala } from "@/app/actions/salas";
+import { criarSalaCaboGuerraPersonalizada } from "@/app/actions/caboGuerraOnline";
 
 type Questao = { enunciado: string; alternativas: string[] };
 type ItemGabarito = { enunciado: string; respostaCorreta: string; explicacao: string | null };
@@ -16,6 +17,7 @@ const TIPOS_SEM_SALA_AO_VIVO = new Set([
   "caca_palavras",
   "associar_colunas",
   "apresentacao",
+  "cabo_de_guerra",
 ]);
 
 export default async function PaginaDetalheAtividade({
@@ -58,6 +60,24 @@ export default async function PaginaDetalheAtividade({
                 Iniciar sala ao vivo
               </button>
             </form>
+          )}
+          {atividade.tipo === "cabo_de_guerra" && (
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href={`/painel/cabo-de-guerra/personalizado/${atividade.id}`}
+                className="whitespace-nowrap rounded-lg bg-gradient-to-br from-[#FFD600] to-[#FF8F00] px-4 py-2 text-sm font-bold text-[#1a1a2e] hover:brightness-105"
+              >
+                🪢 Jogar (projetor)
+              </Link>
+              <form action={criarSalaCaboGuerraPersonalizada.bind(null, atividade.id)}>
+                <button
+                  type="submit"
+                  className="whitespace-nowrap rounded-lg border-2 border-[#1a3fd4] px-4 py-2 text-sm font-bold text-[#1a3fd4] hover:bg-[#1a3fd4]/5"
+                >
+                  📱 Jogar online
+                </button>
+              </form>
+            </div>
           )}
         </div>
 
@@ -107,7 +127,8 @@ export default async function PaginaDetalheAtividade({
           )}
           {(atividade.tipo === "quiz" ||
             atividade.tipo === "verdadeiro_falso" ||
-            atividade.tipo === "completar_frase") && (
+            atividade.tipo === "completar_frase" ||
+            atividade.tipo === "cabo_de_guerra") && (
             <BlocoQuestoes conteudo={conteudo} gabarito={gabarito} tipo={atividade.tipo} />
           )}
         </div>

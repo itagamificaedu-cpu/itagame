@@ -3,7 +3,7 @@ import { descriptografar } from "@/lib/sessao";
 import { obterSessaoParticipanteCaboGuerra } from "@/lib/caboGuerraSessao";
 import { prisma } from "@/lib/prisma";
 import { avancarSeNecessario } from "@/lib/caboGuerraTick";
-import { nivelDaRodada, TEMPO_RODADA } from "@/lib/caboGuerraPerguntas";
+import { nivelDaRodada, TEMPO_RODADA, TOTAL_RODADAS } from "@/lib/caboGuerraPerguntas";
 
 export const dynamic = "force-dynamic";
 
@@ -64,15 +64,20 @@ export async function GET(_req: Request, { params }: { params: Promise<{ codigo:
             else vencedorFinal = 0;
           }
 
+          const modoPersonalizado = sala.perguntas !== null;
+
           const payload = {
             status: sala.status,
             nomeEquipe1: sala.nomeEquipe1,
             nomeEquipe2: sala.nomeEquipe2,
             rodadaAtual: sala.rodadaAtual,
+            totalRodadas: modoPersonalizado ? sala.totalRodadas : TOTAL_RODADAS,
+            modoPersonalizado,
             nivel: nivelDaRodada(sala.rodadaAtual),
             pontosEquipe1: sala.pontosEquipe1,
             pontosEquipe2: sala.pontosEquipe2,
             perguntaTexto: sala.perguntaTexto,
+            perguntaAlternativas: sala.perguntaAlternativas as string[] | null,
             tempoRestante,
             rodadaGanhaPor: sala.rodadaGanhaPor,
             equipe1: sala.participantes
