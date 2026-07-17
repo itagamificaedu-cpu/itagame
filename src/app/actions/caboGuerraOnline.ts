@@ -235,5 +235,10 @@ export async function responderCaboGuerra(
     return { ok: true, correta: true, tarde: true };
   }
 
+  await prisma.participanteCaboGuerra.update({
+    where: { id: participante.id },
+    data: { pontuacao: { increment: 1 } },
+  });
+
   return { ok: true, correta: true };
 }

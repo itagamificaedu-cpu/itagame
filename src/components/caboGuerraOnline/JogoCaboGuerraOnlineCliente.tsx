@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { responderCaboGuerra } from "@/app/actions/caboGuerraOnline";
 import { NOMES_NIVEL, type Nivel } from "@/lib/caboGuerraPerguntas";
 
+type Participante = { id: string; apelido: string; pontuacao: number };
+
 type EstadoSala = {
   status: "aberta" | "em_andamento" | "encerrada";
   nomeEquipe1: string;
@@ -18,6 +20,9 @@ type EstadoSala = {
   perguntaAlternativas: string[] | null;
   tempoRestante: number;
   rodadaGanhaPor: number | null;
+  equipe1: Participante[];
+  equipe2: Participante[];
+  meuId: string | null;
   minhaEquipe: number | null;
   vencedorFinal: number | null;
 };
@@ -246,8 +251,17 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
 
   const minhaVitoria = dados.vencedorFinal === dados.minhaEquipe;
 
+  const ranking = [
+    ...dados.equipe1.map((p) => ({ ...p, emoji: "🔵" })),
+    ...dados.equipe2.map((p) => ({ ...p, emoji: "🔴" })),
+  ].sort((a, b) => b.pontuacao - a.pontuacao);
+  const minhaPosicao = ranking.findIndex((p) => p.id === dados.meuId) + 1;
+  const podio = ranking.slice(0, 3);
+  const resto = ranking.slice(3, 10);
+  const medalha = ["🥇", "🥈", "🥉"];
+
   return (
-    <main className={`flex min-h-screen flex-col items-center justify-center gap-3 px-6 text-center ${corFundo}`}>
+    <main className={`flex min-h-screen flex-col items-center justify-center gap-3 px-6 py-12 text-center ${corFundo}`}>
       <span className="text-7xl">{dados.vencedorFinal === 0 ? "🤝" : minhaVitoria ? "🏆" : "😢"}</span>
       <p className="text-3xl font-extrabold text-white">
         {dados.vencedorFinal === 0
@@ -259,6 +273,54 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
       <p className="text-lg text-white/85">
         Placar final: {dados.pontosEquipe1} × {dados.pontosEquipe2}
       </p>
+
+      {ranking.some((p) => p.pontuacao > 0) && (
+        <div className="mt-4 w-full max-w-sm">
+          <p className="text-xs font-bold tracking-wide text-white/70 uppercase">
+            {minhaPosicao > 0 ? `Você ficou em ${minhaPosicao}º lugar` : "Ranking final"}
+          </p>
+
+          {podio.length > 0 && (
+            <div className="mt-4 flex items-end justify-center gap-3">
+              {[podio[1], podio[0], podio[2]].map((p, ordem) =>
+                p ? (
+                  <div
+                    key={p.id}
+                    className={`flex flex-col items-center rounded-2xl px-3 pt-4 pb-3 ${
+                      ordem === 1 ? "order-2 bg-white/20 pb-5" : "order-none bg-white/10"
+                    } ${p.id === dados.meuId ? "ring-2 ring-[#00c264]" : ""}`}
+                    style={{ minWidth: "84px" }}
+                  >
+                    <span className="text-2xl">{medalha[ordem === 1 ? 0 : ordem === 0 ? 1 : 2]}</span>
+                    <span className="mt-1 max-w-[76px] truncate text-xs font-bold text-white">
+                      {p.emoji} {p.apelido}
+                    </span>
+                    <span className="text-xs text-white/70">{p.pontuacao} pts</span>
+                  </div>
+                ) : null
+              )}
+            </div>
+          )}
+
+          {resto.length > 0 && (
+            <ol className="mt-4 space-y-1.5 text-left">
+              {resto.map((p, indice) => (
+                <li
+                  key={p.id}
+                  className={`flex items-center justify-between rounded-xl px-4 py-2 text-sm text-white ${
+                    p.id === dados.meuId ? "bg-[#00c264]/20 font-bold" : "bg-white/10"
+                  }`}
+                >
+                  <span>
+                    {indice + 4}. {p.emoji} {p.apelido}
+                  </span>
+                  <span>{p.pontuacao} pts</span>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+      )}
     </main>
   );
 }

@@ -82,10 +82,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ codigo:
             rodadaGanhaPor: sala.rodadaGanhaPor,
             equipe1: sala.participantes
               .filter((p) => p.equipe === 1)
-              .map((p) => ({ id: p.id, apelido: p.apelido })),
+              .map((p) => ({ id: p.id, apelido: p.apelido, pontuacao: p.pontuacao })),
             equipe2: sala.participantes
               .filter((p) => p.equipe === 2)
-              .map((p) => ({ id: p.id, apelido: p.apelido })),
+              .map((p) => ({ id: p.id, apelido: p.apelido, pontuacao: p.pontuacao })),
             meuId: meuParticipante?.id ?? null,
             minhaEquipe: meuParticipante?.equipe ?? null,
             vencedorFinal,

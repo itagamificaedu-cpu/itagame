@@ -5,7 +5,7 @@ import Link from "next/link";
 import { iniciarPartidaCaboGuerra, encerrarSalaCaboGuerra } from "@/app/actions/caboGuerraOnline";
 import { NOMES_NIVEL, type Nivel } from "@/lib/caboGuerraPerguntas";
 
-type Participante = { id: string; apelido: string };
+type Participante = { id: string; apelido: string; pontuacao: number };
 
 type EstadoSala = {
   status: "aberta" | "em_andamento" | "encerrada";
@@ -161,8 +161,15 @@ export function ControleCaboGuerraOnlineCliente({ codigo }: { codigo: string }) 
         ? "bg-gradient-to-br from-[#B71C1C] to-[#EF5350]"
         : "bg-gradient-to-br from-[#1a1a2e] to-[#2d2d5e]";
 
+  const ranking = [
+    ...dados.equipe1.map((p) => ({ ...p, emoji: "🔵" })),
+    ...dados.equipe2.map((p) => ({ ...p, emoji: "🔴" })),
+  ]
+    .sort((a, b) => b.pontuacao - a.pontuacao)
+    .slice(0, 10);
+
   return (
-    <main className={`flex min-h-screen flex-col items-center justify-center gap-3 px-6 text-center ${corFundo}`}>
+    <main className={`flex min-h-screen flex-col items-center justify-center gap-3 px-6 py-12 text-center ${corFundo}`}>
       <span className="text-7xl">{dados.vencedorFinal === 0 ? "🤝" : "🏆"}</span>
       <p className="text-3xl font-extrabold text-white">
         {dados.vencedorFinal === 0
@@ -174,6 +181,26 @@ export function ControleCaboGuerraOnlineCliente({ codigo }: { codigo: string }) 
       <p className="text-lg text-white/85">
         Placar final: {dados.pontosEquipe1} × {dados.pontosEquipe2}
       </p>
+
+      {ranking.length > 0 && (
+        <div className="mt-4 w-full max-w-sm rounded-2xl bg-white/10 p-5 text-left">
+          <p className="text-center text-sm font-bold tracking-wide text-white/80 uppercase">Ranking final</p>
+          <ol className="mt-3 space-y-1.5">
+            {ranking.map((p, indice) => (
+              <li
+                key={p.id}
+                className="flex items-center justify-between rounded-xl bg-black/20 px-3 py-2 text-sm text-white"
+              >
+                <span>
+                  {indice + 1}. {p.emoji} {p.apelido}
+                </span>
+                <span className="font-bold">{p.pontuacao} pts</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
       <Link
         href="/painel/cabo-de-guerra-online/nova"
         className="mt-6 rounded-xl bg-[#FFD600] px-8 py-3 text-base font-extrabold text-[#1a1a2e]"

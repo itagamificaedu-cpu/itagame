@@ -328,6 +328,7 @@ model ParticipanteCaboGuerra {
   id        String   @id @default(cuid())
   apelido   String
   equipe    Int
+  pontuacao Int      @default(0)
   entrouEm  DateTime @default(now())
 
   salaId    String
