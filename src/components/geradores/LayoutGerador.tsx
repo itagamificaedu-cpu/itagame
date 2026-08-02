@@ -43,11 +43,33 @@ export function LayoutGerador({
         <aside className="w-full shrink-0 space-y-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm print:hidden lg:w-72">
           {config}
         </aside>
-        <div className="min-w-0 flex-1 overflow-x-auto rounded-2xl border-2 bg-white p-8 shadow-sm print:border-0 print:p-0 print:shadow-none" style={{ borderColor: `${cor}33` }}>
-          {children}
+        <div
+          className="min-w-0 flex-1 rounded-3xl p-3 print:bg-transparent print:p-0"
+          style={{ backgroundColor: `${cor}0d` }}
+        >
+          <div
+            className="overflow-x-auto rounded-2xl border-[3px] bg-white p-8 shadow-md print:border print:shadow-none"
+            style={{ borderColor: cor }}
+          >
+            {children}
+            <RodapeMotivacional cor={cor} />
+          </div>
         </div>
       </div>
     </main>
+  );
+}
+
+function RodapeMotivacional({ cor }: { cor: string }) {
+  return (
+    <div className="mt-10 flex justify-center">
+      <span
+        className="rounded-full border-2 px-5 py-1.5 text-sm font-extrabold"
+        style={{ borderColor: cor, color: cor }}
+      >
+        ★ Você consegue! ★
+      </span>
+    </div>
   );
 }
 

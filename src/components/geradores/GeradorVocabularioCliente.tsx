@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LayoutGerador, CampoConfig, CabecalhoFolha } from "./LayoutGerador";
+import { LayoutGerador, CampoConfig, CabecalhoFolha, NumeroColorido, PALETA_CORES } from "./LayoutGerador";
 import { CATEGORIAS_VOCABULARIO, ROTULO_CATEGORIA } from "@/lib/geradores/vocabulario";
 import { aleatorioInt, embaralhar } from "@/lib/geradores/aleatorio";
 
@@ -90,19 +90,33 @@ export function GeradorVocabularioCliente() {
       <CabecalhoFolha titulo={`Vocabulário — ${ROTULO_CATEGORIA[categoria]}`} cor={COR_TEMA} />
 
       {modo === "unir" && (
-        <div className="grid grid-cols-2 gap-8">
-          <div className="space-y-3">
-            {palavras.map((item, indice) => (
-              <p key={item.palavra} className="text-base font-semibold text-neutral-800">
-                {indice + 1}. {item.palavra} <span className="text-neutral-400">( ___ )</span>
-              </p>
-            ))}
+        <div
+          className="grid grid-cols-2 gap-x-10 gap-y-4 rounded-2xl border p-6"
+          style={{ borderColor: `${COR_TEMA}33` }}
+        >
+          <div className="space-y-4">
+            {palavras.map((item, indice) => {
+              const cor = PALETA_CORES[indice % PALETA_CORES.length];
+              return (
+                <div key={item.palavra} className="flex items-center gap-3">
+                  <NumeroColorido numero={indice + 1} cor={cor} />
+                  <span className="font-bold text-neutral-800">{item.palavra}</span>
+                  <span className="flex-1 border-b-2 border-dotted" style={{ borderColor: cor }} />
+                  <span className="w-8 rounded border-2 text-center text-sm font-bold" style={{ borderColor: cor, color: cor }}>
+                    &nbsp;
+                  </span>
+                </div>
+              );
+            })}
           </div>
-          <div className="space-y-3">
+          <div className="space-y-4 border-l pl-8" style={{ borderColor: `${COR_TEMA}33` }}>
             {emojisEmbaralhados.map((item, indice) => (
-              <p key={item.palavra} className="text-base text-neutral-800">
-                {LETRAS[indice]}) <span className="text-2xl">{item.emoji}</span>
-              </p>
+              <div key={item.palavra} className="flex items-center gap-3">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-neutral-300 text-xs font-extrabold text-neutral-500">
+                  {LETRAS[indice]}
+                </span>
+                <span className="text-2xl">{item.emoji}</span>
+              </div>
             ))}
           </div>
         </div>
