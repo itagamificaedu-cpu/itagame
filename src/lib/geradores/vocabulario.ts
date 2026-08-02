@@ -1,0 +1,67 @@
+export type PalavraVocabulario = { palavra: string; emoji: string };
+
+export const CATEGORIAS_VOCABULARIO: Record<string, PalavraVocabulario[]> = {
+  animais: [
+    { palavra: "CACHORRO", emoji: "🐶" },
+    { palavra: "GATO", emoji: "🐱" },
+    { palavra: "ELEFANTE", emoji: "🐘" },
+    { palavra: "LEAO", emoji: "🦁" },
+    { palavra: "COELHO", emoji: "🐰" },
+    { palavra: "PASSARO", emoji: "🐦" },
+    { palavra: "PEIXE", emoji: "🐟" },
+    { palavra: "TARTARUGA", emoji: "🐢" },
+    { palavra: "BORBOLETA", emoji: "🦋" },
+    { palavra: "ABELHA", emoji: "🐝" },
+  ],
+  frutas: [
+    { palavra: "MACA", emoji: "🍎" },
+    { palavra: "BANANA", emoji: "🍌" },
+    { palavra: "UVA", emoji: "🍇" },
+    { palavra: "MORANGO", emoji: "🍓" },
+    { palavra: "LARANJA", emoji: "🍊" },
+    { palavra: "ABACAXI", emoji: "🍍" },
+    { palavra: "MELANCIA", emoji: "🍉" },
+    { palavra: "PERA", emoji: "🍐" },
+    { palavra: "MANGA", emoji: "🥭" },
+    { palavra: "LIMAO", emoji: "🍋" },
+  ],
+  cores: [
+    { palavra: "VERMELHO", emoji: "🔴" },
+    { palavra: "AZUL", emoji: "🔵" },
+    { palavra: "VERDE", emoji: "🟢" },
+    { palavra: "AMARELO", emoji: "🟡" },
+    { palavra: "ROXO", emoji: "🟣" },
+    { palavra: "LARANJA", emoji: "🟠" },
+    { palavra: "PRETO", emoji: "⚫" },
+    { palavra: "BRANCO", emoji: "⚪" },
+    { palavra: "MARROM", emoji: "🟤" },
+  ],
+  objetosEscolares: [
+    { palavra: "LAPIS", emoji: "✏️" },
+    { palavra: "CADERNO", emoji: "📓" },
+    { palavra: "MOCHILA", emoji: "🎒" },
+    { palavra: "TESOURA", emoji: "✂️" },
+    { palavra: "RELOGIO", emoji: "🕒" },
+    { palavra: "LIVRO", emoji: "📖" },
+    { palavra: "REGUA", emoji: "📏" },
+    { palavra: "BORRACHA", emoji: "🧼" },
+  ],
+  natureza: [
+    { palavra: "SOL", emoji: "☀️" },
+    { palavra: "LUA", emoji: "🌙" },
+    { palavra: "ESTRELA", emoji: "⭐" },
+    { palavra: "NUVEM", emoji: "☁️" },
+    { palavra: "ARVORE", emoji: "🌳" },
+    { palavra: "FLOR", emoji: "🌸" },
+    { palavra: "CHUVA", emoji: "🌧️" },
+    { palavra: "MONTANHA", emoji: "⛰️" },
+  ],
+};
+
+export const ROTULO_CATEGORIA: Record<string, string> = {
+  animais: "Animais",
+  frutas: "Frutas",
+  cores: "Cores",
+  objetosEscolares: "Objetos escolares",
+  natureza: "Natureza",
+};

@@ -129,6 +129,12 @@ export default async function PaginaPainel() {
               🪢 Cabo de Guerra
             </Link>
             <Link
+              href="/painel/geradores"
+              className="rounded-lg border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
+            >
+              🧮 Geradores de atividades
+            </Link>
+            <Link
               href="/oferta/combo-pro"
               className="rounded-lg border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
             >
