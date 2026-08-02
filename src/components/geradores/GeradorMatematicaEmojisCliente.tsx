@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LayoutGerador, CampoConfig, CabecalhoFolha } from "./LayoutGerador";
+import { LayoutGerador, CampoConfig, CabecalhoFolha, EstrelaDivisoria, PALETA_CORES } from "./LayoutGerador";
 import { aleatorioInt } from "@/lib/geradores/aleatorio";
+
+const COR_TEMA = "#FF8F00";
 
 const TEMAS: Record<string, string> = {
   frutas: "🍎",
@@ -43,6 +45,7 @@ export function GeradorMatematicaEmojisCliente() {
   return (
     <LayoutGerador
       titulo="😄 Matemática com Emojis"
+      cor={COR_TEMA}
       config={
         <>
           <CampoConfig rotulo="Tema">
@@ -111,25 +114,33 @@ export function GeradorMatematicaEmojisCliente() {
         </>
       }
     >
-      <CabecalhoFolha titulo="Matemática com Emojis" />
+      <CabecalhoFolha titulo="Matemática com Emojis" subtitulo="Conte os grupos e resolva." cor={COR_TEMA} />
       <div className="grid gap-6 sm:grid-cols-2">
-        {questoes.map((questao, indice) => (
-          <div key={indice} className="rounded-xl border border-neutral-200 p-4">
-            <p className="text-xs font-bold text-neutral-400">Questão {indice + 1}</p>
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-2xl">
-              <span>{emoji.repeat(questao.a)}</span>
-              <span className="text-lg font-bold text-neutral-500">{operacao === "soma" ? "+" : "-"}</span>
-              <span>{emoji.repeat(questao.b)}</span>
-              <span className="text-lg font-bold text-neutral-500">=</span>
-              {mostrarRespostas ? (
-                <span className="text-lg font-bold text-[#00854a]">{questao.resposta}</span>
-              ) : (
-                <span className="inline-block h-8 w-14 rounded border-2 border-dashed border-neutral-400" />
-              )}
+        {questoes.map((questao, indice) => {
+          const cor = PALETA_CORES[indice % PALETA_CORES.length];
+          return (
+            <div key={indice} className="rounded-xl border-2 p-4" style={{ borderColor: `${cor}55` }}>
+              <p className="text-xs font-extrabold" style={{ color: cor }}>
+                Questão {indice + 1}
+              </p>
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-2xl">
+                <span>{emoji.repeat(questao.a)}</span>
+                <span className="text-lg font-bold text-neutral-500">{operacao === "soma" ? "+" : "-"}</span>
+                <span>{emoji.repeat(questao.b)}</span>
+                <span className="text-lg font-bold text-neutral-500">=</span>
+                {mostrarRespostas ? (
+                  <span className="text-lg font-bold" style={{ color: cor }}>
+                    {questao.resposta}
+                  </span>
+                ) : (
+                  <span className="inline-block h-8 w-14 rounded border-2 border-dashed" style={{ borderColor: cor }} />
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+      <EstrelaDivisoria cor={COR_TEMA} />
     </LayoutGerador>
   );
 }

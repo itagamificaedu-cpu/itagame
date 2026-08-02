@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import { LayoutGerador, CampoConfig, CabecalhoFolha } from "./LayoutGerador";
+
 import { ROTULO_FORMA, pontosForma, type TipoForma } from "@/lib/geradores/formas";
+const COR_TEMA = "#0ea5e9";
+
 
 const TAMANHO_SVG = 90;
 
@@ -38,6 +41,7 @@ export function GeradorTracadoFormasCliente() {
   return (
     <LayoutGerador
       titulo="✏️ Gerador de Traçado de Formas"
+      cor={COR_TEMA}
       config={
         <>
           <CampoConfig rotulo="Formas">
@@ -64,7 +68,7 @@ export function GeradorTracadoFormasCliente() {
         </>
       }
     >
-      <CabecalhoFolha titulo="Traçado de Formas" />
+      <CabecalhoFolha titulo="Traçado de Formas" cor={COR_TEMA} />
       <div className="space-y-8">
         {formas.map((tipo) => (
           <div key={tipo}>

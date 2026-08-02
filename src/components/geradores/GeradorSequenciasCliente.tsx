@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LayoutGerador, CampoConfig, CabecalhoFolha } from "./LayoutGerador";
+import { LayoutGerador, CampoConfig, CabecalhoFolha, EstrelaDivisoria, NumeroColorido, PALETA_CORES } from "./LayoutGerador";
 import { aleatorioInt } from "@/lib/geradores/aleatorio";
+
+const COR_TEMA = "#6366f1";
 
 type Tipo = "numerica" | "emoji";
 type Dificuldade = "facil" | "medio" | "dificil";
@@ -50,6 +52,7 @@ export function GeradorSequenciasCliente() {
   return (
     <LayoutGerador
       titulo="🔢 Gerador de Sequências"
+      cor={COR_TEMA}
       config={
         <>
           <CampoConfig rotulo="Tipo">
@@ -120,30 +123,39 @@ export function GeradorSequenciasCliente() {
         </>
       }
     >
-      <CabecalhoFolha titulo="Sequências" />
+      <CabecalhoFolha titulo="Sequências" subtitulo="Descubra o padrão e complete." cor={COR_TEMA} />
       <div className="space-y-4">
-        {sequencias.map((seq, indiceSeq) => (
-          <div key={indiceSeq} className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4">
-            <span className="text-sm font-bold text-neutral-400">{indiceSeq + 1}.</span>
-            <div className="flex flex-wrap items-center gap-2 text-lg font-bold text-neutral-800">
-              {seq.termos.map((termo, indice) =>
-                indice === seq.posicaoLacuna && !mostrarRespostas ? (
-                  <span key={indice} className="inline-block w-12 rounded border-2 border-dashed border-neutral-400 text-center">
-                    ?
-                  </span>
-                ) : (
-                  <span
-                    key={indice}
-                    className={indice === seq.posicaoLacuna ? "rounded bg-[#00c264]/10 px-1 text-[#00854a]" : ""}
-                  >
-                    {termo}
-                  </span>
-                )
-              )}
+        {sequencias.map((seq, indiceSeq) => {
+          const cor = PALETA_CORES[indiceSeq % PALETA_CORES.length];
+          return (
+            <div key={indiceSeq} className="flex items-center gap-3 rounded-xl border-2 p-4" style={{ borderColor: `${cor}33` }}>
+              <NumeroColorido numero={indiceSeq + 1} cor={cor} />
+              <div className="flex flex-wrap items-center gap-2 text-lg font-bold text-neutral-800">
+                {seq.termos.map((termo, indice) =>
+                  indice === seq.posicaoLacuna && !mostrarRespostas ? (
+                    <span
+                      key={indice}
+                      className="inline-block w-12 rounded border-2 border-dashed text-center"
+                      style={{ borderColor: cor }}
+                    >
+                      ?
+                    </span>
+                  ) : (
+                    <span
+                      key={indice}
+                      className={indice === seq.posicaoLacuna ? "rounded px-1" : ""}
+                      style={indice === seq.posicaoLacuna ? { backgroundColor: `${cor}22`, color: cor } : undefined}
+                    >
+                      {termo}
+                    </span>
+                  )
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+      <EstrelaDivisoria cor={COR_TEMA} />
     </LayoutGerador>
   );
 }

@@ -2,9 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { LayoutGerador, CampoConfig, CabecalhoFolha } from "./LayoutGerador";
+
 import { gerarGradeCacaPalavras } from "@/lib/geradores/cacaPalavras";
 import { CATEGORIAS_VOCABULARIO, ROTULO_CATEGORIA } from "@/lib/geradores/vocabulario";
 import { embaralhar } from "@/lib/geradores/aleatorio";
+const COR_TEMA = "#7c3aed";
+
 
 type Origem = "categoria" | "personalizada";
 
@@ -50,6 +53,7 @@ export function GeradorCacaPalavrasCliente() {
   return (
     <LayoutGerador
       titulo="🔎 Gerador de Caça-Palavras"
+      cor={COR_TEMA}
       config={
         <>
           <CampoConfig rotulo="Origem das palavras">
@@ -118,7 +122,7 @@ export function GeradorCacaPalavrasCliente() {
         </>
       }
     >
-      <CabecalhoFolha titulo="Caça-Palavras" />
+      <CabecalhoFolha titulo="Caça-Palavras" cor={COR_TEMA} />
 
       <div className="flex flex-col items-center gap-6">
         <div

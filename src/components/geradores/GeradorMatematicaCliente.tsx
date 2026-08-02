@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LayoutGerador, CampoConfig, CabecalhoFolha } from "./LayoutGerador";
+import { LayoutGerador, CampoConfig, CabecalhoFolha, EstrelaDivisoria, NumeroColorido, PALETA_CORES } from "./LayoutGerador";
 import { aleatorioInt } from "@/lib/geradores/aleatorio";
+
+const COR_TEMA = "#1a3fd4";
 
 type Operacao = "soma" | "subtracao" | "multiplicacao" | "divisao" | "mista";
 type Dificuldade = "facil" | "medio" | "dificil";
@@ -68,6 +70,7 @@ export function GeradorMatematicaCliente() {
   return (
     <LayoutGerador
       titulo="🧮 Gerador de Matemática"
+      cor={COR_TEMA}
       config={
         <>
           <CampoConfig rotulo="Operação">
@@ -126,23 +129,35 @@ export function GeradorMatematicaCliente() {
         </>
       }
     >
-      <CabecalhoFolha titulo="Prática de Matemática" />
+      <CabecalhoFolha
+        titulo={`${ROTULO_OPERACAO[operacao]}`}
+        subtitulo="Resolva as operações a seguir."
+        cor={COR_TEMA}
+      />
       <div
         className="grid gap-x-8 gap-y-4"
         style={{ gridTemplateColumns: `repeat(${colunas}, minmax(0, 1fr))` }}
       >
-        {questoes.map((questao, indice) => (
-          <div key={indice} className="flex items-center gap-2 text-sm text-neutral-800">
-            <span className="font-bold text-neutral-400">{indice + 1}.</span>
-            <span className="font-semibold">{questao.texto}</span>
-            {mostrarRespostas ? (
-              <span className="font-bold text-[#00854a]">{questao.resposta}</span>
-            ) : (
-              <span className="ml-1 inline-block w-14 border-b-2 border-neutral-400">&nbsp;</span>
-            )}
-          </div>
-        ))}
+        {questoes.map((questao, indice) => {
+          const cor = PALETA_CORES[indice % PALETA_CORES.length];
+          return (
+            <div key={indice} className="flex items-center gap-2 text-sm text-neutral-800">
+              <NumeroColorido numero={indice + 1} cor={cor} />
+              <span className="font-semibold">{questao.texto}</span>
+              {mostrarRespostas ? (
+                <span className="font-bold" style={{ color: cor }}>
+                  {questao.resposta}
+                </span>
+              ) : (
+                <span className="ml-1 inline-block w-14 border-b-2" style={{ borderColor: cor }}>
+                  &nbsp;
+                </span>
+              )}
+            </div>
+          );
+        })}
       </div>
+      <EstrelaDivisoria cor={COR_TEMA} />
     </LayoutGerador>
   );
 }

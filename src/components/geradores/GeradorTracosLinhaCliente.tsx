@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import { LayoutGerador, CampoConfig, CabecalhoFolha } from "./LayoutGerador";
+
 import { pathLinha, pathEspiral, ROTULO_TRACO, type TipoTraco } from "@/lib/geradores/tracos";
+const COR_TEMA = "#14b8a6";
+
 
 const LARGURA_LINHA = 600;
 const ALTURA_LINHA = 70;
@@ -14,6 +17,7 @@ export function GeradorTracosLinhaCliente() {
   return (
     <LayoutGerador
       titulo="〰️ Gerador de Traços de Linha"
+      cor={COR_TEMA}
       config={
         <>
           <CampoConfig rotulo="Tipo de traço">
@@ -43,7 +47,7 @@ export function GeradorTracosLinhaCliente() {
         </>
       }
     >
-      <CabecalhoFolha titulo="Traços de Linha — Coordenação Motora" />
+      <CabecalhoFolha titulo="Traços de Linha — Coordenação Motora" cor={COR_TEMA} />
 
       {tipo === "espiral" ? (
         <div className="flex flex-wrap gap-6">

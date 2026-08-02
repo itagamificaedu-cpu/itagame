@@ -2,9 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { LayoutGerador, CampoConfig, CabecalhoFolha } from "./LayoutGerador";
+
 import { gerarCruzadas } from "@/lib/geradores/cruzadas";
 import { CATEGORIAS_CRUZADAS, ROTULO_CATEGORIA_CRUZADAS } from "@/lib/geradores/bancoCruzadas";
 import { embaralhar } from "@/lib/geradores/aleatorio";
+const COR_TEMA = "#e11d48";
+
 
 type Origem = "categoria" | "personalizada";
 
@@ -43,6 +46,7 @@ export function GeradorCruzadasCliente() {
   return (
     <LayoutGerador
       titulo="🧩 Gerador de Palavras Cruzadas"
+      cor={COR_TEMA}
       config={
         <>
           <CampoConfig rotulo="Origem das palavras">
@@ -111,7 +115,7 @@ export function GeradorCruzadasCliente() {
         </>
       }
     >
-      <CabecalhoFolha titulo="Palavras Cruzadas" />
+      <CabecalhoFolha titulo="Palavras Cruzadas" cor={COR_TEMA} />
 
       <div className="flex flex-col items-center gap-6">
         <div

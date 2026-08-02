@@ -5,6 +5,8 @@ import { LayoutGerador, CampoConfig, CabecalhoFolha } from "./LayoutGerador";
 import { CATEGORIAS_VOCABULARIO, ROTULO_CATEGORIA } from "@/lib/geradores/vocabulario";
 import { aleatorioInt, embaralhar } from "@/lib/geradores/aleatorio";
 
+const COR_TEMA = "#00c264";
+
 type Modo = "unir" | "letras_faltando" | "tracado";
 
 const LETRAS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -36,6 +38,7 @@ export function GeradorVocabularioCliente() {
   return (
     <LayoutGerador
       titulo="📖 Gerador de Folhas de Vocabulário"
+      cor={COR_TEMA}
       config={
         <>
           <CampoConfig rotulo="Categoria">
@@ -84,7 +87,7 @@ export function GeradorVocabularioCliente() {
         </>
       }
     >
-      <CabecalhoFolha titulo={`Vocabulário — ${ROTULO_CATEGORIA[categoria]}`} />
+      <CabecalhoFolha titulo={`Vocabulário — ${ROTULO_CATEGORIA[categoria]}`} cor={COR_TEMA} />
 
       {modo === "unir" && (
         <div className="grid grid-cols-2 gap-8">

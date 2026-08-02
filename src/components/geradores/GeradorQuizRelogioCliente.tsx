@@ -2,7 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { LayoutGerador, CampoConfig, CabecalhoFolha } from "./LayoutGerador";
+
 import { aleatorioInt, escolher } from "@/lib/geradores/aleatorio";
+const COR_TEMA = "#ef4444";
+
 
 type Dificuldade = "facil" | "medio" | "dificil" | "qualquer";
 
@@ -63,6 +66,7 @@ export function GeradorQuizRelogioCliente() {
   return (
     <LayoutGerador
       titulo="🕒 Gerador de Quiz do Relógio"
+      cor={COR_TEMA}
       config={
         <>
           <CampoConfig rotulo="Dificuldade">
@@ -107,7 +111,7 @@ export function GeradorQuizRelogioCliente() {
         </>
       }
     >
-      <CabecalhoFolha titulo="Quiz do Relógio" />
+      <CabecalhoFolha titulo="Quiz do Relógio" cor={COR_TEMA} />
       <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
         {relogios.map((r, indice) => (
           <div key={indice} className="flex flex-col items-center gap-2">

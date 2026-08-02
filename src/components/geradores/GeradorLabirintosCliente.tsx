@@ -2,7 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { LayoutGerador, CampoConfig, CabecalhoFolha } from "./LayoutGerador";
+
 import { gerarLabirinto, resolverLabirinto } from "@/lib/geradores/labirinto";
+const COR_TEMA = "#f59e0b";
+
 
 type Dificuldade = "facil" | "medio" | "dificil";
 
@@ -25,6 +28,7 @@ export function GeradorLabirintosCliente() {
   return (
     <LayoutGerador
       titulo="🌀 Gerador de Labirintos"
+      cor={COR_TEMA}
       config={
         <>
           <CampoConfig rotulo="Dificuldade">
@@ -53,7 +57,7 @@ export function GeradorLabirintosCliente() {
         </>
       }
     >
-      <CabecalhoFolha titulo="Labirinto" />
+      <CabecalhoFolha titulo="Labirinto" cor={COR_TEMA} />
       <div className="flex justify-center">
         <svg width={largura} height={altura} viewBox={`0 0 ${largura} ${altura}`}>
           <rect x={0} y={0} width={largura} height={altura} fill="none" stroke="#1f2937" strokeWidth={3} />
