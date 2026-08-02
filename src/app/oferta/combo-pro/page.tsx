@@ -10,13 +10,48 @@ function reais(valor: number) {
   return `R$ ${valor.toFixed(2).replace(".", ",")}`;
 }
 
-const BENEFICIOS_PRO = [
-  "Atividades geradas por IA sem limite — quiz, verdadeiro/falso, completar frase, caça-palavras, associar colunas, apresentação e Cabo de Guerra",
-  "Salas ao vivo ilimitadas, estilo Kahoot, com ranking em tempo real",
-  "Cabo de Guerra local e online ilimitado — inclusive para qualquer disciplina, não só Matemática",
-  "Correção de redação com IA, com nota por critério (gramática, coerência, argumentação, repertório)",
-  "Exportação de atividades em Word, PDF e PowerPoint",
-  "Suporte prioritário direto com o criador da plataforma",
+const PROBLEMAS = [
+  {
+    titulo: "Criar tudo à mão",
+    texto: "Horas montando uma atividade que o aluno resolve em poucos minutos.",
+  },
+  {
+    titulo: "Material sempre igual",
+    texto: "As mesmas apostilas prontas da internet, sem relação com a turma nem com a BNCC.",
+  },
+  {
+    titulo: "Turma dispersa",
+    texto: "Atividade no papel não prende atenção como um jogo ao vivo prende.",
+  },
+];
+
+const MUDANCAS = [
+  {
+    titulo: "Atividade nova sempre que precisar",
+    texto: "Escolhe disciplina, série e tema — a IA gera na hora, alinhada à BNCC.",
+  },
+  {
+    titulo: "Você economiza horas por semana",
+    texto: "De montar do zero a gerar em segundos, prova, quiz, caça-palavras e mais.",
+  },
+  {
+    titulo: "Turma mais engajada",
+    texto: "Salas ao vivo e Cabo de Guerra colocam a turma competindo em tempo real, com placar e cronômetro de verdade.",
+  },
+  {
+    titulo: "Você com controle total",
+    texto: "Ajusta disciplina, série, tema e tipo de atividade sem mexer em nada técnico.",
+  },
+];
+
+const GERADORES = [
+  "Quiz de múltipla escolha",
+  "Verdadeiro ou falso",
+  "Completar frase",
+  "Caça-palavras",
+  "Associar colunas",
+  "Apresentação de slides",
+  "Cabo de Guerra (qualquer disciplina)",
 ];
 
 const PERGUNTAS = [
@@ -55,11 +90,12 @@ export default function OfertaComboPro() {
             ⏳ Oferta por tempo limitado
           </span>
           <h1 className="mt-5 text-3xl font-extrabold sm:text-4xl">
-            Sua sala de aula mais dinâmica em poucos minutos, com ItaGame Pro + bônus
+            Atividades novas para sua turma em segundos — sem criar nada do zero
           </h1>
           <p className="mt-4 text-base text-white/85">
-            Gere atividades com IA, crie salas ao vivo e jogos como o Cabo de Guerra para qualquer
-            disciplina — e leve de brinde um manual completo e um kit de atividades prontas.
+            Gere atividades com IA alinhadas à BNCC, crie salas ao vivo e jogos como o Cabo de
+            Guerra para qualquer disciplina — e leve de brinde um manual completo e um kit de
+            atividades prontas.
           </p>
           <a
             href="#oferta"
@@ -71,15 +107,90 @@ export default function OfertaComboPro() {
       </section>
 
       <section className="mx-auto max-w-2xl px-6 py-14">
-        <h2 className="text-center text-2xl font-extrabold text-neutral-900">O que você recebe no ItaGame Pro</h2>
-        <ul className="mt-6 space-y-3">
-          {BENEFICIOS_PRO.map((item) => (
-            <li key={item} className="flex gap-3 rounded-xl border border-neutral-200 bg-white p-4 text-sm text-neutral-700">
-              <span className="text-[#00c264]">✓</span>
-              <span>{item}</span>
-            </li>
+        <h2 className="text-center text-2xl font-extrabold text-neutral-900">
+          O problema não é falta de vontade de ensinar
+        </h2>
+        <p className="mt-3 text-center text-sm text-neutral-500">
+          Você quer dar atividades novas toda semana. Mas montar cada uma na mão leva tempo, e as
+          apostilas prontas da internet são sempre as mesmas.
+        </p>
+        <div className="mt-6 space-y-3">
+          {PROBLEMAS.map((item) => (
+            <div key={item.titulo} className="flex gap-3 rounded-xl border border-neutral-200 bg-white p-4">
+              <span className="text-lg text-red-500">❌</span>
+              <div>
+                <p className="text-sm font-bold text-neutral-900">{item.titulo}</p>
+                <p className="text-sm text-neutral-500">{item.texto}</p>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
+        <p className="mt-6 text-center text-sm font-semibold text-neutral-700">
+          A saída é simples: gerar a atividade na hora, do jeito que a turma precisa, sem repetir
+          sempre as mesmas folhas.
+        </p>
+      </section>
+
+      <section className="mx-auto max-w-2xl px-6 py-6">
+        <h2 className="text-center text-2xl font-extrabold text-neutral-900">
+          Conheça o ItaGame Pro
+        </h2>
+        <p className="mt-3 text-center text-sm text-neutral-500">
+          Um gerador de atividades com IA, alinhado à BNCC, direto no navegador — mais salas ao
+          vivo e jogos que colocam a turma inteira competindo em tempo real.
+        </p>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {MUDANCAS.map((item) => (
+            <div key={item.titulo} className="rounded-xl border border-neutral-200 bg-white p-4">
+              <p className="text-sm font-bold text-neutral-900">{item.titulo}</p>
+              <p className="mt-1 text-sm text-neutral-500">{item.texto}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-6">
+          <p className="text-center text-sm font-bold text-neutral-900">
+            7 tipos de atividade geráveis por IA
+          </p>
+          <div className="mt-3 flex flex-wrap justify-center gap-2">
+            {GERADORES.map((item) => (
+              <span
+                key={item}
+                className="rounded-full bg-[#1a3fd4]/10 px-3 py-1 text-xs font-semibold text-[#1a3fd4]"
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-2xl px-6 py-14">
+        <h2 className="text-center text-2xl font-extrabold text-neutral-900">
+          🧠 Mas já existem atividades prontas na internet...
+        </h2>
+        <p className="mt-3 text-center text-sm text-neutral-500">
+          Sim. Mas provavelmente são sempre as mesmas, sem relação com a sua turma e sem
+          alinhamento com a BNCC. Aqui é diferente:
+        </p>
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-xl border border-neutral-200 bg-white p-4 text-center">
+            <p className="text-lg">✅</p>
+            <p className="text-sm font-bold text-neutral-900">Sempre nova</p>
+            <p className="mt-1 text-xs text-neutral-500">Cada geração é diferente, no tema que você escolher.</p>
+          </div>
+          <div className="rounded-xl border border-neutral-200 bg-white p-4 text-center">
+            <p className="text-lg">✅</p>
+            <p className="text-sm font-bold text-neutral-900">Você ajusta</p>
+            <p className="mt-1 text-xs text-neutral-500">Disciplina, série, tema e tipo, do seu jeito.</p>
+          </div>
+          <div className="rounded-xl border border-neutral-200 bg-white p-4 text-center">
+            <p className="text-lg">✅</p>
+            <p className="text-sm font-bold text-neutral-900">Sem instalar nada</p>
+            <p className="mt-1 text-xs text-neutral-500">Funciona direto no navegador, no computador ou no celular.</p>
+          </div>
+        </div>
       </section>
 
       <section id="oferta" className="mx-auto max-w-2xl px-6 py-6">
@@ -89,7 +200,10 @@ export default function OfertaComboPro() {
           <div className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-5">
             <div>
               <p className="font-bold text-neutral-900">👑 ItaGame Pro — acesso por 1 ano</p>
-              <p className="text-sm text-neutral-500">Todas as funções liberadas, sem limite</p>
+              <p className="text-sm text-neutral-500">
+                Geração ilimitada de atividades, salas ao vivo e Cabo de Guerra com placar e
+                cronômetro em tempo real
+              </p>
             </div>
             <p className="font-bold text-neutral-400 line-through">{reais(VALOR_PRO)}</p>
           </div>
