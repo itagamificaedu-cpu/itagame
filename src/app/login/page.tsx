@@ -1,11 +1,22 @@
 "use client";
 
-import { useActionState } from "react";
+import { Suspense, useActionState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { entrar } from "@/app/actions/autenticacao";
 
 export default function PaginaLogin() {
+  return (
+    <Suspense>
+      <FormularioLogin />
+    </Suspense>
+  );
+}
+
+function FormularioLogin() {
   const [estado, action, pendente] = useActionState(entrar, undefined);
+  const parametros = useSearchParams();
+  const proximo = parametros.get("next") ?? "";
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-neutral-50 px-4">
@@ -19,6 +30,7 @@ export default function PaginaLogin() {
         </p>
 
         <form action={action} className="mt-6 space-y-4">
+          <input type="hidden" name="proximo" value={proximo} />
           <div>
             <label htmlFor="email" className="text-sm font-medium text-neutral-700">
               E-mail
@@ -61,7 +73,10 @@ export default function PaginaLogin() {
 
         <p className="mt-6 text-center text-sm text-neutral-500">
           Ainda não tem conta?{" "}
-          <Link href="/cadastro" className="font-semibold text-[#1a3fd4]">
+          <Link
+            href={proximo ? `/cadastro?next=${encodeURIComponent(proximo)}` : "/cadastro"}
+            className="font-semibold text-[#1a3fd4]"
+          >
             Criar conta
           </Link>
         </p>

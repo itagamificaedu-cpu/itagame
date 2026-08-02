@@ -1,11 +1,22 @@
 "use client";
 
-import { useActionState } from "react";
+import { Suspense, useActionState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { cadastrar } from "@/app/actions/autenticacao";
 
 export default function PaginaCadastro() {
+  return (
+    <Suspense>
+      <FormularioCadastro />
+    </Suspense>
+  );
+}
+
+function FormularioCadastro() {
   const [estado, action, pendente] = useActionState(cadastrar, undefined);
+  const parametros = useSearchParams();
+  const proximo = parametros.get("next") ?? "";
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-neutral-50 px-4">
@@ -19,6 +30,7 @@ export default function PaginaCadastro() {
         </p>
 
         <form action={action} className="mt-6 space-y-4">
+          <input type="hidden" name="proximo" value={proximo} />
           <div>
             <label htmlFor="nome" className="text-sm font-medium text-neutral-700">
               Nome completo
@@ -84,7 +96,10 @@ export default function PaginaCadastro() {
 
         <p className="mt-6 text-center text-sm text-neutral-500">
           Já tem conta?{" "}
-          <Link href="/login" className="font-semibold text-[#1a3fd4]">
+          <Link
+            href={proximo ? `/login?next=${encodeURIComponent(proximo)}` : "/login"}
+            className="font-semibold text-[#1a3fd4]"
+          >
             Entrar
           </Link>
         </p>

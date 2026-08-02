@@ -6,6 +6,13 @@ import { prisma } from "@/lib/prisma";
 import { criarSessao, excluirSessao } from "@/lib/sessao";
 import { EsquemaCadastro, EsquemaLogin, EstadoFormulario } from "@/lib/definicoes";
 
+function destinoSeguro(valor: FormDataEntryValue | null): string {
+  if (typeof valor === "string" && valor.startsWith("/") && !valor.startsWith("//")) {
+    return valor;
+  }
+  return "/painel";
+}
+
 export async function cadastrar(_estado: EstadoFormulario, formData: FormData): Promise<EstadoFormulario> {
   const camposValidados = EsquemaCadastro.safeParse({
     nome: formData.get("nome"),
@@ -18,6 +25,7 @@ export async function cadastrar(_estado: EstadoFormulario, formData: FormData): 
   }
 
   const { nome, email, senha } = camposValidados.data;
+  const proximo = destinoSeguro(formData.get("proximo"));
 
   const existente = await prisma.usuario.findUnique({ where: { email } });
   if (existente) {
@@ -31,7 +39,7 @@ export async function cadastrar(_estado: EstadoFormulario, formData: FormData): 
   });
 
   await criarSessao({ userId: usuario.id, papel: usuario.papel });
-  redirect("/painel");
+  redirect(proximo);
 }
 
 export async function entrar(_estado: EstadoFormulario, formData: FormData): Promise<EstadoFormulario> {
@@ -45,6 +53,7 @@ export async function entrar(_estado: EstadoFormulario, formData: FormData): Pro
   }
 
   const { email, senha } = camposValidados.data;
+  const proximo = destinoSeguro(formData.get("proximo"));
 
   const usuario = await prisma.usuario.findUnique({ where: { email } });
   if (!usuario) {
@@ -57,7 +66,7 @@ export async function entrar(_estado: EstadoFormulario, formData: FormData): Pro
   }
 
   await criarSessao({ userId: usuario.id, papel: usuario.papel });
-  redirect("/painel");
+  redirect(proximo);
 }
 
 export async function sair() {

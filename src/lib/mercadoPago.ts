@@ -6,6 +6,7 @@ const cliente = new MercadoPagoConfig({
 });
 
 export const PRECO_PRO_ANUAL = 24.99;
+export const PRECO_COMBO_PRO = 37.0;
 
 export const preferenciaMercadoPago = new Preference(cliente);
 export const pagamentoMercadoPago = new Payment(cliente);
