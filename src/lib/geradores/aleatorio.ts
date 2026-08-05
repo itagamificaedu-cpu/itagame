@@ -14,3 +14,10 @@ export function embaralhar<T>(itens: T[]): T[] {
 export function escolher<T>(itens: T[]): T {
   return itens[aleatorioInt(0, itens.length - 1)];
 }
+
+/** Sorteia um inteiro no intervalo [min, max], nunca zero (útil pra coeficiente de equação). */
+export function aleatorioNaoZero(min: number, max: number): number {
+  let n = 0;
+  while (n === 0) n = aleatorioInt(min, max);
+  return n;
+}
