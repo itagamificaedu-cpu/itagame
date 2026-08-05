@@ -58,6 +58,18 @@ export function GeradorVocabularioCliente() {
     (_, i) => (respostas[i] ?? "").trim().toUpperCase() === lacunas[i].letraCorreta
   ).length;
 
+  // No modo "unir", a resposta certa de cada palavra é a letra da coluna da direita
+  // (embaralhada) onde está o mesmo item.
+  const letraCertaUnir = (indice: number) => {
+    const posicao = emojisEmbaralhados.findIndex((item) => item.palavra === palavras[indice].palavra);
+    return LETRAS[posicao];
+  };
+  const acertosUnir = palavras.filter(
+    (_, i) => (respostas[i] ?? "").trim().toUpperCase() === letraCertaUnir(i)
+  ).length;
+
+  const modoOnlineSuportado = modo === "unir" || modo === "letras_faltando";
+
   return (
     <LayoutGerador
       titulo="📖 Gerador de Folhas de Vocabulário"
@@ -66,9 +78,9 @@ export function GeradorVocabularioCliente() {
         <>
           <CampoConfig rotulo="Modo">
             <SeletorModo modo={modoAtividade} aoAlterar={setModoAtividade} cor={COR_TEMA} />
-            {modoAtividade === "online" && modo !== "letras_faltando" && (
+            {modoAtividade === "online" && !modoOnlineSuportado && (
               <p className="mt-1.5 text-xs text-neutral-500">
-                📱 Responder na tela funciona só no modo &quot;Letras faltando&quot;.
+                📱 Responder na tela não funciona no modo &quot;Traçado pontilhado&quot; (é atividade de treinar a escrita no papel).
               </p>
             )}
           </CampoConfig>
@@ -117,7 +129,7 @@ export function GeradorVocabularioCliente() {
             🔄 Gerar nova folha
           </button>
 
-          {modoAtividade === "online" && modo === "letras_faltando" && (
+          {modoAtividade === "online" && modoOnlineSuportado && (
             <ControleConferencia
               conferido={conferido}
               aoConferir={() => setConferido(true)}
@@ -132,8 +144,12 @@ export function GeradorVocabularioCliente() {
       }
     >
       <CabecalhoFolha titulo={`Vocabulário — ${ROTULO_CATEGORIA[categoria]}`} cor={COR_TEMA} />
-      {modoAtividade === "online" && modo === "letras_faltando" && conferido && (
-        <ResumoPontuacao acertos={acertosLetras} total={palavras.length} cor={COR_TEMA} />
+      {modoAtividade === "online" && modoOnlineSuportado && conferido && (
+        <ResumoPontuacao
+          acertos={modo === "unir" ? acertosUnir : acertosLetras}
+          total={palavras.length}
+          cor={COR_TEMA}
+        />
       )}
 
       {modo === "unir" && (
@@ -144,14 +160,40 @@ export function GeradorVocabularioCliente() {
           <div className="space-y-4">
             {palavras.map((item, indice) => {
               const cor = PALETA_CORES[indice % PALETA_CORES.length];
+              const online = modoAtividade === "online";
+              const respostaEscolhida = respostas[indice] ?? "";
+              const correta = respostaEscolhida.trim().toUpperCase() === letraCertaUnir(indice);
               return (
                 <div key={item.palavra} className="flex items-center gap-3">
                   <NumeroColorido numero={indice + 1} cor={cor} />
                   <span className="font-bold text-neutral-800">{item.palavra}</span>
                   <span className="flex-1 border-b-2 border-dotted" style={{ borderColor: cor }} />
-                  <span className="w-8 rounded border-2 text-center text-sm font-bold" style={{ borderColor: cor, color: cor }}>
-                    &nbsp;
-                  </span>
+                  {online ? (
+                    <select
+                      value={respostaEscolhida}
+                      disabled={conferido}
+                      onChange={(e) => setRespostas((atual) => ({ ...atual, [indice]: e.target.value }))}
+                      className={`w-14 rounded border-2 px-1 py-1 text-center text-sm font-bold outline-none disabled:opacity-100 ${
+                        conferido
+                          ? correta
+                            ? "border-[#00c264] bg-[#00c264]/10 text-[#00854a]"
+                            : "border-[#e11d48] bg-[#e11d48]/10 text-[#e11d48]"
+                          : "bg-white"
+                      }`}
+                      style={!conferido ? { borderColor: cor, color: cor } : undefined}
+                    >
+                      <option value="">?</option>
+                      {emojisEmbaralhados.map((_, i) => (
+                        <option key={i} value={LETRAS[i]}>
+                          {LETRAS[i]}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <span className="w-8 rounded border-2 text-center text-sm font-bold" style={{ borderColor: cor, color: cor }}>
+                      &nbsp;
+                    </span>
+                  )}
                 </div>
               );
             })}
