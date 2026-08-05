@@ -63,7 +63,7 @@ export default async function PaginaAssinatura({
           <div className="mt-6 overflow-hidden rounded-2xl border border-neutral-200 bg-white">
             <div className="bg-gradient-to-br from-[#1a3fd4] to-[#0e2694] p-8 text-white">
               <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-xs font-bold">
-                👑 ItaGame Pro
+                👑 ItaGameficaEdu Pro
               </span>
               <p className="mt-4 text-3xl font-extrabold">
                 R$ {PRECO_PRO_ANUAL.toFixed(2).replace(".", ",")}

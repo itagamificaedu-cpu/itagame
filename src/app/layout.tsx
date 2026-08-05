@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ItaGame — IA e gamificação para a sua sala de aula",
+  title: "ItaGameficaEdu — IA e gamificação para a sua sala de aula",
   description:
     "Gere atividades com IA em segundos, corrija provas e redações automaticamente e transforme a turma em um jogo com ranking ao vivo.",
 };

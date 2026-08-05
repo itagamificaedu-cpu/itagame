@@ -44,17 +44,17 @@ export default async function ObrigadoComboPro({
         <div className="rounded-2xl border border-[#00c264]/30 bg-[#00c264]/10 p-6 text-center">
           <span className="text-4xl">🎉</span>
           <h1 className="mt-2 text-2xl font-extrabold text-neutral-900">
-            Pagamento aprovado! Seu ItaGame Pro está ativo.
+            Pagamento aprovado! Seu ItaGameficaEdu Pro está ativo.
           </h1>
           <p className="mt-1 text-sm text-neutral-600">
-            Obrigado por confiar no ItaGame. Seus bônus estão liberados abaixo.
+            Obrigado por confiar no ItaGameficaEdu. Seus bônus estão liberados abaixo.
           </p>
         </div>
 
         <div className="mt-8 space-y-4">
           <div className="rounded-2xl border border-neutral-200 bg-white p-6">
             <p className="text-xs font-bold tracking-wide text-[#1a3fd4] uppercase">Bônus 1</p>
-            <h2 className="mt-1 text-lg font-bold text-neutral-900">📘 Manual do ItaGame — Guia do Professor</h2>
+            <h2 className="mt-1 text-lg font-bold text-neutral-900">📘 Manual do ItaGameficaEdu — Guia do Professor</h2>
             <p className="mt-1 text-sm text-neutral-500">
               Passo a passo completo de todas as funções da plataforma, em PDF.
             </p>

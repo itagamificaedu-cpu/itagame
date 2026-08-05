@@ -47,7 +47,7 @@ export default async function PaginaPainel() {
       <header className="border-b border-neutral-200 bg-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <Link href="/" className="text-xl font-extrabold tracking-tight text-[#1a3fd4]">
-            ItaGame
+            ItaGameficaEdu
           </Link>
 
           <div className="flex items-center gap-3">

@@ -58,12 +58,12 @@ const PERGUNTAS = [
   {
     pergunta: "Como recebo o acesso depois de comprar?",
     resposta:
-      "Na hora. Assim que o pagamento é aprovado pelo Mercado Pago, seu ItaGame Pro é ativado automaticamente e você já cai na página com os links dos bônus para baixar.",
+      "Na hora. Assim que o pagamento é aprovado pelo Mercado Pago, seu ItaGameficaEdu Pro é ativado automaticamente e você já cai na página com os links dos bônus para baixar.",
   },
   {
     pergunta: "Funciona no celular?",
     resposta:
-      "Sim. O ItaGame funciona direto no navegador, tanto no computador quanto no celular — não precisa instalar nada.",
+      "Sim. O ItaGameficaEdu funciona direto no navegador, tanto no computador quanto no celular — não precisa instalar nada.",
   },
   {
     pergunta: "Por quanto tempo tenho acesso ao Pro?",
@@ -133,7 +133,7 @@ export default function OfertaComboPro() {
 
       <section className="mx-auto max-w-2xl px-6 py-6">
         <h2 className="text-center text-2xl font-extrabold text-neutral-900">
-          Conheça o ItaGame Pro
+          Conheça o ItaGameficaEdu Pro
         </h2>
         <p className="mt-3 text-center text-sm text-neutral-500">
           Um gerador de atividades com IA, alinhado à BNCC, direto no navegador — mais salas ao
@@ -199,7 +199,7 @@ export default function OfertaComboPro() {
         <div className="mt-6 space-y-4">
           <div className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-5">
             <div>
-              <p className="font-bold text-neutral-900">👑 ItaGame Pro — acesso por 1 ano</p>
+              <p className="font-bold text-neutral-900">👑 ItaGameficaEdu Pro — acesso por 1 ano</p>
               <p className="text-sm text-neutral-500">
                 Geração ilimitada de atividades, salas ao vivo e Cabo de Guerra com placar e
                 cronômetro em tempo real
@@ -239,7 +239,7 @@ export default function OfertaComboPro() {
             href="/oferta/combo-pro/finalizar"
             className="mt-6 block w-full rounded-xl bg-gradient-to-br from-[#FFD600] to-[#FF8F00] py-4 text-base font-extrabold text-[#1a1a2e] transition hover:brightness-105"
           >
-            ⚔️ Quero o ItaGame Pro + bônus
+            ⚔️ Quero o ItaGameficaEdu Pro + bônus
           </Link>
           <p className="mt-3 text-xs text-neutral-400">Pagamento seguro via Mercado Pago</p>
         </div>
@@ -263,7 +263,7 @@ export default function OfertaComboPro() {
       </section>
 
       <footer className="border-t border-neutral-200 px-6 py-8 text-center text-xs text-neutral-400">
-        ItaGame — uma plataforma ITA Tecnologia Educacional
+        ItaGameficaEdu — uma plataforma ITA Tecnologia Educacional
       </footer>
     </main>
   );

@@ -28,7 +28,7 @@ export function Depoimentos() {
     <section id="depoimentos" className="px-6 py-20">
       <div className="mx-auto max-w-6xl">
         <h2 className="text-center text-3xl font-extrabold text-neutral-900">
-          O que professores dizem ao testar o ItaGame
+          O que professores dizem ao testar o ItaGameficaEdu
         </h2>
         <p className="mt-2 text-center text-sm text-neutral-500">
           Depoimentos de exemplo — serão substituídos por relatos reais após o lançamento.

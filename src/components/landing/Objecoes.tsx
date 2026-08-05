@@ -2,7 +2,7 @@ const objecoes = [
   {
     duvida: "Tenho dificuldade com tecnologia.",
     resposta:
-      "Você escolhe o tipo de atividade, informa o tema e conduz tudo pelo painel. Se você consegue usar um grupo de WhatsApp, consegue usar o ItaGame.",
+      "Você escolhe o tipo de atividade, informa o tema e conduz tudo pelo painel. Se você consegue usar um grupo de WhatsApp, consegue usar o ItaGameficaEdu.",
   },
   {
     duvida: "Minha turma não tem celular pra todo mundo.",
@@ -12,7 +12,7 @@ const objecoes = [
   {
     duvida: "Não tenho tempo de preparar nada para hoje.",
     resposta:
-      "É pra isso que o ItaGame existe. Você escolhe o tipo, a IA monta o conteúdo com gabarito em segundos e você já aplica — sem gastar a madrugada preparando material.",
+      "É pra isso que o ItaGameficaEdu existe. Você escolhe o tipo, a IA monta o conteúdo com gabarito em segundos e você já aplica — sem gastar a madrugada preparando material.",
   },
 ];
 

@@ -14,7 +14,7 @@ export async function iniciarCheckoutAssinaturaPro() {
       items: [
         {
           id: "itagame-pro-anual",
-          title: "ItaGame Pro — acesso por 1 ano",
+          title: "ItaGameficaEdu Pro — acesso por 1 ano",
           quantity: 1,
           unit_price: PRECO_PRO_ANUAL,
           currency_id: "BRL",
@@ -49,7 +49,7 @@ export async function iniciarCheckoutComboPro() {
       items: [
         {
           id: "itagame-combo-pro-bonus",
-          title: "ItaGame Pro + Bônus — oferta especial",
+          title: "ItaGameficaEdu Pro + Bônus — oferta especial",
           quantity: 1,
           unit_price: PRECO_COMBO_PRO,
           currency_id: "BRL",

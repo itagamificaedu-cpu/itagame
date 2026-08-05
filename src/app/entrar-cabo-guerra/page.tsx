@@ -15,7 +15,7 @@ export default function PaginaEntrarCaboGuerra() {
 
       <div className="relative w-full max-w-sm rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm">
         <Link href="/" className="text-xl font-extrabold text-[#1a3fd4]">
-          ItaGame
+          ItaGameficaEdu
         </Link>
         <h1 className="mt-4 text-2xl font-extrabold text-neutral-900">🪢 Cabo de Guerra</h1>
         <p className="mt-1 text-sm text-neutral-500">

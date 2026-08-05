@@ -95,7 +95,7 @@ export function CatalogoAtividades() {
                 </span>
 
                 <span className="absolute right-2.5 bottom-2.5 flex items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[10px] font-bold text-neutral-700 shadow-sm">
-                  🤖 ItaGame
+                  🤖 ItaGameficaEdu
                 </span>
               </div>
               <div className="p-5">

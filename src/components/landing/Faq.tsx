@@ -21,7 +21,7 @@ const perguntas = [
   {
     pergunta: "Preciso saber mexer com tecnologia?",
     resposta:
-      "Não. Se você consegue usar um grupo de WhatsApp, consegue usar o ItaGame — o aluno só precisa de um código para entrar.",
+      "Não. Se você consegue usar um grupo de WhatsApp, consegue usar o ItaGameficaEdu — o aluno só precisa de um código para entrar.",
   },
   {
     pergunta: "Meus alunos precisam criar conta?",

@@ -15,7 +15,7 @@ export function Cabecalho() {
     <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link href="/" className="text-xl font-extrabold tracking-tight text-[#1a3fd4]">
-          ItaGame
+          ItaGameficaEdu
         </Link>
 
         <nav className="hidden items-center gap-6 lg:flex">

@@ -3,7 +3,7 @@ export function Rodape() {
     <footer className="bg-neutral-900 px-6 py-10 pb-24 text-sm text-neutral-400">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-lg font-extrabold text-white">ItaGame</p>
+          <p className="text-lg font-extrabold text-white">ItaGameficaEdu</p>
           <p className="mt-1">Um produto ITA Tecnologia Educacional.</p>
         </div>
 
@@ -30,7 +30,7 @@ export function Rodape() {
 
       <div className="mx-auto mt-8 max-w-6xl border-t border-neutral-800 pt-6 text-xs text-neutral-500">
         <p>
-          Termos de uso · Política de privacidade · © {new Date().getFullYear()} ItaGame — ITA
+          Termos de uso · Política de privacidade · © {new Date().getFullYear()} ItaGameficaEdu — ITA
           Tecnologia Educacional.
         </p>
       </div>
