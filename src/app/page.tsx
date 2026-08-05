@@ -4,6 +4,7 @@ import { BarraDestaques } from "@/components/landing/BarraDestaques";
 import { SecaoDor } from "@/components/landing/SecaoDor";
 import { ComoFunciona } from "@/components/landing/ComoFunciona";
 import { CatalogoAtividades } from "@/components/landing/CatalogoAtividades";
+import { GeradoresAtividades } from "@/components/landing/GeradoresAtividades";
 import { GradeFuncionalidades } from "@/components/landing/GradeFuncionalidades";
 import { Publico } from "@/components/landing/Publico";
 import { Objecoes } from "@/components/landing/Objecoes";
@@ -24,6 +25,7 @@ export default function Home() {
         <SecaoDor />
         <ComoFunciona />
         <CatalogoAtividades />
+        <GeradoresAtividades />
         <GradeFuncionalidades />
         <Publico />
         <Objecoes />

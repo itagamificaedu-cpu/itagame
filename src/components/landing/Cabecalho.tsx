@@ -4,6 +4,7 @@ const links = [
   { href: "#funcionalidades", label: "Funcionalidades" },
   { href: "#como-funciona", label: "Como funciona" },
   { href: "#jogos", label: "Tipos de atividade" },
+  { href: "#geradores", label: "Geradores" },
   { href: "#depoimentos", label: "Depoimentos" },
   { href: "#planos", label: "Planos" },
   { href: "#faq", label: "Dúvidas" },
