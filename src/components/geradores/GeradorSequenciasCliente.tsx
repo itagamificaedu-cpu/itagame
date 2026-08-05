@@ -1,7 +1,19 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LayoutGerador, CampoConfig, CabecalhoFolha, EstrelaDivisoria, NumeroColorido, PALETA_CORES } from "./LayoutGerador";
+import {
+  LayoutGerador,
+  CampoConfig,
+  CabecalhoFolha,
+  EstrelaDivisoria,
+  NumeroColorido,
+  PALETA_CORES,
+  SeletorModo,
+  ControleConferencia,
+  ResumoPontuacao,
+  CampoRespostaCurta,
+  type ModoAtividade,
+} from "./LayoutGerador";
 import { aleatorioInt } from "@/lib/geradores/aleatorio";
 
 const COR_TEMA = "#6366f1";
@@ -37,6 +49,9 @@ export function GeradorSequenciasCliente() {
   const [quantidadeSequencias, setQuantidadeSequencias] = useState(6);
   const [mostrarRespostas, setMostrarRespostas] = useState(false);
   const [semente, setSemente] = useState(0);
+  const [modo, setModo] = useState<ModoAtividade>("imprimir");
+  const [respostas, setRespostas] = useState<Record<number, string>>({});
+  const [conferido, setConferido] = useState(false);
 
   const tamanhoSequencia = 6;
 
@@ -49,12 +64,27 @@ export function GeradorSequenciasCliente() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tipo, dificuldade, tema, quantidadeSequencias, semente]);
 
+  const [sequenciasConferidas, setSequenciasConferidas] = useState(sequencias);
+  if (sequenciasConferidas !== sequencias) {
+    setSequenciasConferidas(sequencias);
+    setRespostas({});
+    setConferido(false);
+  }
+
+  const acertos = sequencias.filter(
+    (seq, i) => String(respostas[i] ?? "").trim() === String(seq.termos[seq.posicaoLacuna])
+  ).length;
+
   return (
     <LayoutGerador
       titulo="🔢 Gerador de Sequências"
       cor={COR_TEMA}
       config={
         <>
+          <CampoConfig rotulo="Modo">
+            <SeletorModo modo={modo} aoAlterar={setModo} cor={COR_TEMA} />
+          </CampoConfig>
+
           <CampoConfig rotulo="Tipo">
             <select
               value={tipo}
@@ -105,14 +135,16 @@ export function GeradorSequenciasCliente() {
             />
           </CampoConfig>
 
-          <label className="flex items-center gap-2 text-sm text-neutral-700">
-            <input
-              type="checkbox"
-              checked={mostrarRespostas}
-              onChange={(e) => setMostrarRespostas(e.target.checked)}
-            />
-            Mostrar respostas
-          </label>
+          {modo === "imprimir" && (
+            <label className="flex items-center gap-2 text-sm text-neutral-700">
+              <input
+                type="checkbox"
+                checked={mostrarRespostas}
+                onChange={(e) => setMostrarRespostas(e.target.checked)}
+              />
+              Mostrar respostas
+            </label>
+          )}
 
           <button
             onClick={() => setSemente((s) => s + 1)}
@@ -120,19 +152,75 @@ export function GeradorSequenciasCliente() {
           >
             🔄 Gerar nova folha
           </button>
+
+          {modo === "online" && (
+            <ControleConferencia
+              conferido={conferido}
+              aoConferir={() => setConferido(true)}
+              aoTentarNovamente={() => {
+                setRespostas({});
+                setConferido(false);
+              }}
+              cor={COR_TEMA}
+            />
+          )}
         </>
       }
     >
       <CabecalhoFolha titulo="Sequências" subtitulo="Descubra o padrão e complete." cor={COR_TEMA} />
+      {modo === "online" && conferido && (
+        <ResumoPontuacao acertos={acertos} total={sequencias.length} cor={COR_TEMA} />
+      )}
       <div className="space-y-4">
         {sequencias.map((seq, indiceSeq) => {
           const cor = PALETA_CORES[indiceSeq % PALETA_CORES.length];
+          const respostaCerta = String(seq.termos[seq.posicaoLacuna]);
           return (
             <div key={indiceSeq} className="flex items-center gap-3 rounded-xl border-2 p-4" style={{ borderColor: `${cor}33` }}>
               <NumeroColorido numero={indiceSeq + 1} cor={cor} />
               <div className="flex flex-wrap items-center gap-2 text-lg font-bold text-neutral-800">
-                {seq.termos.map((termo, indice) =>
-                  indice === seq.posicaoLacuna && !mostrarRespostas ? (
+                {seq.termos.map((termo, indice) => {
+                  if (indice !== seq.posicaoLacuna) {
+                    return <span key={indice}>{termo}</span>;
+                  }
+                  if (modo === "online") {
+                    const respostaDigitada = respostas[indiceSeq] ?? "";
+                    const correta = respostaDigitada.trim() === respostaCerta;
+                    return tipo === "numerica" ? (
+                      <CampoRespostaCurta
+                        key={indice}
+                        valor={respostaDigitada}
+                        aoAlterar={(valor) => setRespostas((atual) => ({ ...atual, [indiceSeq]: valor }))}
+                        cor={cor}
+                        conferido={conferido}
+                        correta={correta}
+                        largura="w-14"
+                      />
+                    ) : (
+                      <select
+                        key={indice}
+                        value={respostaDigitada}
+                        disabled={conferido}
+                        onChange={(e) => setRespostas((atual) => ({ ...atual, [indiceSeq]: e.target.value }))}
+                        className={`rounded-lg border-2 px-2 py-1 text-center text-xl outline-none disabled:opacity-100 ${
+                          conferido
+                            ? correta
+                              ? "border-[#00c264] bg-[#00c264]/10"
+                              : "border-[#e11d48] bg-[#e11d48]/10"
+                            : "bg-white"
+                        }`}
+                        style={!conferido ? { borderColor: cor } : undefined}
+                      >
+                        <option value="">?</option>
+                        {TEMAS_EMOJI[tema].map((op) => (
+                          <option key={op} value={op}>
+                            {op}
+                          </option>
+                        ))}
+                      </select>
+                    );
+                  }
+                  return !mostrarRespostas ? (
                     <span
                       key={indice}
                       className="inline-block w-12 rounded border-2 border-dashed text-center"
@@ -141,15 +229,11 @@ export function GeradorSequenciasCliente() {
                       ?
                     </span>
                   ) : (
-                    <span
-                      key={indice}
-                      className={indice === seq.posicaoLacuna ? "rounded px-1" : ""}
-                      style={indice === seq.posicaoLacuna ? { backgroundColor: `${cor}22`, color: cor } : undefined}
-                    >
+                    <span key={indice} className="rounded px-1" style={{ backgroundColor: `${cor}22`, color: cor }}>
                       {termo}
                     </span>
-                  )
-                )}
+                  );
+                })}
               </div>
             </div>
           );

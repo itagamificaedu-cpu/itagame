@@ -1,7 +1,18 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LayoutGerador, CampoConfig, CabecalhoFolha, EstrelaDivisoria, PALETA_CORES } from "./LayoutGerador";
+import {
+  LayoutGerador,
+  CampoConfig,
+  CabecalhoFolha,
+  EstrelaDivisoria,
+  PALETA_CORES,
+  SeletorModo,
+  ControleConferencia,
+  ResumoPontuacao,
+  CampoRespostaCurta,
+  type ModoAtividade,
+} from "./LayoutGerador";
 import { aleatorioInt } from "@/lib/geradores/aleatorio";
 
 const COR_TEMA = "#FF8F00";
@@ -24,6 +35,9 @@ export function GeradorMatematicaEmojisCliente() {
   const [quantidade, setQuantidade] = useState(10);
   const [mostrarRespostas, setMostrarRespostas] = useState(false);
   const [semente, setSemente] = useState(0);
+  const [modo, setModo] = useState<ModoAtividade>("imprimir");
+  const [respostas, setRespostas] = useState<Record<number, string>>({});
+  const [conferido, setConferido] = useState(false);
 
   const emoji = TEMAS[tema];
   const maximo = dificuldade === "facil" ? 6 : 12;
@@ -42,12 +56,25 @@ export function GeradorMatematicaEmojisCliente() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tema, operacao, dificuldade, quantidade, semente]);
 
+  const [questoesConferidas, setQuestoesConferidas] = useState(questoes);
+  if (questoesConferidas !== questoes) {
+    setQuestoesConferidas(questoes);
+    setRespostas({});
+    setConferido(false);
+  }
+
+  const acertos = questoes.filter((q, i) => Number(respostas[i]) === q.resposta).length;
+
   return (
     <LayoutGerador
       titulo="😄 Matemática com Emojis"
       cor={COR_TEMA}
       config={
         <>
+          <CampoConfig rotulo="Modo">
+            <SeletorModo modo={modo} aoAlterar={setModo} cor={COR_TEMA} />
+          </CampoConfig>
+
           <CampoConfig rotulo="Tema">
             <select
               value={tema}
@@ -96,14 +123,16 @@ export function GeradorMatematicaEmojisCliente() {
             />
           </CampoConfig>
 
-          <label className="flex items-center gap-2 text-sm text-neutral-700">
-            <input
-              type="checkbox"
-              checked={mostrarRespostas}
-              onChange={(e) => setMostrarRespostas(e.target.checked)}
-            />
-            Mostrar respostas
-          </label>
+          {modo === "imprimir" && (
+            <label className="flex items-center gap-2 text-sm text-neutral-700">
+              <input
+                type="checkbox"
+                checked={mostrarRespostas}
+                onChange={(e) => setMostrarRespostas(e.target.checked)}
+              />
+              Mostrar respostas
+            </label>
+          )}
 
           <button
             onClick={() => setSemente((s) => s + 1)}
@@ -111,10 +140,23 @@ export function GeradorMatematicaEmojisCliente() {
           >
             🔄 Gerar nova folha
           </button>
+
+          {modo === "online" && (
+            <ControleConferencia
+              conferido={conferido}
+              aoConferir={() => setConferido(true)}
+              aoTentarNovamente={() => {
+                setRespostas({});
+                setConferido(false);
+              }}
+              cor={COR_TEMA}
+            />
+          )}
         </>
       }
     >
       <CabecalhoFolha titulo="Matemática com Emojis" subtitulo="Conte os grupos e resolva." cor={COR_TEMA} />
+      {modo === "online" && conferido && <ResumoPontuacao acertos={acertos} total={questoes.length} cor={COR_TEMA} />}
       <div className="grid gap-6 sm:grid-cols-2">
         {questoes.map((questao, indice) => {
           const cor = PALETA_CORES[indice % PALETA_CORES.length];
@@ -128,7 +170,15 @@ export function GeradorMatematicaEmojisCliente() {
                 <span className="text-lg font-bold text-neutral-500">{operacao === "soma" ? "+" : "-"}</span>
                 <span>{emoji.repeat(questao.b)}</span>
                 <span className="text-lg font-bold text-neutral-500">=</span>
-                {mostrarRespostas ? (
+                {modo === "online" ? (
+                  <CampoRespostaCurta
+                    valor={respostas[indice] ?? ""}
+                    aoAlterar={(valor) => setRespostas((atual) => ({ ...atual, [indice]: valor }))}
+                    cor={cor}
+                    conferido={conferido}
+                    correta={Number(respostas[indice]) === questao.resposta}
+                  />
+                ) : mostrarRespostas ? (
                   <span className="text-lg font-bold" style={{ color: cor }}>
                     {questao.resposta}
                   </span>

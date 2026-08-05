@@ -1,7 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LayoutGerador, CampoConfig, CabecalhoFolha, NumeroColorido, PALETA_CORES } from "./LayoutGerador";
+import {
+  LayoutGerador,
+  CampoConfig,
+  CabecalhoFolha,
+  NumeroColorido,
+  PALETA_CORES,
+  SeletorModo,
+  ControleConferencia,
+  ResumoPontuacao,
+  type ModoAtividade,
+} from "./LayoutGerador";
 import { CATEGORIAS_VOCABULARIO, ROTULO_CATEGORIA } from "@/lib/geradores/vocabulario";
 import { aleatorioInt, embaralhar } from "@/lib/geradores/aleatorio";
 
@@ -11,12 +21,9 @@ type Modo = "unir" | "letras_faltando" | "tracado";
 
 const LETRAS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-function comLetraFaltando(palavra: string) {
+function criarLacuna(palavra: string) {
   const posicao = aleatorioInt(1, palavra.length - 2);
-  return palavra
-    .split("")
-    .map((letra, indice) => (indice === posicao ? "_" : letra))
-    .join("");
+  return { posicao, letraCorreta: palavra[posicao] };
 }
 
 export function GeradorVocabularioCliente() {
@@ -24,6 +31,9 @@ export function GeradorVocabularioCliente() {
   const [modo, setModo] = useState<Modo>("unir");
   const [quantidade, setQuantidade] = useState(8);
   const [semente, setSemente] = useState(0);
+  const [modoAtividade, setModoAtividade] = useState<ModoAtividade>("imprimir");
+  const [respostas, setRespostas] = useState<Record<number, string>>({});
+  const [conferido, setConferido] = useState(false);
 
   const banco = CATEGORIAS_VOCABULARIO[categoria];
   const maximo = Math.min(quantidade, banco.length);
@@ -35,12 +45,34 @@ export function GeradorVocabularioCliente() {
 
   const emojisEmbaralhados = useMemo(() => embaralhar(palavras), [palavras]);
 
+  const lacunas = useMemo(() => palavras.map((item) => criarLacuna(item.palavra)), [palavras]);
+
+  const [palavrasConferidas, setPalavrasConferidas] = useState(palavras);
+  if (palavrasConferidas !== palavras) {
+    setPalavrasConferidas(palavras);
+    setRespostas({});
+    setConferido(false);
+  }
+
+  const acertosLetras = palavras.filter(
+    (_, i) => (respostas[i] ?? "").trim().toUpperCase() === lacunas[i].letraCorreta
+  ).length;
+
   return (
     <LayoutGerador
       titulo="📖 Gerador de Folhas de Vocabulário"
       cor={COR_TEMA}
       config={
         <>
+          <CampoConfig rotulo="Modo">
+            <SeletorModo modo={modoAtividade} aoAlterar={setModoAtividade} cor={COR_TEMA} />
+            {modoAtividade === "online" && modo !== "letras_faltando" && (
+              <p className="mt-1.5 text-xs text-neutral-500">
+                📱 Responder na tela funciona só no modo &quot;Letras faltando&quot;.
+              </p>
+            )}
+          </CampoConfig>
+
           <CampoConfig rotulo="Categoria">
             <select
               value={categoria}
@@ -84,10 +116,25 @@ export function GeradorVocabularioCliente() {
           >
             🔄 Gerar nova folha
           </button>
+
+          {modoAtividade === "online" && modo === "letras_faltando" && (
+            <ControleConferencia
+              conferido={conferido}
+              aoConferir={() => setConferido(true)}
+              aoTentarNovamente={() => {
+                setRespostas({});
+                setConferido(false);
+              }}
+              cor={COR_TEMA}
+            />
+          )}
         </>
       }
     >
       <CabecalhoFolha titulo={`Vocabulário — ${ROTULO_CATEGORIA[categoria]}`} cor={COR_TEMA} />
+      {modoAtividade === "online" && modo === "letras_faltando" && conferido && (
+        <ResumoPontuacao acertos={acertosLetras} total={palavras.length} cor={COR_TEMA} />
+      )}
 
       {modo === "unir" && (
         <div
@@ -124,14 +171,42 @@ export function GeradorVocabularioCliente() {
 
       {modo === "letras_faltando" && (
         <div className="grid gap-5 sm:grid-cols-2">
-          {palavras.map((item) => (
-            <div key={item.palavra} className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4">
-              <span className="text-3xl">{item.emoji}</span>
-              <p className="text-xl font-extrabold tracking-widest text-neutral-800">
-                {comLetraFaltando(item.palavra)}
-              </p>
-            </div>
-          ))}
+          {palavras.map((item, indice) => {
+            const { posicao, letraCorreta } = lacunas[indice];
+            const online = modoAtividade === "online";
+            const respostaDigitada = respostas[indice] ?? "";
+            const correta = respostaDigitada.trim().toUpperCase() === letraCorreta;
+            return (
+              <div key={item.palavra} className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4">
+                <span className="text-3xl">{item.emoji}</span>
+                <p className="flex items-center text-xl font-extrabold tracking-widest text-neutral-800">
+                  {item.palavra.split("").map((letra, i) => {
+                    if (i !== posicao) return <span key={i}>{letra}</span>;
+                    if (!online) return <span key={i}>_</span>;
+                    return (
+                      <input
+                        key={i}
+                        type="text"
+                        maxLength={1}
+                        value={respostaDigitada}
+                        disabled={conferido}
+                        onChange={(e) =>
+                          setRespostas((atual) => ({ ...atual, [indice]: e.target.value }))
+                        }
+                        className={`mx-0.5 h-8 w-7 rounded border-2 text-center text-lg font-extrabold uppercase outline-none disabled:opacity-100 ${
+                          conferido
+                            ? correta
+                              ? "border-[#00c264] bg-[#00c264]/10 text-[#00854a]"
+                              : "border-[#e11d48] bg-[#e11d48]/10 text-[#e11d48]"
+                            : "border-neutral-300 bg-white"
+                        }`}
+                      />
+                    );
+                  })}
+                </p>
+              </div>
+            );
+          })}
         </div>
       )}
 

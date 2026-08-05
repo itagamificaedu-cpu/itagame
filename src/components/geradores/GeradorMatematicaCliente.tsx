@@ -1,7 +1,19 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LayoutGerador, CampoConfig, CabecalhoFolha, EstrelaDivisoria, NumeroColorido, PALETA_CORES } from "./LayoutGerador";
+import {
+  LayoutGerador,
+  CampoConfig,
+  CabecalhoFolha,
+  EstrelaDivisoria,
+  NumeroColorido,
+  PALETA_CORES,
+  SeletorModo,
+  ControleConferencia,
+  ResumoPontuacao,
+  CampoRespostaCurta,
+  type ModoAtividade,
+} from "./LayoutGerador";
 import { aleatorioInt } from "@/lib/geradores/aleatorio";
 
 const COR_TEMA = "#1a3fd4";
@@ -55,6 +67,9 @@ export function GeradorMatematicaCliente() {
   const [quantidade, setQuantidade] = useState(20);
   const [mostrarRespostas, setMostrarRespostas] = useState(false);
   const [semente, setSemente] = useState(0);
+  const [modo, setModo] = useState<ModoAtividade>("imprimir");
+  const [respostas, setRespostas] = useState<Record<number, string>>({});
+  const [conferido, setConferido] = useState(false);
 
   const questoes = useMemo(() => {
     const operacoesPossiveis: Exclude<Operacao, "mista">[] = ["soma", "subtracao", "multiplicacao", "divisao"];
@@ -65,7 +80,15 @@ export function GeradorMatematicaCliente() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [operacao, dificuldade, quantidade, semente]);
 
+  const [questoesConferidas, setQuestoesConferidas] = useState(questoes);
+  if (questoesConferidas !== questoes) {
+    setQuestoesConferidas(questoes);
+    setRespostas({});
+    setConferido(false);
+  }
+
   const colunas = quantidade > 24 ? 3 : 2;
+  const acertos = questoes.filter((q, i) => Number(respostas[i]) === q.resposta).length;
 
   return (
     <LayoutGerador
@@ -73,6 +96,10 @@ export function GeradorMatematicaCliente() {
       cor={COR_TEMA}
       config={
         <>
+          <CampoConfig rotulo="Modo">
+            <SeletorModo modo={modo} aoAlterar={setModo} cor={COR_TEMA} />
+          </CampoConfig>
+
           <CampoConfig rotulo="Operação">
             <select
               value={operacao}
@@ -111,14 +138,16 @@ export function GeradorMatematicaCliente() {
             />
           </CampoConfig>
 
-          <label className="flex items-center gap-2 text-sm text-neutral-700">
-            <input
-              type="checkbox"
-              checked={mostrarRespostas}
-              onChange={(e) => setMostrarRespostas(e.target.checked)}
-            />
-            Mostrar respostas
-          </label>
+          {modo === "imprimir" && (
+            <label className="flex items-center gap-2 text-sm text-neutral-700">
+              <input
+                type="checkbox"
+                checked={mostrarRespostas}
+                onChange={(e) => setMostrarRespostas(e.target.checked)}
+              />
+              Mostrar respostas
+            </label>
+          )}
 
           <button
             onClick={() => setSemente((s) => s + 1)}
@@ -126,6 +155,18 @@ export function GeradorMatematicaCliente() {
           >
             🔄 Gerar nova folha
           </button>
+
+          {modo === "online" && (
+            <ControleConferencia
+              conferido={conferido}
+              aoConferir={() => setConferido(true)}
+              aoTentarNovamente={() => {
+                setRespostas({});
+                setConferido(false);
+              }}
+              cor={COR_TEMA}
+            />
+          )}
         </>
       }
     >
@@ -134,6 +175,7 @@ export function GeradorMatematicaCliente() {
         subtitulo="Resolva as operações a seguir."
         cor={COR_TEMA}
       />
+      {modo === "online" && conferido && <ResumoPontuacao acertos={acertos} total={questoes.length} cor={COR_TEMA} />}
       <div
         className="grid gap-x-8 gap-y-4"
         style={{ gridTemplateColumns: `repeat(${colunas}, minmax(0, 1fr))` }}
@@ -144,7 +186,15 @@ export function GeradorMatematicaCliente() {
             <div key={indice} className="flex items-center gap-2 text-sm text-neutral-800">
               <NumeroColorido numero={indice + 1} cor={cor} />
               <span className="font-semibold">{questao.texto}</span>
-              {mostrarRespostas ? (
+              {modo === "online" ? (
+                <CampoRespostaCurta
+                  valor={respostas[indice] ?? ""}
+                  aoAlterar={(valor) => setRespostas((atual) => ({ ...atual, [indice]: valor }))}
+                  cor={cor}
+                  conferido={conferido}
+                  correta={Number(respostas[indice]) === questao.resposta}
+                />
+              ) : mostrarRespostas ? (
                 <span className="font-bold" style={{ color: cor }}>
                   {questao.resposta}
                 </span>

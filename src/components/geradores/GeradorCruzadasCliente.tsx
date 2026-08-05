@@ -1,7 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LayoutGerador, CampoConfig, CabecalhoFolha } from "./LayoutGerador";
+import {
+  LayoutGerador,
+  CampoConfig,
+  CabecalhoFolha,
+  SeletorModo,
+  ControleConferencia,
+  ResumoPontuacao,
+  type ModoAtividade,
+} from "./LayoutGerador";
 
 import { gerarCruzadas } from "@/lib/geradores/cruzadas";
 import { CATEGORIAS_CRUZADAS, ROTULO_CATEGORIA_CRUZADAS } from "@/lib/geradores/bancoCruzadas";
@@ -20,6 +28,9 @@ export function GeradorCruzadasCliente() {
   );
   const [mostrarRespostas, setMostrarRespostas] = useState(false);
   const [semente, setSemente] = useState(0);
+  const [modo, setModo] = useState<ModoAtividade>("imprimir");
+  const [respostas, setRespostas] = useState<Record<string, string>>({});
+  const [conferido, setConferido] = useState(false);
 
   const banco = CATEGORIAS_CRUZADAS[categoria];
 
@@ -40,8 +51,20 @@ export function GeradorCruzadasCliente() {
 
   const resultado = useMemo(() => gerarCruzadas(itens), [itens]);
 
+  const [resultadoConferido, setResultadoConferido] = useState(resultado);
+  if (resultadoConferido !== resultado) {
+    setResultadoConferido(resultado);
+    setRespostas({});
+    setConferido(false);
+  }
+
   const horizontais = resultado.palavras.filter((p) => p.direcao === "H").sort((a, b) => a.numero - b.numero);
   const verticais = resultado.palavras.filter((p) => p.direcao === "V").sort((a, b) => a.numero - b.numero);
+
+  const totalCelulas = resultado.grade.flat().filter(Boolean).length;
+  const acertos = resultado.grade.flatMap((linha, r) =>
+    linha.map((letra, c) => (letra && (respostas[`${r}-${c}`] ?? "").trim().toUpperCase() === letra ? 1 : 0))
+  ).reduce((a: number, b) => a + b, 0);
 
   return (
     <LayoutGerador
@@ -49,6 +72,10 @@ export function GeradorCruzadasCliente() {
       cor={COR_TEMA}
       config={
         <>
+          <CampoConfig rotulo="Modo">
+            <SeletorModo modo={modo} aoAlterar={setModo} cor={COR_TEMA} />
+          </CampoConfig>
+
           <CampoConfig rotulo="Origem das palavras">
             <select
               value={origem}
@@ -97,14 +124,16 @@ export function GeradorCruzadasCliente() {
             </CampoConfig>
           )}
 
-          <label className="flex items-center gap-2 text-sm text-neutral-700">
-            <input
-              type="checkbox"
-              checked={mostrarRespostas}
-              onChange={(e) => setMostrarRespostas(e.target.checked)}
-            />
-            Mostrar respostas
-          </label>
+          {modo === "imprimir" && (
+            <label className="flex items-center gap-2 text-sm text-neutral-700">
+              <input
+                type="checkbox"
+                checked={mostrarRespostas}
+                onChange={(e) => setMostrarRespostas(e.target.checked)}
+              />
+              Mostrar respostas
+            </label>
+          )}
 
           <button
             onClick={() => setSemente((s) => s + 1)}
@@ -112,10 +141,23 @@ export function GeradorCruzadasCliente() {
           >
             🔄 Gerar nova folha
           </button>
+
+          {modo === "online" && (
+            <ControleConferencia
+              conferido={conferido}
+              aoConferir={() => setConferido(true)}
+              aoTentarNovamente={() => {
+                setRespostas({});
+                setConferido(false);
+              }}
+              cor={COR_TEMA}
+            />
+          )}
         </>
       }
     >
       <CabecalhoFolha titulo="Palavras Cruzadas" cor={COR_TEMA} />
+      {modo === "online" && conferido && <ResumoPontuacao acertos={acertos} total={totalCelulas} cor={COR_TEMA} />}
 
       <div className="flex flex-col items-center gap-6">
         <div
@@ -123,21 +165,41 @@ export function GeradorCruzadasCliente() {
           style={{ gridTemplateColumns: `repeat(${resultado.colunas}, minmax(0, 1.8rem))` }}
         >
           {resultado.grade.flatMap((linha, r) =>
-            linha.map((letra, c) => (
-              <div
-                key={`${r}-${c}`}
-                className={`relative flex h-7 w-7 items-center justify-center border text-sm font-bold ${
-                  letra ? "border-neutral-400 bg-white" : "border-transparent"
-                }`}
-              >
-                {letra && resultado.numeros[r][c] && (
-                  <span className="absolute top-0 left-0.5 text-[8px] font-bold text-neutral-400">
-                    {resultado.numeros[r][c]}
-                  </span>
-                )}
-                {letra && mostrarRespostas && <span className="text-neutral-800">{letra}</span>}
-              </div>
-            ))
+            linha.map((letra, c) => {
+              const chaveCelula = `${r}-${c}`;
+              const respostaDigitada = respostas[chaveCelula] ?? "";
+              const correta = respostaDigitada.trim().toUpperCase() === letra;
+              return (
+                <div
+                  key={chaveCelula}
+                  className={`relative flex h-7 w-7 items-center justify-center border text-sm font-bold ${
+                    letra ? "border-neutral-400 bg-white" : "border-transparent"
+                  }`}
+                >
+                  {letra && resultado.numeros[r][c] && (
+                    <span className="absolute top-0 left-0.5 text-[8px] font-bold text-neutral-400">
+                      {resultado.numeros[r][c]}
+                    </span>
+                  )}
+                  {letra && modo === "online" ? (
+                    <input
+                      type="text"
+                      maxLength={1}
+                      value={respostaDigitada}
+                      disabled={conferido}
+                      onChange={(e) =>
+                        setRespostas((atual) => ({ ...atual, [chaveCelula]: e.target.value }))
+                      }
+                      className={`h-full w-full rounded-none border-0 bg-transparent text-center text-sm font-bold uppercase outline-none disabled:opacity-100 ${
+                        conferido ? (correta ? "bg-[#00c264]/20 text-[#00854a]" : "bg-[#e11d48]/20 text-[#e11d48]") : ""
+                      }`}
+                    />
+                  ) : (
+                    letra && mostrarRespostas && <span className="text-neutral-800">{letra}</span>
+                  )}
+                </div>
+              );
+            })
           )}
         </div>
 
