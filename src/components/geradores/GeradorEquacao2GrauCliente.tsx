@@ -15,6 +15,7 @@ import {
   type ModoAtividade,
 } from "./LayoutGerador";
 import { gerarQuestaoEquacao2Grau, type DificuldadeEquacao2Grau } from "@/lib/geradores/equacaoSegundoGrau";
+import { gerarSemRepetir } from "@/lib/geradores/aleatorio";
 
 const COR_TEMA = "#d97706";
 
@@ -28,7 +29,7 @@ export function GeradorEquacao2GrauCliente() {
   const [conferido, setConferido] = useState(false);
 
   const questoes = useMemo(() => {
-    return Array.from({ length: quantidade }, () => gerarQuestaoEquacao2Grau(dificuldade));
+    return gerarSemRepetir(() => gerarQuestaoEquacao2Grau(dificuldade), quantidade, (q) => q.enunciado);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dificuldade, quantidade, semente]);
 

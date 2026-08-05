@@ -11,7 +11,7 @@ import {
   type ModoAtividade,
 } from "./LayoutGerador";
 
-import { aleatorioInt, escolher } from "@/lib/geradores/aleatorio";
+import { aleatorioInt, escolher, gerarSemRepetir } from "@/lib/geradores/aleatorio";
 const COR_TEMA = "#ef4444";
 
 
@@ -67,10 +67,11 @@ export function GeradorQuizRelogioCliente() {
 
   const relogios = useMemo(() => {
     const minutos = MINUTOS_POSSIVEIS[dificuldade];
-    return Array.from({ length: quantidade }, () => ({
-      hora: aleatorioInt(1, 12),
-      minuto: escolher(minutos),
-    }));
+    return gerarSemRepetir(
+      () => ({ hora: aleatorioInt(1, 12), minuto: escolher(minutos) }),
+      quantidade,
+      (r) => `${r.hora}:${r.minuto}`
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dificuldade, quantidade, semente]);
 

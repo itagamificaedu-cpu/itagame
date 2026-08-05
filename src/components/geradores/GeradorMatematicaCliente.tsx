@@ -14,7 +14,7 @@ import {
   CampoRespostaCurta,
   type ModoAtividade,
 } from "./LayoutGerador";
-import { aleatorioInt } from "@/lib/geradores/aleatorio";
+import { aleatorioInt, gerarSemRepetir } from "@/lib/geradores/aleatorio";
 
 const COR_TEMA = "#1a3fd4";
 
@@ -73,10 +73,14 @@ export function GeradorMatematicaCliente() {
 
   const questoes = useMemo(() => {
     const operacoesPossiveis: Exclude<Operacao, "mista">[] = ["soma", "subtracao", "multiplicacao", "divisao"];
-    return Array.from({ length: quantidade }, () => {
-      const op = operacao === "mista" ? operacoesPossiveis[aleatorioInt(0, 3)] : operacao;
-      return gerarQuestao(op, dificuldade);
-    });
+    return gerarSemRepetir(
+      () => {
+        const op = operacao === "mista" ? operacoesPossiveis[aleatorioInt(0, 3)] : operacao;
+        return gerarQuestao(op, dificuldade);
+      },
+      quantidade,
+      (q) => q.texto
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [operacao, dificuldade, quantidade, semente]);
 

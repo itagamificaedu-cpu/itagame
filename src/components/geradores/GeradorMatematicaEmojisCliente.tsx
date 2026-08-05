@@ -13,7 +13,7 @@ import {
   CampoRespostaCurta,
   type ModoAtividade,
 } from "./LayoutGerador";
-import { aleatorioInt } from "@/lib/geradores/aleatorio";
+import { aleatorioInt, gerarSemRepetir } from "@/lib/geradores/aleatorio";
 
 const COR_TEMA = "#FF8F00";
 
@@ -43,16 +43,20 @@ export function GeradorMatematicaEmojisCliente() {
   const maximo = dificuldade === "facil" ? 6 : 12;
 
   const questoes = useMemo(() => {
-    return Array.from({ length: quantidade }, () => {
-      if (operacao === "soma") {
-        const a = aleatorioInt(1, maximo);
-        const b = aleatorioInt(1, maximo);
-        return { a, b, resposta: a + b };
-      }
-      const a = aleatorioInt(2, maximo);
-      const b = aleatorioInt(1, a);
-      return { a, b, resposta: a - b };
-    });
+    return gerarSemRepetir(
+      () => {
+        if (operacao === "soma") {
+          const a = aleatorioInt(1, maximo);
+          const b = aleatorioInt(1, maximo);
+          return { a, b, resposta: a + b };
+        }
+        const a = aleatorioInt(2, maximo);
+        const b = aleatorioInt(1, a);
+        return { a, b, resposta: a - b };
+      },
+      quantidade,
+      (q) => `${q.a}-${q.b}`
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tema, operacao, dificuldade, quantidade, semente]);
 

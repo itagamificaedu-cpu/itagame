@@ -15,6 +15,7 @@ import {
   type ModoAtividade,
 } from "./LayoutGerador";
 import { gerarQuestaoSistema, type DificuldadeSistema } from "@/lib/geradores/sistemaEquacoes";
+import { gerarSemRepetir } from "@/lib/geradores/aleatorio";
 
 const COR_TEMA = "#10b981";
 
@@ -28,7 +29,11 @@ export function GeradorSistemaEquacoesCliente() {
   const [conferido, setConferido] = useState(false);
 
   const questoes = useMemo(() => {
-    return Array.from({ length: quantidade }, () => gerarQuestaoSistema(dificuldade));
+    return gerarSemRepetir(
+      () => gerarQuestaoSistema(dificuldade),
+      quantidade,
+      (q) => `${q.eq1}|${q.eq2}`
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dificuldade, quantidade, semente]);
 

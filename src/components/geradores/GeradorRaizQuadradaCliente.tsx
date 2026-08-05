@@ -15,6 +15,7 @@ import {
   type ModoAtividade,
 } from "./LayoutGerador";
 import { gerarQuestaoRaiz, type DificuldadeRaiz } from "@/lib/geradores/raizQuadrada";
+import { gerarSemRepetir } from "@/lib/geradores/aleatorio";
 
 const COR_TEMA = "#06b6d4";
 
@@ -28,7 +29,7 @@ export function GeradorRaizQuadradaCliente() {
   const [conferido, setConferido] = useState(false);
 
   const questoes = useMemo(() => {
-    return Array.from({ length: quantidade }, () => gerarQuestaoRaiz(dificuldade));
+    return gerarSemRepetir(() => gerarQuestaoRaiz(dificuldade), quantidade, (q) => q.enunciado);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dificuldade, quantidade, semente]);
 

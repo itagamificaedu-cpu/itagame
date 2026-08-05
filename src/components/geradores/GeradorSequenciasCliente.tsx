@@ -14,7 +14,7 @@ import {
   CampoRespostaCurta,
   type ModoAtividade,
 } from "./LayoutGerador";
-import { aleatorioInt } from "@/lib/geradores/aleatorio";
+import { aleatorioInt, gerarSemRepetir } from "@/lib/geradores/aleatorio";
 
 const COR_TEMA = "#6366f1";
 
@@ -56,10 +56,13 @@ export function GeradorSequenciasCliente() {
   const tamanhoSequencia = 6;
 
   const sequencias = useMemo(() => {
-    return Array.from({ length: quantidadeSequencias }, () =>
-      tipo === "numerica"
-        ? gerarSequenciaNumerica(dificuldade, tamanhoSequencia)
-        : gerarSequenciaEmoji(tema, tamanhoSequencia)
+    return gerarSemRepetir(
+      () =>
+        tipo === "numerica"
+          ? gerarSequenciaNumerica(dificuldade, tamanhoSequencia)
+          : gerarSequenciaEmoji(tema, tamanhoSequencia),
+      quantidadeSequencias,
+      (seq) => `${seq.termos.join(",")}|${seq.posicaoLacuna}`
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tipo, dificuldade, tema, quantidadeSequencias, semente]);

@@ -15,6 +15,7 @@ import {
   type ModoAtividade,
 } from "./LayoutGerador";
 import { gerarQuestaoPotencia, type DificuldadePotencia } from "@/lib/geradores/potencia";
+import { gerarSemRepetir } from "@/lib/geradores/aleatorio";
 
 const COR_TEMA = "#8b5cf6";
 
@@ -28,7 +29,7 @@ export function GeradorPotenciaCliente() {
   const [conferido, setConferido] = useState(false);
 
   const questoes = useMemo(() => {
-    return Array.from({ length: quantidade }, () => gerarQuestaoPotencia(dificuldade));
+    return gerarSemRepetir(() => gerarQuestaoPotencia(dificuldade), quantidade, (q) => q.enunciado);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dificuldade, quantidade, semente]);
 
