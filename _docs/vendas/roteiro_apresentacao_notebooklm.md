@@ -1,4 +1,4 @@
-# Roteiro para apresentação — ItaGame Pro (uso no NotebookLM)
+# Roteiro para apresentação — ItaGameficaEdu Pro (uso no NotebookLM)
 
 > **Como usar este arquivo:** suba este documento como "fonte" no NotebookLM
 > (Adicionar fonte → arquivo). Depois peça a ele: *"Crie uma apresentação de
@@ -11,12 +11,12 @@
 
 ## SLIDE 1 — Capa
 
-**ItaGame — Sua aula sai da explicação e entra no modo disputa**
+**ItaGameficaEdu — Sua aula sai da explicação e entra no modo disputa**
 
 Inteligência artificial + gamificação para professores que não têm tempo de
 sobra.
 
-*(Nota de apoio: este é o slide de abertura. Pode usar o logo do ItaGame e as
+*(Nota de apoio: este é o slide de abertura. Pode usar o logo do ItaGameficaEdu e as
 cores azul #1a3fd4 e verde #00c264 da marca.)*
 
 ---
@@ -37,9 +37,9 @@ tempo livre, de família, de descanso.
 
 ---
 
-## SLIDE 3 — A solução: ItaGame
+## SLIDE 3 — A solução: ItaGameficaEdu
 
-O ItaGame gera atividade **completa, com gabarito, alinhada à BNCC**, em
+O ItaGameficaEdu gera atividade **completa, com gabarito, alinhada à BNCC**, em
 menos de 2 minutos. Você escolhe o assunto — matemática, português,
 ciências, história ou qualquer disciplina — e a IA cria o desafio.
 
@@ -76,7 +76,7 @@ aplicativo, sem criar conta.
 
 ## SLIDE 6 — Novidade: 16 geradores de atividade pronta pra imprimir
 
-Além das atividades com IA, o ItaGame tem uma central de **geradores
+Além das atividades com IA, o ItaGameficaEdu tem uma central de **geradores
 instantâneos**, sem precisar digitar nada — só escolher a dificuldade e a
 quantidade:
 
@@ -137,7 +137,7 @@ Esse é um diferencial que a concorrência direta não tem pronto.
 ## SLIDE 10 — Respondendo às dúvidas mais comuns
 
 > **"Tenho dificuldade com tecnologia."**
-> Se você consegue usar um grupo de WhatsApp, consegue usar o ItaGame. Você
+> Se você consegue usar um grupo de WhatsApp, consegue usar o ItaGameficaEdu. Você
 > escolhe o tipo, informa o tema e conduz tudo pelo painel.
 
 > **"Minha turma não tem celular pra todo mundo."**
@@ -145,14 +145,14 @@ Esse é um diferencial que a concorrência direta não tem pronto.
 > telão enquanto os alunos respondem em voz alta.
 
 > **"Não tenho tempo de preparar nada pra hoje."**
-> É exatamente pra isso que o ItaGame existe: a IA monta o conteúdo com
+> É exatamente pra isso que o ItaGameficaEdu existe: a IA monta o conteúdo com
 > gabarito em segundos.
 
 ---
 
 ## SLIDE 11 — Investimento
 
-**ItaGame Pro — R$ 24,99 por ano**
+**ItaGameficaEdu Pro — R$ 24,99 por ano**
 (pagamento único, menos de R$ 2,10 por mês)
 
 Inclui:
@@ -183,7 +183,7 @@ em tempo real — a demonstração ao vivo converte mais que qualquer slide.)*
 
 ## Observação importante sobre prova social
 
-A página do ItaGame hoje tem depoimentos **de exemplo**, marcados
+A página do ItaGameficaEdu hoje tem depoimentos **de exemplo**, marcados
 claramente como "serão substituídos por relatos reais após o lançamento".
 **Não use esses textos como se fossem depoimentos reais** em uma
 apresentação para venda — isso seria enganoso. Assim que você tiver os

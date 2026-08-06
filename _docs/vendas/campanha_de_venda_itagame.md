@@ -1,4 +1,4 @@
-# Campanha de Venda — ItaGame Pro
+# Campanha de Venda — ItaGameficaEdu Pro
 
 Plano prático para converter professores em assinantes. Pensado pra ser
 executado por você mesmo, sem precisar de equipe de marketing.
@@ -34,7 +34,7 @@ executado por você mesmo, sem precisar de equipe de marketing.
   disfarçado).
 
 ### Instagram
-- Perfil com destaque fixo "ItaGame" e 3-4 posts mostrando a tela do
+- Perfil com destaque fixo "ItaGameficaEdu" e 3-4 posts mostrando a tela do
   gerador em uso (print real, não mockup).
 - 1 vídeo curto (Reels) de 30-40s: você gerando uma atividade ao vivo, do
   tema em branco até a atividade pronta — a demonstração é o que mais
@@ -68,7 +68,7 @@ executado por você mesmo, sem precisar de equipe de marketing.
 
 ### Script B — post em grupo de WhatsApp/Telegram de professores
 > Pessoal, criei uma plataforma pra quem tá cansado de gastar horas
-> montando atividade: o ItaGame gera quiz, caça-palavras, simulado de
+> montando atividade: o ItaGameficaEdu gera quiz, caça-palavras, simulado de
 > matemática (modelo SPAECE/SAEB, 9º ano) e mais 16 tipos de folha pronta
 > pra imprimir — tudo alinhado à BNCC, em minutos. R$24,99 no ano. Link:
 > itagame.itatecnologiaeducacional.tech — se tiver dúvida me chama.
@@ -84,7 +84,7 @@ executado por você mesmo, sem precisar de equipe de marketing.
 > Link na bio 👆 #professores #educação #salaDeAula #bncc
 
 ### Script D — abordagem com coordenador pedagógico
-> Olá [nome], sou professor e criei o ItaGame, uma plataforma que gera
+> Olá [nome], sou professor e criei o ItaGameficaEdu, uma plataforma que gera
 > atividade gamificada e simulados alinhados à BNCC em minutos, pensada
 > pra reduzir o tempo de preparação de aula dos professores da sua
 > escola. Posso fazer uma demonstração de 10 minutos, sem compromisso,
@@ -138,7 +138,7 @@ executado por você mesmo, sem precisar de equipe de marketing.
   cadastro).
 - Quantas contas criadas viraram assinatura paga.
 - De qual canal veio cada assinatura (pergunte "como você conheceu o
-  ItaGame?" no primeiro contato, ou peça pra marcar na hora do cadastro).
+  ItaGameficaEdu?" no primeiro contato, ou peça pra marcar na hora do cadastro).
 - Repita nas próximas semanas só o que trouxe assinatura de verdade —
   corte o que não converteu.
 
