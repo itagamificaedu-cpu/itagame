@@ -5,7 +5,11 @@ import { gerarAtividadeComIa, type AtividadeGerada, type TipoAtividadeGeravel } 
 // Ação pública (sem login) usada só pelo "Simulador — prévia" da página inicial.
 // Não grava nada no banco — é só uma demonstração real da IA para quem ainda
 // não tem conta. A atividade de verdade (que fica salva) é gerada dentro do
-// painel, em /painel/atividades/nova.
+// painel, em /painel/atividades/nova, e continua sem nenhum limite (online
+// ou para imprimir). O limite de 1 prévia por visitante fica no componente
+// cliente (Simulador.tsx, via localStorage) — aqui no servidor não há como
+// saber "quem" está pedindo sem exigir login, o que tiraria a graça da
+// demonstração.
 
 const MAPA_TIPO: Record<string, TipoAtividadeGeravel> = {
   Quiz: "quiz",
