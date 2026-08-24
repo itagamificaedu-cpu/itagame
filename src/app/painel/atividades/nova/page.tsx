@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { gerarAtividade } from "@/app/actions/atividades";
+import { CriadorManualCliente } from "@/components/atividadeManual/CriadorManualCliente";
 
 const ROTULO_QUANTIDADE: Record<string, string> = {
   quiz: "Quantidade de questões",
@@ -17,6 +18,7 @@ const ROTULO_QUANTIDADE: Record<string, string> = {
 export default function PaginaNovaAtividade() {
   const [estado, action, pendente] = useActionState(gerarAtividade, undefined);
   const [tipo, setTipo] = useState("quiz");
+  const [modo, setModo] = useState<"ia" | "manual">("ia");
 
   return (
     <main className="min-h-screen bg-neutral-50 px-6 py-10">
@@ -25,11 +27,37 @@ export default function PaginaNovaAtividade() {
           ← Voltar ao painel
         </Link>
 
-        <h1 className="mt-4 text-2xl font-bold text-neutral-900">Gerar atividade com IA</h1>
+        <h1 className="mt-4 text-2xl font-bold text-neutral-900">Nova atividade</h1>
         <p className="mt-1 text-sm text-neutral-500">
-          Descreva o tema e a IA monta as questões prontas para aplicar em sala.
+          {modo === "ia"
+            ? "Descreva o tema e a IA monta as questões prontas para aplicar em sala."
+            : "Escreva suas próprias perguntas, uma a uma, e marque a resposta certa."}
         </p>
 
+        <div className="mt-6 flex gap-2 rounded-xl border border-neutral-200 bg-white p-1">
+          <button
+            type="button"
+            onClick={() => setModo("ia")}
+            className={`flex-1 rounded-lg py-2 text-sm font-bold transition ${
+              modo === "ia" ? "bg-[#1a3fd4] text-white" : "text-neutral-500 hover:bg-neutral-50"
+            }`}
+          >
+            ✨ Gerar com IA
+          </button>
+          <button
+            type="button"
+            onClick={() => setModo("manual")}
+            className={`flex-1 rounded-lg py-2 text-sm font-bold transition ${
+              modo === "manual" ? "bg-[#1a3fd4] text-white" : "text-neutral-500 hover:bg-neutral-50"
+            }`}
+          >
+            ✍️ Criar manualmente
+          </button>
+        </div>
+
+        {modo === "manual" ? (
+          <CriadorManualCliente />
+        ) : (
         <form action={action} className="mt-8 space-y-5 rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
           <div>
             <label htmlFor="tipo" className="text-sm font-medium text-neutral-700">
@@ -131,6 +159,7 @@ export default function PaginaNovaAtividade() {
             {pendente ? "Gerando atividade..." : "Gerar atividade"}
           </button>
         </form>
+        )}
       </div>
     </main>
   );

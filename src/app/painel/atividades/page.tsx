@@ -33,7 +33,7 @@ export default async function PaginaAtividades() {
             href="/painel/atividades/nova"
             className="rounded-lg bg-[#1a3fd4] px-4 py-2 text-sm font-bold text-white hover:brightness-110"
           >
-            + Gerar atividade
+            + Nova atividade
           </Link>
         </div>
 
