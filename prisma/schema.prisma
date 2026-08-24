@@ -74,6 +74,7 @@ model Usuario {
   resgates            ResgateLoja[]
   assinaturaProfessor Assinatura?    @relation("AssinaturaProfessor")
   salasCaboGuerra     SalaCaboGuerra[]
+  salasJogoExterno    SalaJogoExterno[]
 
   @@map("usuarios")
 }
@@ -336,4 +337,39 @@ model ParticipanteCaboGuerra {
 
   @@unique([salaId, apelido])
   @@map("participantes_cabo_guerra")
+}
+
+// Salas para jogos externos ao Next.js (ex: exports HTML5 do Construct 2, hospedados
+// em outra origem/domínio). O aluno não faz login — entra com apelido + código da sala,
+// igual ao Cabo de Guerra, e recebe um token assinado (não cookie, porque o jogo roda
+// em outra origem) que usa pra mandar o resultado final quando a partida acaba.
+model SalaJogoExterno {
+  id          String     @id @default(cuid())
+  codigo      String     @unique
+  jogo        String     // slug do jogo, ex: "ita3climas"
+  status      StatusSala @default(aberta)
+  criadaEm    DateTime   @default(now())
+
+  professorId String
+  professor   Usuario    @relation(fields: [professorId], references: [id])
+
+  participantes ParticipanteJogoExterno[]
+
+  @@map("salas_jogo_externo")
+}
+
+model ParticipanteJogoExterno {
+  id            String    @id @default(cuid())
+  apelido       String
+  pontuacao     Int       @default(0)
+  tempoSegundos Int?
+  respostas     Json?
+  entrouEm      DateTime  @default(now())
+  finalizadoEm  DateTime?
+
+  salaId        String
+  sala          SalaJogoExterno @relation(fields: [salaId], references: [id])
+
+  @@unique([salaId, apelido])
+  @@map("participantes_jogo_externo")
 }
