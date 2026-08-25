@@ -17,7 +17,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ codigo:
     return Response.json({ erro: "Token inválido ou expirado." }, { status: 401, headers: cors });
   }
 
-  let corpo: { pontuacao?: number; tempoSegundos?: number; respostas?: unknown };
+  let corpo: { pontuacao?: number; tempoSegundos?: number; respostas?: unknown; capturaTela?: string };
   try {
     corpo = await req.json();
   } catch {
@@ -27,6 +27,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ codigo:
   const pontuacao = Number(corpo.pontuacao);
   if (!Number.isFinite(pontuacao)) {
     return Response.json({ erro: "Pontuação inválida." }, { status: 400, headers: cors });
+  }
+
+  // Captura de tela e opcional (o script sempre manda, mas nao trava o envio se faltar).
+  // Limite de tamanho evita abuso — um JPEG do canvas em qualidade baixa fica bem
+  // menor que isso; qualquer coisa maior e suspeita, so ignora.
+  let capturaTela: string | undefined;
+  if (typeof corpo.capturaTela === "string" && corpo.capturaTela.startsWith("data:image/")) {
+    capturaTela = corpo.capturaTela.length <= 800_000 ? corpo.capturaTela : undefined;
   }
 
   const sala = await prisma.salaJogoExterno.findUnique({ where: { codigo } });
@@ -50,6 +58,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ codigo:
       pontuacao: Math.trunc(pontuacao),
       tempoSegundos: Number.isFinite(Number(corpo.tempoSegundos)) ? Math.trunc(Number(corpo.tempoSegundos)) : null,
       respostas: corpo.respostas === undefined ? undefined : (corpo.respostas as object),
+      capturaTela,
       finalizadoEm: new Date(),
     },
   });

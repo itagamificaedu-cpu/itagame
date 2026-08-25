@@ -364,6 +364,12 @@ model ParticipanteJogoExterno {
   pontuacao     Int       @default(0)
   tempoSegundos Int?
   respostas     Json?
+  // Print da tela do jogo no momento em que o aluno informou a pontuação (base64,
+  // capturado do <canvas> pelo itagame-integracao.js). O aluno digita a pontuação
+  // (não dá pra ler automaticamente do jogo compilado — sem o .capx fonte não dá pra
+  // saber com certeza onde fica essa variável), então essa imagem é a forma do
+  // professor conferir se bate, sem confiar cegamente no número digitado.
+  capturaTela   String?   @db.Text
   entrouEm      DateTime  @default(now())
   finalizadoEm  DateTime?
 

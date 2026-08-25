@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { listarParticipantesJogoExterno, encerrarSalaJogoExterno } from "@/app/actions/jogosExternos";
+import {
+  listarParticipantesJogoExterno,
+  encerrarSalaJogoExterno,
+  obterCapturaParticipante,
+} from "@/app/actions/jogosExternos";
 import { urlJogoExterno } from "@/lib/catalogoJogosExternos";
 
 type Participante = {
@@ -11,13 +15,22 @@ type Participante = {
   pontuacao: number;
   tempoSegundos: number | null;
   finalizado: boolean;
+  temCaptura: boolean;
 };
 
 export function PlacarJogoExternoCliente({ codigo, jogo }: { codigo: string; jogo: string }) {
   const [status, setStatus] = useState<"aberta" | "em_andamento" | "encerrada">("aberta");
   const [participantes, setParticipantes] = useState<Participante[]>([]);
   const [copiado, setCopiado] = useState(false);
+  const [captura, setCaptura] = useState<{ apelido: string; url: string } | null>(null);
   const link = urlJogoExterno(jogo);
+
+  async function verCaptura(participanteId: string) {
+    const dados = await obterCapturaParticipante(participanteId);
+    if (dados.capturaTela) {
+      setCaptura({ apelido: dados.apelido, url: dados.capturaTela });
+    }
+  }
 
   function copiarLink() {
     if (!link) return;
@@ -104,8 +117,19 @@ export function PlacarJogoExternoCliente({ codigo, jogo }: { codigo: string; jog
                 className="flex items-center justify-between rounded-xl bg-neutral-50 px-4 py-2 text-sm"
               >
                 <span className="font-medium text-neutral-800">{p.apelido}</span>
-                <span className="text-neutral-500">
-                  {p.finalizado ? `${p.pontuacao} pts` : "jogando..."}
+                <span className="flex items-center gap-2">
+                  <span className="text-neutral-500">
+                    {p.finalizado ? `${p.pontuacao} pts` : "jogando..."}
+                  </span>
+                  {p.temCaptura && (
+                    <button
+                      type="button"
+                      onClick={() => verCaptura(p.id)}
+                      className="rounded-full border border-neutral-300 px-2 py-0.5 text-xs font-semibold text-neutral-500"
+                    >
+                      ver captura
+                    </button>
+                  )}
                 </span>
               </li>
             ))}
@@ -115,6 +139,28 @@ export function PlacarJogoExternoCliente({ codigo, jogo }: { codigo: string; jog
           </ul>
         </div>
       </div>
+
+      {captura && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6"
+          onClick={() => setCaptura(null)}
+        >
+          <div className="max-w-2xl rounded-2xl bg-white p-4" onClick={(e) => e.stopPropagation()}>
+            <p className="mb-2 text-sm font-semibold text-neutral-700">
+              Tela final de {captura.apelido}
+            </p>
+            {/* eslint-disable-next-line @next/next/no-img-element -- imagem vem como data URL do banco, não faz sentido pelo next/image */}
+            <img src={captura.url} alt={`Tela final de ${captura.apelido}`} className="max-h-[70vh] w-full rounded-lg object-contain" />
+            <button
+              type="button"
+              onClick={() => setCaptura(null)}
+              className="mt-3 rounded-full border border-neutral-300 px-4 py-1.5 text-sm font-semibold text-neutral-600"
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

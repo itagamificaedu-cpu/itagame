@@ -66,6 +66,25 @@ export async function listarParticipantesJogoExterno(codigo: string) {
       pontuacao: p.pontuacao,
       tempoSegundos: p.tempoSegundos,
       finalizado: Boolean(p.finalizadoEm),
+      temCaptura: Boolean(p.capturaTela),
     })),
   };
+}
+
+// Busca a captura de tela de UM participante, sob demanda (o placar atualiza a cada
+// 3s e não vale a pena carregar a imagem de todo mundo o tempo todo — só quando o
+// professor clica pra conferir).
+export async function obterCapturaParticipante(participanteId: string) {
+  const sessao = await verificarSessao();
+
+  const participante = await prisma.participanteJogoExterno.findUnique({
+    where: { id: participanteId },
+    include: { sala: true },
+  });
+
+  if (!participante || participante.sala.professorId !== sessao.userId) {
+    throw new Error("Participante não encontrado.");
+  }
+
+  return { apelido: participante.apelido, capturaTela: participante.capturaTela };
 }
