@@ -1,9 +1,6 @@
 import { verificarSessao } from "@/lib/acessoDados";
 import { iniciarSalaJogoExterno } from "@/app/actions/jogosExternos";
-
-const JOGOS_DISPONIVEIS = [
-  { slug: "ita3climas", nome: "Cidade dos 3 Climas" },
-];
+import { JOGOS_EXTERNOS } from "@/lib/catalogoJogosExternos";
 
 export default async function PaginaJogosExternos() {
   await verificarSessao();
@@ -17,7 +14,7 @@ export default async function PaginaJogosExternos() {
         </p>
 
         <div className="mt-6 space-y-3">
-          {JOGOS_DISPONIVEIS.map((jogo) => (
+          {JOGOS_EXTERNOS.map((jogo) => (
             <form key={jogo.slug} action={iniciarSalaJogoExterno.bind(null, jogo.slug)}>
               <div className="flex items-center justify-between rounded-2xl border border-neutral-200 bg-white p-5">
                 <span className="font-semibold text-neutral-800">{jogo.nome}</span>

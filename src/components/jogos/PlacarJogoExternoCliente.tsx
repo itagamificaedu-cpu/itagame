@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { listarParticipantesJogoExterno, encerrarSalaJogoExterno } from "@/app/actions/jogosExternos";
+import { urlJogoExterno } from "@/lib/catalogoJogosExternos";
 
 type Participante = {
   id: string;
@@ -15,6 +16,16 @@ type Participante = {
 export function PlacarJogoExternoCliente({ codigo, jogo }: { codigo: string; jogo: string }) {
   const [status, setStatus] = useState<"aberta" | "em_andamento" | "encerrada">("aberta");
   const [participantes, setParticipantes] = useState<Participante[]>([]);
+  const [copiado, setCopiado] = useState(false);
+  const link = urlJogoExterno(jogo);
+
+  function copiarLink() {
+    if (!link) return;
+    navigator.clipboard.writeText(link).then(() => {
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    });
+  }
 
   useEffect(() => {
     let ativo = true;
@@ -53,6 +64,20 @@ export function PlacarJogoExternoCliente({ codigo, jogo }: { codigo: string; jog
           <p className="mt-2 text-sm text-neutral-500">
             Peça pros alunos abrirem o jogo e digitarem esse código pra entrar.
           </p>
+
+          {link && (
+            <div className="mt-4 rounded-xl bg-neutral-50 p-3">
+              <p className="text-xs font-semibold text-neutral-500">Link do jogo</p>
+              <p className="mt-1 break-all text-sm text-neutral-700">{link}</p>
+              <button
+                type="button"
+                onClick={copiarLink}
+                className="mt-2 rounded-full border border-neutral-300 px-4 py-1.5 text-xs font-semibold text-neutral-600"
+              >
+                {copiado ? "Copiado!" : "Copiar link"}
+              </button>
+            </div>
+          )}
 
           {status === "encerrada" ? (
             <p className="mt-4 text-sm font-semibold text-neutral-500">Sala encerrada.</p>
