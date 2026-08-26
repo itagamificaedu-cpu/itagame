@@ -1,5 +1,6 @@
 "use server";
 
+import crypto from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -19,6 +20,13 @@ async function verificarDonoTurma(turmaId: string, professorId: string) {
   return turma;
 }
 
+// Código fixo de 6 dígitos que o aluno usa (junto com o PIN) pra entrar nas
+// Trilhas sem precisar de e-mail/conta. Diferente do código de sala ao vivo
+// (esse não expira). Gerado uma vez, na criação da turma.
+function gerarCodigoAcessoTurma() {
+  return String(crypto.randomInt(100000, 999999));
+}
+
 export async function criarTurma(
   _estado: EstadoCriarTurma,
   formData: FormData
@@ -36,9 +44,20 @@ export async function criarTurma(
 
   const { nome, serie } = camposValidados.data;
 
-  const turma = await prisma.turma.create({
-    data: { nome, serie, professorId: sessao.userId },
-  });
+  let turma = null;
+  for (let tentativa = 0; tentativa < 5 && !turma; tentativa++) {
+    try {
+      turma = await prisma.turma.create({
+        data: { nome, serie, professorId: sessao.userId, codigoAcesso: gerarCodigoAcessoTurma() },
+      });
+    } catch {
+      turma = null;
+    }
+  }
+
+  if (!turma) {
+    return { mensagem: "Não foi possível criar a turma. Tente novamente." };
+  }
 
   revalidatePath("/painel/turmas");
   redirect(`/painel/turmas/${turma.id}`);

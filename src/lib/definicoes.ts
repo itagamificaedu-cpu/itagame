@@ -157,6 +157,27 @@ export type EstadoCriarSalaCaboGuerra =
     }
   | undefined;
 
+export const EsquemaCriarTrilha = z.object({
+  nome: z.string().min(3, { error: "Dê um nome pra trilha." }).trim(),
+  descricao: z.string().min(3, { error: "Descreva a trilha." }).trim(),
+  tipoEstrutura: z.enum(["linear", "livre"], { error: "Escolha o tipo de estrutura." }),
+  nivel: z.enum(["iniciante", "intermediario", "avancado"], { error: "Escolha o nível." }),
+  turmaId: z.string().min(1, { error: "Escolha a turma." }),
+});
+
+export type EstadoCriarTrilha =
+  | {
+      erros?: {
+        nome?: string[];
+        descricao?: string[];
+        tipoEstrutura?: string[];
+        nivel?: string[];
+        turmaId?: string[];
+      };
+      mensagem?: string;
+    }
+  | undefined;
+
 export const EsquemaEntrarCaboGuerra = z.object({
   codigo: z.string().length(6, { error: "O código tem 6 dígitos." }).trim(),
   apelido: z

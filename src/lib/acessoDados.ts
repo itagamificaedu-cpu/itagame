@@ -3,6 +3,7 @@ import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { descriptografar } from "@/lib/sessao";
+import { obterSessaoAluno } from "@/lib/alunoSessao";
 import { prisma } from "@/lib/prisma";
 
 export const verificarSessao = cache(async () => {
@@ -44,6 +45,27 @@ export const exigirAssinaturaAtiva = cache(async () => {
   }
 
   return sessao;
+});
+
+// Sessão do ALUNO nas Trilhas (aluno.ts / alunoSessao.ts) — sem e-mail, entra
+// com código da turma + nome + PIN. Redireciona pra tela de entrada se não
+// houver sessão, ou se o Aluno tiver sido removido da turma nesse meio tempo.
+export const verificarSessaoAluno = cache(async () => {
+  const sessao = await obterSessaoAluno();
+  if (!sessao?.alunoId) {
+    redirect("/entrar-trilha");
+  }
+
+  const aluno = await prisma.aluno.findUnique({
+    where: { id: sessao.alunoId },
+    include: { turma: true },
+  });
+
+  if (!aluno || aluno.turmaId !== sessao.turmaId) {
+    redirect("/entrar-trilha");
+  }
+
+  return aluno;
 });
 
 export const getUsuarioAtual = cache(async () => {

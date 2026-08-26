@@ -42,6 +42,39 @@ enum StatusSala {
   encerrada
 }
 
+enum TipoEstruturaTrilha {
+  linear
+  livre
+}
+
+enum StatusTrilha {
+  rascunho
+  publicada
+}
+
+enum TipoAtividadeMissao {
+  video
+  quiz
+  pratica
+  projeto
+  leitura
+  desafio
+}
+
+enum CheckpointTipo {
+  quiz_automatico
+  correcao_professor
+  avaliacao_pratica
+  banca
+}
+
+enum StatusProgressoMissao {
+  bloqueada
+  disponivel
+  em_andamento
+  concluida
+}
+
 model Escola {
   id          String   @id @default(cuid())
   nome        String
@@ -70,11 +103,11 @@ model Usuario {
   atividadesCriadas   Atividade[]
   correcoesRedacao    CorrecaoRedacao[]
   missoesCriadas      Missao[]
-  xpTransacoes        XpTransacao[]
-  resgates            ResgateLoja[]
   assinaturaProfessor Assinatura?    @relation("AssinaturaProfessor")
   salasCaboGuerra     SalaCaboGuerra[]
   salasJogoExterno    SalaJogoExterno[]
+  trilhasCriadas      Trilha[]       @relation("TrilhasCriadas")
+  progressosAvaliados ProgressoAluno[]
 
   @@map("usuarios")
 }
@@ -83,6 +116,10 @@ model Turma {
   id           String   @id @default(cuid())
   nome         String
   serie        String
+  // Código fixo (não expira, diferente do código de sala ao vivo) que o
+  // aluno usa junto com o PIN pra acessar as trilhas da turma sem precisar
+  // de e-mail/conta.
+  codigoAcesso String?  @unique
   criadaEm     DateTime @default(now())
 
   professorId  String
@@ -91,6 +128,7 @@ model Turma {
   matriculas   Matricula[]
   aplicacoes   AplicacaoAtividade[]
   alunos       Aluno[]
+  trilhas      Trilha[]
 
   @@map("turmas")
 }
@@ -98,10 +136,19 @@ model Turma {
 model Aluno {
   id        String   @id @default(cuid())
   nome      String
+  // PIN de 4 dígitos (hash bcrypt, igual senha de professor) — só o aluno
+  // usa, junto com o código da turma, pra entrar em /entrar-trilha sem
+  // precisar de e-mail. Nulo até o professor gerar o primeiro PIN.
+  pinHash   String?
   criadoEm  DateTime @default(now())
 
   turmaId   String
   turma     Turma    @relation(fields: [turmaId], references: [id])
+
+  progressos       ProgressoAluno[]
+  xpTransacoes     XpTransacao[]
+  resgates         ResgateLoja[]
+  badgesConcedidas BadgeConcedida[]
 
   @@map("alunos")
 }
@@ -233,9 +280,43 @@ model XpTransacao {
   quantidade  Int
   criadaEm    DateTime @default(now())
 
-  aluno       Usuario  @relation(fields: [alunoId], references: [id])
+  aluno       Aluno    @relation(fields: [alunoId], references: [id])
 
   @@map("xp_transacoes")
+}
+
+model Trilha {
+  id            String              @id @default(cuid())
+  nome          String
+  descricao     String
+  tipoEstrutura TipoEstruturaTrilha @default(linear)
+  nivel         String
+  status        StatusTrilha        @default(rascunho)
+  criadaEm      DateTime            @default(now())
+  atualizadaEm  DateTime            @updatedAt
+
+  professorId   String
+  professor     Usuario             @relation("TrilhasCriadas", fields: [professorId], references: [id])
+
+  turmaId       String
+  turma         Turma               @relation(fields: [turmaId], references: [id])
+
+  missoes       Missao[]
+
+  @@map("trilhas")
+}
+
+model Badge {
+  id         String   @id @default(cuid())
+  nome       String
+  descricao  String
+  icone      String   @default("🏅")
+  criadaEm   DateTime @default(now())
+
+  missoes    Missao[]
+  concedidas BadgeConcedida[]
+
+  @@map("badges")
 }
 
 model Missao {
@@ -248,7 +329,59 @@ model Missao {
   criadaPorId    String
   criadaPor      Usuario  @relation(fields: [criadaPorId], references: [id])
 
+  // --- campos de trilha (Missao sem trilhaId fica "avulsa", sem sequência) ---
+  trilhaId            String?
+  trilha              Trilha?             @relation(fields: [trilhaId], references: [id])
+  ordem               Int                 @default(0)
+  tipoAtividade       TipoAtividadeMissao @default(desafio)
+  nivelDificuldade    String?
+  preRequisitoId      String?
+  preRequisito        Missao?             @relation("PreRequisitoMissao", fields: [preRequisitoId], references: [id])
+  desbloqueiaMissoes  Missao[]            @relation("PreRequisitoMissao")
+  criterioDesbloqueio String?
+  badgeId             String?
+  badge               Badge?              @relation(fields: [badgeId], references: [id])
+  checkpointTipo      CheckpointTipo      @default(correcao_professor)
+  notaMinima          Int?
+  // Perguntas do quiz automático: [{ enunciado, alternativas, respostaCorreta }]
+  // — mesmo formato usado nas atividades geradas por IA. Só é lido quando
+  // checkpointTipo = quiz_automatico.
+  quizPerguntas       Json?
+
+  progressos          ProgressoAluno[]
+
   @@map("missoes")
+}
+
+model ProgressoAluno {
+  id            String                @id @default(cuid())
+  alunoId       String
+  aluno         Aluno                 @relation(fields: [alunoId], references: [id])
+  missaoId      String
+  missao        Missao                @relation(fields: [missaoId], references: [id])
+  status        StatusProgressoMissao @default(bloqueada)
+  xpGanho       Int                   @default(0)
+  entregaTexto  String?
+  feedbackProfessor String?
+  concluidaEm   DateTime?
+  avaliadoPorId String?
+  avaliadoPor   Usuario?              @relation(fields: [avaliadoPorId], references: [id])
+  atualizadoEm  DateTime              @updatedAt
+
+  @@unique([alunoId, missaoId])
+  @@map("progresso_alunos")
+}
+
+model BadgeConcedida {
+  id          String   @id @default(cuid())
+  alunoId     String
+  aluno       Aluno    @relation(fields: [alunoId], references: [id])
+  badgeId     String
+  badge       Badge    @relation(fields: [badgeId], references: [id])
+  concedidaEm DateTime @default(now())
+
+  @@unique([alunoId, badgeId])
+  @@map("badges_concedidas")
 }
 
 model ItemLoja {
@@ -269,7 +402,7 @@ model ResgateLoja {
   itemId      String
   resgatadoEm DateTime @default(now())
 
-  aluno       Usuario  @relation(fields: [alunoId], references: [id])
+  aluno       Aluno    @relation(fields: [alunoId], references: [id])
   item        ItemLoja @relation(fields: [itemId], references: [id])
 
   @@map("resgates_loja")
