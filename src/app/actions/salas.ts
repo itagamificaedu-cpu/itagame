@@ -4,7 +4,7 @@ import crypto from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { criarSessaoParticipante, obterSessaoParticipante } from "@/lib/salaSessao";
 import { EsquemaEntrarSala, EstadoEntrarSala } from "@/lib/definicoes";
 
@@ -13,7 +13,7 @@ function gerarCodigo() {
 }
 
 export async function iniciarSala(atividadeId: string) {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const atividade = await prisma.atividade.findUnique({ where: { id: atividadeId } });
   if (!atividade || atividade.professorId !== sessao.userId) {
@@ -39,7 +39,7 @@ export async function iniciarSala(atividadeId: string) {
 }
 
 export async function avancarPergunta(codigo: string) {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const sala = await prisma.salaAoVivo.findUnique({
     where: { codigo },
@@ -73,7 +73,7 @@ export async function avancarPergunta(codigo: string) {
 }
 
 export async function encerrarSala(codigo: string) {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const sala = await prisma.salaAoVivo.findUnique({
     where: { codigo },

@@ -1,7 +1,7 @@
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { GeradorVocabularioCliente } from "@/components/geradores/GeradorVocabularioCliente";
 
 export default async function PaginaGeradorVocabulario() {
-  await verificarSessao();
+  await exigirAssinaturaAtiva();
   return <GeradorVocabularioCliente />;
 }

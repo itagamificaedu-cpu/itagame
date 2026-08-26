@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import {
   EsquemaCriarTurma,
   EstadoCriarTurma,
@@ -23,7 +23,7 @@ export async function criarTurma(
   _estado: EstadoCriarTurma,
   formData: FormData
 ): Promise<EstadoCriarTurma> {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const camposValidados = EsquemaCriarTurma.safeParse({
     nome: formData.get("nome"),
@@ -45,7 +45,7 @@ export async function criarTurma(
 }
 
 export async function excluirTurma(turmaId: string) {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
   await verificarDonoTurma(turmaId, sessao.userId);
 
   await prisma.aluno.deleteMany({ where: { turmaId } });
@@ -60,7 +60,7 @@ export async function adicionarAluno(
   _estado: EstadoAdicionarAluno,
   formData: FormData
 ): Promise<EstadoAdicionarAluno> {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
   await verificarDonoTurma(turmaId, sessao.userId);
 
   const camposValidados = EsquemaAdicionarAluno.safeParse({
@@ -80,7 +80,7 @@ export async function adicionarAluno(
 }
 
 export async function removerAluno(turmaId: string, alunoId: string) {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
   await verificarDonoTurma(turmaId, sessao.userId);
 
   await prisma.aluno.deleteMany({ where: { id: alunoId, turmaId } });

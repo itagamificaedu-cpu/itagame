@@ -3,7 +3,7 @@
 import crypto from "node:crypto";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 
 function gerarCodigo() {
   return String(crypto.randomInt(100000, 999999));
@@ -12,7 +12,7 @@ function gerarCodigo() {
 // Cria uma sala pra um jogo externo (ex: "ita3climas") e manda o professor pra tela
 // com o código. Mesmo padrão de iniciarSala() em actions/salas.ts.
 export async function iniciarSalaJogoExterno(jogo: string) {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   let sala = null;
   for (let tentativa = 0; tentativa < 5 && !sala; tentativa++) {
@@ -33,7 +33,7 @@ export async function iniciarSalaJogoExterno(jogo: string) {
 }
 
 export async function encerrarSalaJogoExterno(codigo: string) {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const sala = await prisma.salaJogoExterno.findUnique({ where: { codigo } });
   if (!sala || sala.professorId !== sessao.userId) {
@@ -46,7 +46,7 @@ export async function encerrarSalaJogoExterno(codigo: string) {
 // Usado pelo painel do professor pra atualizar o placar periodicamente (sem SSE —
 // esse jogo é autônomo/assíncrono, não precisa sincronizar pergunta a pergunta).
 export async function listarParticipantesJogoExterno(codigo: string) {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const sala = await prisma.salaJogoExterno.findUnique({
     where: { codigo },
@@ -75,7 +75,7 @@ export async function listarParticipantesJogoExterno(codigo: string) {
 // 3s e não vale a pena carregar a imagem de todo mundo o tempo todo — só quando o
 // professor clica pra conferir).
 export async function obterCapturaParticipante(participanteId: string) {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const participante = await prisma.participanteJogoExterno.findUnique({
     where: { id: participanteId },

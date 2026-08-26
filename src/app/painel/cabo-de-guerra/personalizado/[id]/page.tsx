@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { prepararPerguntasPersonalizadas } from "@/lib/caboGuerraPersonalizado";
 import { CaboDeGuerraPersonalizadoCliente } from "@/components/caboGuerraPersonalizado/CaboDeGuerraPersonalizadoCliente";
@@ -10,7 +10,7 @@ export default async function PaginaCaboDeGuerraPersonalizado({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const atividade = await prisma.atividade.findUnique({ where: { id } });
   if (!atividade || atividade.professorId !== sessao.userId || atividade.tipo !== "cabo_de_guerra") {

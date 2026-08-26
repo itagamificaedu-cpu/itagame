@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 
 function corPorNota(nota: number) {
@@ -9,7 +9,7 @@ function corPorNota(nota: number) {
 }
 
 export default async function PaginaRedacoes() {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const correcoes = await prisma.correcaoRedacao.findMany({
     where: { professorId: sessao.userId },

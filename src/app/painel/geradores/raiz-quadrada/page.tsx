@@ -1,7 +1,7 @@
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { GeradorRaizQuadradaCliente } from "@/components/geradores/GeradorRaizQuadradaCliente";
 
 export default async function PaginaGeradorRaizQuadrada() {
-  await verificarSessao();
+  await exigirAssinaturaAtiva();
   return <GeradorRaizQuadradaCliente />;
 }

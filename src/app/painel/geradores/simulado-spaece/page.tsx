@@ -1,7 +1,7 @@
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { GeradorSimuladoSpaeceCliente } from "@/components/geradores/GeradorSimuladoSpaeceCliente";
 
 export default async function PaginaGeradorSimuladoSpaece() {
-  await verificarSessao();
+  await exigirAssinaturaAtiva();
   return <GeradorSimuladoSpaeceCliente />;
 }

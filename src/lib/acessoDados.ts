@@ -16,6 +16,36 @@ export const verificarSessao = cache(async () => {
   return { autenticado: true, userId: sessao.userId, papel: sessao.papel };
 });
 
+// Exige sessão válida E assinatura Pro ativa. Usar em toda página/ação que
+// seja uma funcionalidade de verdade da plataforma (gerar atividade, sala ao
+// vivo, redação, turmas, geradores, cabo de guerra etc.) — sem isso, uma
+// conta gratuita (criada de graça, sem pagar) conseguia usar tudo igual a
+// uma conta Pro. `ita_owner` (a conta do dono da plataforma) não paga a si
+// mesmo, então passa direto. NUNCA usar em src/app/actions/assinatura.ts
+// (checkout e status da assinatura) nem em /painel/assinatura — essas
+// telas têm que continuar acessíveis pra quem ainda não pagou, senão
+// ninguém consegue nem chegar na tela de pagar.
+export const exigirAssinaturaAtiva = cache(async () => {
+  const sessao = await verificarSessao();
+
+  if (sessao.papel === "ita_owner") {
+    return sessao;
+  }
+
+  const assinatura = await prisma.assinatura.findUnique({ where: { professorId: sessao.userId } });
+  const proAtivo =
+    assinatura?.plano === "pro" &&
+    assinatura.status === "ativa" &&
+    assinatura.validade !== null &&
+    assinatura.validade > new Date();
+
+  if (!proAtivo) {
+    redirect("/painel/assinatura");
+  }
+
+  return sessao;
+});
+
 export const getUsuarioAtual = cache(async () => {
   const cookie = (await cookies()).get("itagame_sessao")?.value;
   const sessao = await descriptografar(cookie);

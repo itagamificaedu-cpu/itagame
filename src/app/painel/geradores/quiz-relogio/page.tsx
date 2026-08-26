@@ -1,7 +1,7 @@
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { GeradorQuizRelogioCliente } from "@/components/geradores/GeradorQuizRelogioCliente";
 
 export default async function PaginaGeradorQuizRelogio() {
-  await verificarSessao();
+  await exigirAssinaturaAtiva();
   return <GeradorQuizRelogioCliente />;
 }

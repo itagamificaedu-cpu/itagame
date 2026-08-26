@@ -1,7 +1,7 @@
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { GeradorCacaPalavrasCliente } from "@/components/geradores/GeradorCacaPalavrasCliente";
 
 export default async function PaginaGeradorCacaPalavras() {
-  await verificarSessao();
+  await exigirAssinaturaAtiva();
   return <GeradorCacaPalavrasCliente />;
 }

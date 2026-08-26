@@ -1,7 +1,7 @@
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { GeradorMatematicaEmojisCliente } from "@/components/geradores/GeradorMatematicaEmojisCliente";
 
 export default async function PaginaGeradorMatematicaEmojis() {
-  await verificarSessao();
+  await exigirAssinaturaAtiva();
   return <GeradorMatematicaEmojisCliente />;
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { iniciarSala } from "@/app/actions/salas";
 import { criarSalaCaboGuerraPersonalizada } from "@/app/actions/caboGuerraOnline";
@@ -26,7 +26,7 @@ export default async function PaginaDetalheAtividade({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const atividade = await prisma.atividade.findUnique({ where: { id } });
   if (!atividade || atividade.professorId !== sessao.userId) {

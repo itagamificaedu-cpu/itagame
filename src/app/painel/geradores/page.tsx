@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 
 type ItemGerador = { slug: string; icone: string; titulo: string; texto: string };
 
@@ -43,7 +43,7 @@ const CATEGORIAS: { titulo: string; itens: ItemGerador[] }[] = [
 ];
 
 export default async function PaginaGeradores() {
-  await verificarSessao();
+  await exigirAssinaturaAtiva();
 
   return (
     <main className="min-h-screen bg-neutral-50 px-6 py-10">

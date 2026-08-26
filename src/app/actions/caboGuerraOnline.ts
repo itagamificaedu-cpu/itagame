@@ -4,7 +4,7 @@ import crypto from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import {
   criarSessaoParticipanteCaboGuerra,
   obterSessaoParticipanteCaboGuerra,
@@ -27,7 +27,7 @@ export async function criarSalaCaboGuerra(
   _estado: EstadoCriarSalaCaboGuerra,
   formData: FormData
 ): Promise<EstadoCriarSalaCaboGuerra> {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const camposValidados = EsquemaCriarSalaCaboGuerra.safeParse({
     nomeEquipe1: formData.get("nomeEquipe1"),
@@ -59,7 +59,7 @@ export async function criarSalaCaboGuerra(
 }
 
 export async function criarSalaCaboGuerraPersonalizada(atividadeId: string) {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const atividade = await prisma.atividade.findUnique({ where: { id: atividadeId } });
   if (!atividade || atividade.professorId !== sessao.userId || atividade.tipo !== "cabo_de_guerra") {
@@ -97,7 +97,7 @@ export async function criarSalaCaboGuerraPersonalizada(atividadeId: string) {
 }
 
 export async function iniciarPartidaCaboGuerra(codigo: string) {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const sala = await prisma.salaCaboGuerra.findUnique({ where: { codigo } });
   if (!sala || sala.professorId !== sessao.userId) {
@@ -136,7 +136,7 @@ export async function iniciarPartidaCaboGuerra(codigo: string) {
 }
 
 export async function encerrarSalaCaboGuerra(codigo: string) {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const sala = await prisma.salaCaboGuerra.findUnique({ where: { codigo } });
   if (!sala || sala.professorId !== sessao.userId) {

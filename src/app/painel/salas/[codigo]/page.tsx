@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { ControleSalaCliente } from "@/components/sala/ControleSalaCliente";
 
@@ -9,7 +9,7 @@ export default async function PaginaControleSala({
   params: Promise<{ codigo: string }>;
 }) {
   const { codigo } = await params;
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const sala = await prisma.salaAoVivo.findUnique({
     where: { codigo },

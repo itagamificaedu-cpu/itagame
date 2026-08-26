@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 
 type NotaCriterio = { criterio: string; nota: number; comentario: string };
@@ -17,7 +17,7 @@ export default async function PaginaDetalheCorrecao({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const correcao = await prisma.correcaoRedacao.findUnique({ where: { id } });
   if (!correcao || correcao.professorId !== sessao.userId) {

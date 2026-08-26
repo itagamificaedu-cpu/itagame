@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { corrigirRedacaoComIa } from "@/lib/ia";
 import { EsquemaCorrecaoRedacao, EstadoCorrecaoRedacao } from "@/lib/definicoes";
 
@@ -11,7 +11,7 @@ export async function corrigirRedacao(
   _estado: EstadoCorrecaoRedacao,
   formData: FormData
 ): Promise<EstadoCorrecaoRedacao> {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const camposValidados = EsquemaCorrecaoRedacao.safeParse({
     tema: formData.get("tema"),

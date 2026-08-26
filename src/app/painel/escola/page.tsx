@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { removerProfessorEscola } from "@/app/actions/escola";
 import FormularioAdicionarProfessor from "./FormularioAdicionarProfessor";
 
 export default async function PaginaPainelEscola() {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const usuario = await prisma.usuario.findUnique({ where: { id: sessao.userId } });
   if (!usuario || usuario.papel !== "escola_admin" || !usuario.escolaId) {

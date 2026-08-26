@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 
 // Criação manual de atividade — pra quando o professor já tem as perguntas
 // prontas e não precisa da IA. Mesma lógica do criador de quiz do ITA
@@ -30,7 +30,7 @@ export async function criarAtividadeManual(input: {
   tema: string;
   questoes: QuestaoManual[];
 }): Promise<ResultadoAtividadeManual> {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const disciplina = input.disciplina.trim();
   const serie = input.serie.trim();

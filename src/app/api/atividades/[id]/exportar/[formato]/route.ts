@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { extrairDadosAtividade, nomeArquivo } from "@/lib/exportacao/dados";
 import { gerarDocx } from "@/lib/exportacao/docx";
@@ -24,7 +24,7 @@ export async function GET(
     return NextResponse.json({ erro: "Formato inválido." }, { status: 400 });
   }
 
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const atividade = await prisma.atividade.findUnique({ where: { id } });
   if (!atividade || atividade.professorId !== sessao.userId) {

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 
 const RESUMO_TIPO: Record<string, { rotulo: string; icone: string }> = {
@@ -12,7 +12,7 @@ const RESUMO_TIPO: Record<string, { rotulo: string; icone: string }> = {
 };
 
 export default async function PaginaAtividades() {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const atividades = await prisma.atividade.findMany({
     where: { professorId: sessao.userId },

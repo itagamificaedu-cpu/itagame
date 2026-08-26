@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getUsuarioAtual } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva, getUsuarioAtual } from "@/lib/acessoDados";
 import { sair } from "@/app/actions/autenticacao";
 import { prisma } from "@/lib/prisma";
 
@@ -13,6 +13,7 @@ const RESUMO_TIPO: Record<string, { rotulo: string; icone: string }> = {
 };
 
 export default async function PaginaPainel() {
+  await exigirAssinaturaAtiva();
   const usuario = await getUsuarioAtual();
 
   const [atividadesRecentes, totalAtividades, totalSalas, totalRedacoes, totalTurmas, assinatura] =

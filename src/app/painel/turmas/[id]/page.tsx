@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { excluirTurma, removerAluno } from "@/app/actions/turmas";
 import FormularioAdicionarAluno from "./FormularioAdicionarAluno";
@@ -11,7 +11,7 @@ export default async function PaginaDetalheTurma({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const turma = await prisma.turma.findUnique({
     where: { id },

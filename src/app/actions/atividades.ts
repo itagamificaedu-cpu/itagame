@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { gerarAtividadeComIa } from "@/lib/ia";
 import { gerarGradeCacaPalavras } from "@/lib/cacaPalavras";
 import { EsquemaGeracaoAtividade, EstadoGeracaoAtividade } from "@/lib/definicoes";
@@ -22,7 +22,7 @@ export async function gerarAtividade(
   _estado: EstadoGeracaoAtividade,
   formData: FormData
 ): Promise<EstadoGeracaoAtividade> {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const camposValidados = EsquemaGeracaoAtividade.safeParse({
     tipo: formData.get("tipo"),

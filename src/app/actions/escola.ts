@@ -2,11 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { EsquemaAdicionarProfessorEscola, EstadoAdicionarProfessorEscola } from "@/lib/definicoes";
 
 async function verificarCoordenador() {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
   const usuario = await prisma.usuario.findUnique({ where: { id: sessao.userId } });
 
   if (!usuario || usuario.papel !== "escola_admin" || !usuario.escolaId) {

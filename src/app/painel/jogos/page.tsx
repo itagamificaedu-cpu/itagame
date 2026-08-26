@@ -1,9 +1,9 @@
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { iniciarSalaJogoExterno } from "@/app/actions/jogosExternos";
 import { JOGOS_EXTERNOS } from "@/lib/catalogoJogosExternos";
 
 export default async function PaginaJogosExternos() {
-  await verificarSessao();
+  await exigirAssinaturaAtiva();
 
   return (
     <main className="min-h-screen bg-neutral-50 px-6 py-10">

@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 
 export default async function PaginaTurmas() {
-  const sessao = await verificarSessao();
+  const sessao = await exigirAssinaturaAtiva();
 
   const turmas = await prisma.turma.findMany({
     where: { professorId: sessao.userId },

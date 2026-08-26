@@ -1,7 +1,7 @@
-import { verificarSessao } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { GeradorTracadoFormasCliente } from "@/components/geradores/GeradorTracadoFormasCliente";
 
 export default async function PaginaGeradorTracadoFormas() {
-  await verificarSessao();
+  await exigirAssinaturaAtiva();
   return <GeradorTracadoFormasCliente />;
 }
