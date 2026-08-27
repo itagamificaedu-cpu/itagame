@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
-import FormularioNovaTrilha from "./FormularioNovaTrilha";
+import FormularioGerarTrilhaIa from "./FormularioGerarTrilhaIa";
 
-export default async function PaginaNovaTrilha() {
+export default async function PaginaGerarTrilhaIa() {
   const sessao = await exigirAssinaturaAtiva();
   const turmas = await prisma.turma.findMany({
     where: { professorId: sessao.userId },
@@ -17,21 +17,17 @@ export default async function PaginaNovaTrilha() {
           ← Trilhas educativas
         </Link>
 
-        <h1 className="mt-4 text-2xl font-bold text-neutral-900">Nova trilha</h1>
+        <h1 className="mt-4 text-2xl font-bold text-neutral-900">✨ Gerar trilha com IA</h1>
         <p className="mt-1 text-sm text-neutral-500">
-          Crie a trilha e depois adicione as missões antes de publicar pros alunos.{" "}
-          <Link href="/painel/trilhas/gerar-ia" className="font-semibold text-[#1a3fd4]">
-            Ou gere uma trilha pronta com IA →
-          </Link>
+          A IA monta a trilha inteira — nome, descrição e todas as missões em sequência — alinhada
+          à BNCC Computação (Pensamento Computacional, Mundo Digital e Cultura Digital). A trilha
+          nasce como rascunho, você pode revisar e ajustar tudo antes de publicar pros alunos.
         </p>
 
         {turmas.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-dashed border-neutral-300 bg-white p-8 text-center">
             <p className="text-3xl">🏫</p>
             <p className="mt-2 font-semibold text-neutral-700">Crie uma turma primeiro</p>
-            <p className="mt-1 text-sm text-neutral-500">
-              Toda trilha pertence a uma turma — cadastre a turma e os alunos antes.
-            </p>
             <Link
               href="/painel/turmas/nova"
               className="mt-4 inline-block rounded-lg bg-[#1a3fd4] px-4 py-2 text-sm font-bold text-white hover:brightness-110"
@@ -40,7 +36,7 @@ export default async function PaginaNovaTrilha() {
             </Link>
           </div>
         ) : (
-          <FormularioNovaTrilha turmas={turmas} />
+          <FormularioGerarTrilhaIa turmas={turmas} />
         )}
       </div>
     </main>

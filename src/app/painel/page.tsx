@@ -130,6 +130,12 @@ export default async function PaginaPainel() {
               🧭 Trilhas educativas
             </Link>
             <Link
+              href="/painel/loja"
+              className="rounded-lg border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
+            >
+              💰 Loja de recompensas
+            </Link>
+            <Link
               href="/painel/cabo-de-guerra"
               className="rounded-lg border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
             >

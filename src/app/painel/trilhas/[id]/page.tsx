@@ -72,6 +72,18 @@ export default async function PaginaDetalheTrilha({
               {trilha.status === "publicada" ? "🟢 Publicada" : "📝 Rascunho"}
             </p>
             <p className="mt-2 max-w-xl text-sm text-neutral-600">{trilha.descricao}</p>
+            {trilha.competenciasBncc.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {trilha.competenciasBncc.map((competencia) => (
+                  <span
+                    key={competencia}
+                    className="rounded-full bg-[#1a3fd4]/10 px-2.5 py-1 text-xs font-semibold text-[#1a3fd4]"
+                  >
+                    🎓 {competencia}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col items-end gap-2">

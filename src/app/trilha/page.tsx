@@ -55,6 +55,19 @@ export default async function PaginaTrilhaAluno() {
           </div>
         </div>
 
+        <Link
+          href="/trilha/loja"
+          className="mt-4 flex items-center gap-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:border-[#1a3fd4] hover:bg-[#1a3fd4]/5"
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#1a3fd4]/10 text-xl">
+            💰
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-neutral-900">Loja de recompensas</p>
+            <p className="mt-0.5 text-sm text-neutral-500">Troque seu XP por prêmios</p>
+          </div>
+        </Link>
+
         {badgesConcedidas.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {badgesConcedidas.map((b) => (

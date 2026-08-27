@@ -2,8 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
+import { gerarTrilhaComIa, type QuestaoTrilhaGerada } from "@/lib/ia";
 import { EsquemaCriarTrilha, EstadoCriarTrilha } from "@/lib/definicoes";
 
 // Ações de professor pra Trilhas Educativas: criar, publicar e excluir. A
@@ -106,6 +108,93 @@ export async function publicarTrilha(trilhaId: string): Promise<ResultadoPublica
   revalidatePath(`/painel/trilhas/${trilhaId}`);
   revalidatePath("/trilha");
   return { ok: true };
+}
+
+function normalizarQuizPerguntas(perguntas: QuestaoTrilhaGerada[] | undefined) {
+  if (!perguntas) return undefined;
+  const validas = perguntas
+    .map((p) => ({
+      enunciado: p.enunciado.trim(),
+      alternativas: p.alternativas.map((a) => a.trim()).filter(Boolean),
+      respostaCorreta: p.respostaCorreta.trim(),
+    }))
+    .filter((p) => p.enunciado && p.alternativas.length >= 2 && p.alternativas.includes(p.respostaCorreta));
+  return validas.length > 0 ? validas : undefined;
+}
+
+export type ResultadoGerarTrilhaIa = { ok: true; trilhaId: string } | { ok: false; erro: string };
+
+// Gera uma trilha inteira (nome, descrição e todas as missões em sequência)
+// com IA, alinhada à BNCC Computação. Sempre cria como "rascunho" — o
+// professor revisa/ajusta as missões antes de publicar pros alunos.
+export async function gerarTrilhaIa(input: {
+  turmaId: string;
+  nivel: string;
+  tema?: string;
+  quantidadeMissoes: number;
+}): Promise<ResultadoGerarTrilhaIa> {
+  const sessao = await exigirAssinaturaAtiva();
+
+  const turma = await prisma.turma.findUnique({ where: { id: input.turmaId } });
+  if (!turma || turma.professorId !== sessao.userId) {
+    return { ok: false, erro: "Turma não encontrada." };
+  }
+
+  const quantidade = Math.min(8, Math.max(3, Math.round(input.quantidadeMissoes) || 5));
+
+  let gerada;
+  try {
+    gerada = await gerarTrilhaComIa({ nivel: input.nivel, tema: input.tema, quantidadeMissoes: quantidade });
+  } catch {
+    return { ok: false, erro: "Não consegui gerar a trilha agora. Tente novamente em instantes." };
+  }
+
+  if (gerada.missoes.length === 0) {
+    return { ok: false, erro: "A IA não gerou nenhuma missão. Tente novamente." };
+  }
+
+  const trilhaId = await prisma.$transaction(async (tx) => {
+    const trilha = await tx.trilha.create({
+      data: {
+        nome: gerada.nome,
+        descricao: gerada.descricao,
+        tipoEstrutura: "linear",
+        nivel: input.nivel,
+        competenciasBncc: gerada.competenciasBncc,
+        turmaId: input.turmaId,
+        professorId: sessao.userId,
+      },
+    });
+
+    let preRequisitoId: string | undefined;
+    for (const [indice, missao] of gerada.missoes.entries()) {
+      const quizPerguntas =
+        missao.checkpointTipo === "quiz_automatico"
+          ? normalizarQuizPerguntas(missao.quizPerguntas)
+          : undefined;
+
+      const criada = await tx.missao.create({
+        data: {
+          titulo: missao.titulo,
+          descricao: missao.descricao,
+          xpRecompensa: Math.max(1, Math.round(missao.xp) || 10),
+          criadaPorId: sessao.userId,
+          trilhaId: trilha.id,
+          ordem: indice,
+          tipoAtividade: missao.tipoAtividade,
+          preRequisitoId,
+          checkpointTipo: quizPerguntas ? "quiz_automatico" : "correcao_professor",
+          quizPerguntas: quizPerguntas as Prisma.InputJsonValue | undefined,
+        },
+      });
+      preRequisitoId = criada.id;
+    }
+
+    return trilha.id;
+  });
+
+  revalidatePath("/painel/trilhas");
+  return { ok: true, trilhaId };
 }
 
 export async function excluirTrilha(trilhaId: string) {

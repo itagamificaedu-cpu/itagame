@@ -118,6 +118,131 @@ export async function gerarAtividadeComIa(params: {
   return blocoFerramenta.input as AtividadeGerada;
 }
 
+// --- geração de trilha (BNCC Computação) ---
+
+export type QuestaoTrilhaGerada = {
+  enunciado: string;
+  alternativas: string[];
+  respostaCorreta: string;
+};
+
+export type MissaoTrilhaGerada = {
+  titulo: string;
+  descricao: string;
+  tipoAtividade: "video" | "quiz" | "pratica" | "projeto" | "leitura" | "desafio";
+  xp: number;
+  checkpointTipo: "quiz_automatico" | "correcao_professor";
+  quizPerguntas?: QuestaoTrilhaGerada[];
+};
+
+export type TrilhaGerada = {
+  nome: string;
+  descricao: string;
+  competenciasBncc: string[];
+  missoes: MissaoTrilhaGerada[];
+};
+
+// Eixos oficiais da BNCC Computação (Currículo de Referência em Tecnologia e
+// Computação) — toda trilha gerada precisa se apoiar neles.
+const EIXOS_BNCC_COMPUTACAO = `
+- Pensamento Computacional: abstração, decomposição de problemas, reconhecimento de padrões, algoritmos e avaliação de soluções.
+- Mundo Digital: como computadores, redes, dispositivos e sistemas digitais funcionam por trás das tecnologias do dia a dia.
+- Cultura Digital: uso crítico, ético, seguro e responsável das tecnologias — cidadania digital, privacidade, desinformação, colaboração online.
+`.trim();
+
+const FERRAMENTA_SALVAR_TRILHA: Anthropic.Tool = {
+  name: "salvar_trilha",
+  description: "Salva uma trilha de aprendizagem gamificada, com suas missões em sequência, alinhada à BNCC Computação.",
+  input_schema: {
+    type: "object",
+    properties: {
+      nome: { type: "string", description: "Nome curto e atrativo da trilha" },
+      descricao: { type: "string", description: "O que o aluno vai aprender ao longo da trilha (1-2 frases)" },
+      competenciasBncc: {
+        type: "array",
+        items: { type: "string" },
+        description: "Habilidades/eixos da BNCC Computação trabalhados nessa trilha (ex: 'Pensamento Computacional — reconhecimento de padrões')",
+      },
+      missoes: {
+        type: "array",
+        description: "Missões em ordem — cada uma libera a próxima quando concluída.",
+        items: {
+          type: "object",
+          properties: {
+            titulo: { type: "string" },
+            descricao: { type: "string", description: "O que o aluno precisa fazer nessa missão, de forma clara e prática" },
+            tipoAtividade: {
+              type: "string",
+              enum: ["video", "quiz", "pratica", "projeto", "leitura", "desafio"],
+            },
+            xp: { type: "number", description: "XP da missão, entre 10 e 50 — mais difícil/trabalhosa, mais XP" },
+            checkpointTipo: {
+              type: "string",
+              enum: ["quiz_automatico", "correcao_professor"],
+              description:
+                "'quiz_automatico' quando dá pra verificar a resposta certa automaticamente (conceitos, teoria). 'correcao_professor' quando o aluno precisa produzir algo (prática, projeto, redação) que só um humano avalia.",
+            },
+            quizPerguntas: {
+              type: "array",
+              description: "Só preencher quando checkpointTipo = quiz_automatico. De 2 a 4 perguntas de múltipla escolha.",
+              items: {
+                type: "object",
+                properties: {
+                  enunciado: { type: "string" },
+                  alternativas: {
+                    type: "array",
+                    items: { type: "string" },
+                    description: "Exatamente 4 alternativas plausíveis",
+                  },
+                  respostaCorreta: { type: "string", description: "Texto exato da alternativa correta" },
+                },
+                required: ["enunciado", "alternativas", "respostaCorreta"],
+              },
+            },
+          },
+          required: ["titulo", "descricao", "tipoAtividade", "xp", "checkpointTipo"],
+        },
+      },
+    },
+    required: ["nome", "descricao", "competenciasBncc", "missoes"],
+  },
+};
+
+export async function gerarTrilhaComIa(params: {
+  nivel: string;
+  tema?: string;
+  quantidadeMissoes: number;
+}): Promise<TrilhaGerada> {
+  const { nivel, tema, quantidadeMissoes } = params;
+
+  const instrucao = `Crie uma trilha de aprendizagem gamificada em português do Brasil, sobre Computação/Tecnologia, pra uma turma de nível "${nivel}"${
+    tema ? `, com foco no tema "${tema}"` : ", escolhendo você mesmo um tema interessante e adequado à idade"
+  }.
+
+A trilha precisa trabalhar pelo menos um dos três eixos oficiais da BNCC Computação:
+${EIXOS_BNCC_COMPUTACAO}
+
+Gere exatamente ${quantidadeMissoes} missões, em ordem progressiva (da mais simples pra mais desafiadora), formando uma sequência linear onde cada missão prepara o aluno pra próxima.
+Varie os tipos de missão (vídeo, quiz, prática, projeto, leitura, desafio) — não deixe tudo igual.
+Pelo menos uma missão deve ser do tipo "quiz" com checkpointTipo "quiz_automatico".
+Use linguagem simples e adequada à faixa etária. Chame a ferramenta "salvar_trilha" com o resultado.`;
+
+  const resposta = await cliente.messages.create({
+    model: MODELO,
+    max_tokens: 8192,
+    tools: [FERRAMENTA_SALVAR_TRILHA],
+    tool_choice: { type: "tool", name: "salvar_trilha" },
+    messages: [{ role: "user", content: instrucao }],
+  });
+
+  const blocoFerramenta = resposta.content.find((bloco) => bloco.type === "tool_use");
+  if (!blocoFerramenta || blocoFerramenta.type !== "tool_use") {
+    throw new Error("A IA não retornou a trilha no formato esperado.");
+  }
+
+  return blocoFerramenta.input as TrilhaGerada;
+}
+
 export const CRITERIOS_REDACAO = ["Gramática", "Coerência", "Argumentação", "Repertório"] as const;
 
 export type NotaCriterio = { criterio: string; nota: number; comentario: string };

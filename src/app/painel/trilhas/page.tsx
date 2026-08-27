@@ -21,12 +21,20 @@ export default async function PaginaTrilhas() {
             </Link>
             <h1 className="mt-2 text-2xl font-bold text-neutral-900">Trilhas educativas</h1>
           </div>
-          <Link
-            href="/painel/trilhas/nova"
-            className="rounded-lg bg-[#1a3fd4] px-4 py-2 text-sm font-bold text-white hover:brightness-110"
-          >
-            + Nova trilha
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              href="/painel/trilhas/gerar-ia"
+              className="rounded-lg border border-[#1a3fd4] px-4 py-2 text-sm font-bold text-[#1a3fd4] hover:bg-[#1a3fd4]/5"
+            >
+              ✨ Gerar com IA
+            </Link>
+            <Link
+              href="/painel/trilhas/nova"
+              className="rounded-lg bg-[#1a3fd4] px-4 py-2 text-sm font-bold text-white hover:brightness-110"
+            >
+              + Nova trilha
+            </Link>
+          </div>
         </div>
 
         {trilhas.length === 0 ? (

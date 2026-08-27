@@ -129,6 +129,7 @@ model Turma {
   aplicacoes   AplicacaoAtividade[]
   alunos       Aluno[]
   trilhas      Trilha[]
+  itensLoja    ItemLoja[]
 
   @@map("turmas")
 }
@@ -292,6 +293,9 @@ model Trilha {
   tipoEstrutura TipoEstruturaTrilha @default(linear)
   nivel         String
   status        StatusTrilha        @default(rascunho)
+  // Preenchido quando a trilha é gerada com IA (BNCC Computação) — mesmo
+  // padrão do campo competenciasBncc de Atividade.
+  competenciasBncc String[]         @default([])
   criadaEm      DateTime            @default(now())
   atualizadaEm  DateTime            @updatedAt
 
@@ -384,12 +388,26 @@ model BadgeConcedida {
   @@map("badges_concedidas")
 }
 
+enum StatusResgate {
+  pendente
+  entregue
+  cancelado
+}
+
+// Loja de recompensas — o professor cadastra prêmios (físicos ou digitais)
+// que os alunos da turma resgatam trocando o XP acumulado nas trilhas.
 model ItemLoja {
   id         String   @id @default(cuid())
   nome       String
+  descricao  String?
   custoXp    Int
-  tipo       String
+  icone      String   @default("🎁")
   estoque    Int?
+  ativo      Boolean  @default(true)
+  criadoEm   DateTime @default(now())
+
+  turmaId    String
+  turma      Turma    @relation(fields: [turmaId], references: [id])
 
   resgates   ResgateLoja[]
 
@@ -397,10 +415,15 @@ model ItemLoja {
 }
 
 model ResgateLoja {
-  id          String   @id @default(cuid())
+  id          String        @id @default(cuid())
   alunoId     String
   itemId      String
-  resgatadoEm DateTime @default(now())
+  // Custo no momento do resgate — preservado mesmo que o professor mude o
+  // preço do item depois (não reescreve o histórico).
+  custoXp     Int
+  status      StatusResgate @default(pendente)
+  resgatadoEm DateTime      @default(now())
+  entregueEm  DateTime?
 
   aluno       Aluno    @relation(fields: [alunoId], references: [id])
   item        ItemLoja @relation(fields: [itemId], references: [id])
