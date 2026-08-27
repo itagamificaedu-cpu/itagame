@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { excluirTurma, removerAluno } from "@/app/actions/turmas";
 import FormularioAdicionarAluno from "./FormularioAdicionarAluno";
 import GerarPinCliente from "./GerarPinCliente";
+import CopiarLinkTrilhaCliente from "./CopiarLinkTrilhaCliente";
 
 export default async function PaginaDetalheTurma({
   params,
@@ -57,6 +58,7 @@ export default async function PaginaDetalheTurma({
           <p className="mt-3 text-2xl font-extrabold tracking-widest text-[#1a3fd4]">
             {turma.codigoAcesso ?? "—"}
           </p>
+          <CopiarLinkTrilhaCliente />
         </div>
 
         <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
