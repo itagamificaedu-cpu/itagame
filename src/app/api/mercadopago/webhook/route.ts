@@ -44,9 +44,18 @@ export async function POST(req: NextRequest) {
   const pagamento = await pagamentoMercadoPago.get({ id: dataId });
 
   if (pagamento.status === "approved" && pagamento.external_reference) {
-    const professorId = pagamento.external_reference;
+    // Formato novo: "<professorId>:mensal" ou "<professorId>:anual".
+    // Pagamentos antigos (antes da assinatura mensal existir) só têm o
+    // professorId puro — tratamos como anual pra não quebrar histórico.
+    const [professorId, periodicidade] = pagamento.external_reference.split(":");
+    const ehMensal = periodicidade === "mensal";
+
     const validade = new Date();
-    validade.setFullYear(validade.getFullYear() + 1);
+    if (ehMensal) {
+      validade.setMonth(validade.getMonth() + 1);
+    } else {
+      validade.setFullYear(validade.getFullYear() + 1);
+    }
 
     await prisma.assinatura.upsert({
       where: { professorId },

@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { buscarAssinaturaAtual, iniciarCheckoutAssinaturaPro } from "@/app/actions/assinatura";
-import { PRECO_PRO_ANUAL } from "@/lib/mercadoPago";
+import { PRECO_PRO_ANUAL, PRECO_PRO_MENSAL } from "@/lib/mercadoPago";
+
+const assinarMensal = iniciarCheckoutAssinaturaPro.bind(null, "mensal");
+const assinarAnual = iniciarCheckoutAssinaturaPro.bind(null, "anual");
 
 const MENSAGEM_STATUS: Record<string, { texto: string; cor: string }> = {
   sucesso: {
@@ -60,35 +63,67 @@ export default async function PaginaAssinatura({
             </p>
           </div>
         ) : (
-          <div className="mt-6 overflow-hidden rounded-2xl border border-neutral-200 bg-white">
-            <div className="bg-gradient-to-br from-[#1a3fd4] to-[#0e2694] p-8 text-white">
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-xs font-bold">
-                👑 ItaGameficaEdu Pro
-              </span>
-              <p className="mt-4 text-3xl font-extrabold">
-                R$ {PRECO_PRO_ANUAL.toFixed(2).replace(".", ",")}
-                <span className="text-base font-medium text-white/70"> /ano</span>
-              </p>
-              <p className="mt-2 text-sm text-white/80">
-                Gerador de atividades com IA sem limite e salas ao vivo ilimitadas.
-              </p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+              <div className="bg-gradient-to-br from-neutral-700 to-neutral-900 p-6 text-white">
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-xs font-bold">
+                  👑 Pro mensal
+                </span>
+                <p className="mt-4 text-3xl font-extrabold">
+                  R$ {PRECO_PRO_MENSAL.toFixed(2).replace(".", ",")}
+                  <span className="text-base font-medium text-white/70"> /mês</span>
+                </p>
+                <p className="mt-2 text-sm text-white/80">Renova todo mês, cancele quando quiser.</p>
+              </div>
+
+              <div className="p-6">
+                <ul className="space-y-2 text-sm text-neutral-600">
+                  <li>✓ Atividades geradas por IA sem limite</li>
+                  <li>✓ Salas ao vivo ilimitadas</li>
+                  <li>✓ Suporte prioritário</li>
+                </ul>
+
+                <form action={assinarMensal}>
+                  <button
+                    type="submit"
+                    className="mt-6 w-full rounded-lg bg-neutral-800 py-3 text-sm font-bold text-white transition hover:brightness-110"
+                  >
+                    Assinar mensal
+                  </button>
+                </form>
+              </div>
             </div>
 
-            <div className="p-8">
-              <ul className="space-y-2 text-sm text-neutral-600">
-                <li>✓ Atividades geradas por IA sem limite</li>
-                <li>✓ Salas ao vivo ilimitadas</li>
-                <li>✓ Suporte prioritário</li>
-              </ul>
+            <div className="overflow-hidden rounded-2xl border-2 border-[#1a3fd4] bg-white">
+              <div className="bg-gradient-to-br from-[#1a3fd4] to-[#0e2694] p-6 text-white">
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-xs font-bold">
+                  👑 Pro anual — melhor custo
+                </span>
+                <p className="mt-4 text-3xl font-extrabold">
+                  R$ {PRECO_PRO_ANUAL.toFixed(2).replace(".", ",")}
+                  <span className="text-base font-medium text-white/70"> /ano</span>
+                </p>
+                <p className="mt-2 text-sm text-white/80">
+                  Gerador de atividades com IA sem limite e salas ao vivo ilimitadas.
+                </p>
+              </div>
 
-              <form action={iniciarCheckoutAssinaturaPro}>
-                <button
-                  type="submit"
-                  className="mt-6 w-full rounded-lg bg-[#1a3fd4] py-3 text-sm font-bold text-white transition hover:brightness-110"
-                >
-                  Assinar Pro com Mercado Pago
-                </button>
-              </form>
+              <div className="p-6">
+                <ul className="space-y-2 text-sm text-neutral-600">
+                  <li>✓ Atividades geradas por IA sem limite</li>
+                  <li>✓ Salas ao vivo ilimitadas</li>
+                  <li>✓ Suporte prioritário</li>
+                </ul>
+
+                <form action={assinarAnual}>
+                  <button
+                    type="submit"
+                    className="mt-6 w-full rounded-lg bg-[#1a3fd4] py-3 text-sm font-bold text-white transition hover:brightness-110"
+                  >
+                    Assinar anual
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
         )}
