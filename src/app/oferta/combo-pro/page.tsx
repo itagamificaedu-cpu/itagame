@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { PRECO_COMBO_PRO } from "@/lib/mercadoPago";
+import { redirect } from "next/navigation";
+import { PRECO_COMBO_PRO, OFERTA_COMBO_PRO_ATIVA } from "@/lib/mercadoPago";
 
 const VALOR_PRO = 24.9;
 const VALOR_MANUAL = 19.9;
@@ -82,6 +83,10 @@ const PERGUNTAS = [
 ];
 
 export default function OfertaComboPro() {
+  if (!OFERTA_COMBO_PRO_ATIVA) {
+    redirect("/");
+  }
+
   return (
     <main className="min-h-screen bg-neutral-50 text-neutral-900">
       <section className="bg-gradient-to-br from-[#1a3fd4] to-[#0e2694] px-6 py-16 text-center text-white">
