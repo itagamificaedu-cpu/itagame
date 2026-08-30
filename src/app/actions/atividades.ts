@@ -38,6 +38,22 @@ export async function gerarAtividade(
 
   const { tipo, disciplina, serie, tema, quantidadeQuestoes } = camposValidados.data;
 
+  // Acesso cortesia (Desafio Prof Conectado) só gera 1 atividade de cada
+  // tipo — dá pra conhecer todo mundo dos 6, mas sem custo ilimitado de IA
+  // pra quem ainda não assinou. Assinante pago (cortesia: false) não tem
+  // esse limite.
+  const assinatura = await prisma.assinatura.findUnique({ where: { professorId: sessao.userId } });
+  if (assinatura?.cortesia) {
+    const jaGerouEsseTipo = await prisma.atividade.count({
+      where: { professorId: sessao.userId, tipo },
+    });
+    if (jaGerouEsseTipo > 0) {
+      return {
+        mensagem: `No acesso cortesia você pode gerar 1 atividade de cada tipo pra conhecer a ferramenta — você já gerou uma de "${tipo}". Assine o Pro pra gerar sem limite.`,
+      };
+    }
+  }
+
   let atividadeGerada;
   try {
     atividadeGerada = await gerarAtividadeComIa({ tipo, disciplina, serie, tema, quantidadeQuestoes });

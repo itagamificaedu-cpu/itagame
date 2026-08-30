@@ -95,6 +95,13 @@ model Usuario {
   avatarUrl    String?
   criadoEm     DateTime     @default(now())
 
+  // Segurança de sessão: só um aparelho logado por vez. A cada login (ou
+  // acesso cortesia) sessaoAtual ganha um novo valor e vai carimbado no
+  // cookie — se o carimbo do cookie não bater mais com esse aqui, é porque
+  // a conta foi acessada em outro lugar depois, e aquele acesso é derrubado.
+  sessaoAtual    String?
+  ultimoAcessoEm DateTime?
+
   escolaId     String?
   escola       Escola?      @relation(fields: [escolaId], references: [id])
 
@@ -438,6 +445,11 @@ model Assinatura {
   mercadoPagoId   String?
   validade        DateTime?
   criadaEm        DateTime          @default(now())
+  // true = liberada de graça (acesso cortesia do Desafio Prof Conectado),
+  // não uma assinatura paga de verdade. Vira false automaticamente quando
+  // o professor paga pelo Mercado Pago. Usada pra limitar o cortesia a 1
+  // atividade gerada por tipo, sem afetar quem já é assinante.
+  cortesia        Boolean           @default(false)
 
   escolaId        String?           @unique
   escola          Escola?           @relation(fields: [escolaId], references: [id])

@@ -64,6 +64,7 @@ export async function POST(req: NextRequest) {
         status: "ativa",
         mercadoPagoId: String(pagamento.id),
         validade,
+        cortesia: false, // pagou de verdade — vira assinante, sem os limites do cortesia
       },
       create: {
         professorId,
@@ -71,6 +72,7 @@ export async function POST(req: NextRequest) {
         status: "ativa",
         mercadoPagoId: String(pagamento.id),
         validade,
+        cortesia: false,
       },
     });
   }

@@ -14,6 +14,23 @@ export const verificarSessao = cache(async () => {
     redirect("/login");
   }
 
+  const usuario = await prisma.usuario.findUnique({
+    where: { id: sessao.userId },
+    select: { sessaoAtual: true },
+  });
+
+  // A conta foi acessada em outro aparelho depois desse login — o carimbo
+  // de sessão gravado no cookie não bate mais com o do banco. Derruba esse
+  // acesso (só um aparelho logado por vez).
+  if (!usuario || usuario.sessaoAtual !== sessao.sessaoId) {
+    (await cookies()).delete("itagame_sessao");
+    redirect("/login?erro=outro-acesso");
+  }
+
+  prisma.usuario
+    .update({ where: { id: sessao.userId }, data: { ultimoAcessoEm: new Date() } })
+    .catch(() => {});
+
   return { autenticado: true, userId: sessao.userId, papel: sessao.papel };
 });
 

@@ -44,18 +44,19 @@ export async function POST(req: NextRequest) {
   const validadeCortesia = new Date(Date.now() + Number(dias) * 24 * 60 * 60 * 1000);
   const assinaturaAtual = await prisma.assinatura.findUnique({ where: { professorId: usuario.id } });
 
-  // Não derruba quem já tem plano pago válido por mais tempo que a cortesia.
-  const jaTemAlgoMelhor =
-    assinaturaAtual?.status === "ativa" &&
-    assinaturaAtual.plano === "pro" &&
-    assinaturaAtual.validade &&
-    assinaturaAtual.validade > validadeCortesia;
+  // Já é assinante pago de verdade (veio do Mercado Pago, não de outra
+  // cortesia) — não mexe em nada, ele já tem tudo liberado sem limite.
+  const jaPagaDeVerdade = assinaturaAtual?.status === "ativa" && assinaturaAtual.plano === "pro" && !assinaturaAtual.cortesia;
 
-  if (!jaTemAlgoMelhor) {
+  // Não derruba uma cortesia anterior que ainda vença depois dessa.
+  const jaTemCortesiaMaisLonga =
+    assinaturaAtual?.cortesia && assinaturaAtual.validade && assinaturaAtual.validade > validadeCortesia;
+
+  if (!jaPagaDeVerdade && !jaTemCortesiaMaisLonga) {
     await prisma.assinatura.upsert({
       where: { professorId: usuario.id },
-      update: { plano: "pro", status: "ativa", validade: validadeCortesia },
-      create: { professorId: usuario.id, plano: "pro", status: "ativa", validade: validadeCortesia },
+      update: { plano: "pro", status: "ativa", validade: validadeCortesia, cortesia: true },
+      create: { professorId: usuario.id, plano: "pro", status: "ativa", validade: validadeCortesia, cortesia: true },
     });
   }
 
