@@ -7,10 +7,15 @@ import { criarSessao } from "@/lib/sessao";
  * gerado em /api/interno/cortesia. O professor clica e já entra logado
  * no painel, sem digitar e-mail nem senha.
  */
+// req.url reflete o host que o Next enxerga por trás do proxy (o hostname
+// interno do container, não o domínio público) — sempre monta o redirect
+// a partir da URL pública configurada, nunca de req.url.
+const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://itagame.itatecnologiaeducacional.tech";
+
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token");
   if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/login", base));
   }
 
   try {
@@ -20,8 +25,8 @@ export async function GET(req: NextRequest) {
     if (!userId) throw new Error("token sem userId");
 
     await criarSessao({ userId, papel: "professor" });
-    return NextResponse.redirect(new URL("/painel", req.url));
+    return NextResponse.redirect(new URL("/painel", base));
   } catch {
-    return NextResponse.redirect(new URL("/login?erro=link-expirado", req.url));
+    return NextResponse.redirect(new URL("/login?erro=link-expirado", base));
   }
 }
