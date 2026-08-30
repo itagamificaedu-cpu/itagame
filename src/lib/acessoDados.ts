@@ -21,9 +21,11 @@ export const verificarSessao = cache(async () => {
 
   // A conta foi acessada em outro aparelho depois desse login — o carimbo
   // de sessão gravado no cookie não bate mais com o do banco. Derruba esse
-  // acesso (só um aparelho logado por vez).
+  // acesso (só um aparelho logado por vez). Não dá pra apagar o cookie
+  // aqui (cookies() só aceita escrita em Server Action/Route Handler, não
+  // em Server Component) — sem problema, o cookie velho fica inofensivo:
+  // essa mesma checagem barra ele de novo até a pessoa logar de verdade.
   if (!usuario || usuario.sessaoAtual !== sessao.sessaoId) {
-    (await cookies()).delete("itagame_sessao");
     redirect("/login?erro=outro-acesso");
   }
 
