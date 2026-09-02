@@ -154,7 +154,7 @@ export function GeradorVocabularioCliente() {
 
       {modo === "unir" && (
         <div
-          className="grid grid-cols-2 gap-x-10 gap-y-4 rounded-2xl border p-6"
+          className="grid grid-cols-1 gap-x-10 gap-y-6 rounded-2xl border p-6 sm:grid-cols-2 sm:gap-y-4"
           style={{ borderColor: `${COR_TEMA}33` }}
         >
           <div className="space-y-4">
@@ -198,7 +198,10 @@ export function GeradorVocabularioCliente() {
               );
             })}
           </div>
-          <div className="space-y-4 border-l pl-8" style={{ borderColor: `${COR_TEMA}33` }}>
+          <div
+            className="space-y-4 border-t pt-6 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-8"
+            style={{ borderColor: `${COR_TEMA}33` }}
+          >
             {emojisEmbaralhados.map((item, indice) => (
               <div key={item.palavra} className="flex items-center gap-3">
                 <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-neutral-300 text-xs font-extrabold text-neutral-500">
