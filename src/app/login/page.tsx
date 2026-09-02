@@ -17,6 +17,7 @@ function FormularioLogin() {
   const [estado, action, pendente] = useActionState(entrar, undefined);
   const parametros = useSearchParams();
   const proximo = parametros.get("next") ?? "";
+  const redefinida = parametros.get("redefinida") === "1";
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-neutral-50 px-4">
@@ -28,6 +29,12 @@ function FormularioLogin() {
         <p className="mt-1 text-sm text-neutral-500">
           Acesse seu painel de professor.
         </p>
+
+        {redefinida && (
+          <p className="mt-4 rounded-lg bg-[#00c264]/10 p-3 text-sm text-[#00854a]">
+            Senha redefinida! Já pode entrar com a senha nova.
+          </p>
+        )}
 
         <form action={action} className="mt-6 space-y-4">
           <input type="hidden" name="proximo" value={proximo} />
@@ -48,9 +55,14 @@ function FormularioLogin() {
           </div>
 
           <div>
-            <label htmlFor="senha" className="text-sm font-medium text-neutral-700">
-              Senha
-            </label>
+            <div className="flex items-center justify-between">
+              <label htmlFor="senha" className="text-sm font-medium text-neutral-700">
+                Senha
+              </label>
+              <Link href="/esqueci-senha" className="text-xs font-semibold text-[#1a3fd4]">
+                Esqueceu a senha?
+              </Link>
+            </div>
             <input
               id="senha"
               name="senha"

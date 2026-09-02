@@ -27,6 +27,35 @@ export type EstadoFormulario =
     }
   | undefined;
 
+export const EsquemaEsqueciSenha = z.object({
+  email: z.email({ error: "Informe um e-mail válido." }).trim(),
+});
+
+export type EstadoEsqueciSenha =
+  | {
+      erros?: { email?: string[] };
+      mensagem?: string;
+    }
+  | undefined;
+
+export const EsquemaRedefinirSenha = z.object({
+  id: z.string().min(1, { error: "Link inválido." }),
+  token: z.string().min(1, { error: "Link inválido." }),
+  senha: z
+    .string()
+    .min(8, { error: "A senha precisa ter pelo menos 8 caracteres." })
+    .regex(/[a-zA-Z]/, { error: "A senha precisa ter ao menos uma letra." })
+    .regex(/[0-9]/, { error: "A senha precisa ter ao menos um número." })
+    .trim(),
+});
+
+export type EstadoRedefinirSenha =
+  | {
+      erros?: { id?: string[]; token?: string[]; senha?: string[] };
+      mensagem?: string;
+    }
+  | undefined;
+
 export const EsquemaGeracaoAtividade = z.object({
   tipo: z.enum(
     [

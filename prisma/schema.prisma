@@ -108,6 +108,11 @@ model Usuario {
   tentativasLoginFalhas Int       @default(0)
   loginBloqueadoAte     DateTime?
 
+  // "Esqueci minha senha": guarda só o hash do token enviado por e-mail
+  // (nunca o token puro) e a validade dele. Some depois de usado ou expirado.
+  tokenRedefinicaoSenhaHash String?
+  tokenRedefinicaoExpiraEm  DateTime?
+
   escolaId     String?
   escola       Escola?      @relation(fields: [escolaId], references: [id])
 
