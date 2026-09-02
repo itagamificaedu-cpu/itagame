@@ -1,5 +1,11 @@
 const funcionalidades = [
   {
+    icone: "🎯",
+    titulo: "BNCC Computação pronta para 2026/2027",
+    descricao:
+      "Trilhas gamificadas geradas com IA para os 3 eixos oficiais do Parecer CNE/CEB nº 2/2022 (Pensamento Computacional, Mundo Digital e Cultura Digital) — a implementação virou obrigatória em todo o país e o PNLD 2027 já traz livro próprio da disciplina.",
+  },
+  {
     icone: "🎓",
     titulo: "Alinhado à BNCC",
     descricao:

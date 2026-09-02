@@ -3,8 +3,17 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { gerarTrilhaIa } from "@/app/actions/trilhas";
+import type { EixoBnccComputacao } from "@/lib/bnccComputacao";
 
-export default function FormularioGerarTrilhaIa({ turmas }: { turmas: { id: string; nome: string }[] }) {
+export default function FormularioGerarTrilhaIa({
+  turmas,
+  eixo,
+}: {
+  turmas: { id: string; nome: string }[];
+  // Preenchido quando a página é aberta a partir da aba "BNCC Computação" —
+  // trava a geração nesse eixo, sem seletor livre.
+  eixo?: EixoBnccComputacao;
+}) {
   const [turmaId, setTurmaId] = useState("");
   const [nivel, setNivel] = useState("");
   const [tema, setTema] = useState("");
@@ -25,7 +34,13 @@ export default function FormularioGerarTrilhaIa({ turmas }: { turmas: { id: stri
     }
 
     setGerando(true);
-    const resultado = await gerarTrilhaIa({ turmaId, nivel: nivel.trim(), tema: tema.trim() || undefined, quantidadeMissoes });
+    const resultado = await gerarTrilhaIa({
+      turmaId,
+      nivel: nivel.trim(),
+      tema: tema.trim() || undefined,
+      quantidadeMissoes,
+      eixo,
+    });
     setGerando(false);
 
     if (!resultado.ok) {
@@ -65,7 +80,9 @@ export default function FormularioGerarTrilhaIa({ turmas }: { turmas: { id: stri
 
       <div>
         <label className="text-sm font-medium text-neutral-700">
-          Tema (opcional — deixe em branco pra IA escolher)
+          {eixo
+            ? "Tema dentro desse eixo (opcional — deixe em branco pra IA escolher)"
+            : "Tema (opcional — deixe em branco pra IA escolher)"}
         </label>
         <input
           value={tema}

@@ -52,6 +52,16 @@ enum StatusTrilha {
   publicada
 }
 
+// Os 3 eixos oficiais da BNCC Computação (Parecer CNE/CEB nº 2/2022 —
+// complemento à BNCC, obrigatório em todo o país desde 2026). Preenchido só
+// nas trilhas geradas a partir da aba "BNCC Computação" — trilhas comuns
+// ficam com esse campo null.
+enum EixoBnccComputacao {
+  pensamento_computacional
+  mundo_digital
+  cultura_digital
+}
+
 enum TipoAtividadeMissao {
   video
   quiz
@@ -319,6 +329,9 @@ model Trilha {
   // Preenchido quando a trilha é gerada com IA (BNCC Computação) — mesmo
   // padrão do campo competenciasBncc de Atividade.
   competenciasBncc String[]         @default([])
+  // Preenchido só quando a trilha nasce na aba "BNCC Computação" (ver
+  // src/lib/bnccComputacao.ts) — indica qual dos 3 eixos oficiais ela cobre.
+  eixoBnccComputacao EixoBnccComputacao?
   criadaEm      DateTime            @default(now())
   atualizadaEm  DateTime            @updatedAt
 

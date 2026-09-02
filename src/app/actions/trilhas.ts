@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { gerarTrilhaComIa, type QuestaoTrilhaGerada } from "@/lib/ia";
 import { EsquemaCriarTrilha, EstadoCriarTrilha } from "@/lib/definicoes";
+import type { EixoBnccComputacao } from "@/lib/bnccComputacao";
 
 // Ações de professor pra Trilhas Educativas: criar, publicar e excluir. A
 // criação de missão fica em missoes.ts (arquivo separado pra não ficar
@@ -132,6 +133,9 @@ export async function gerarTrilhaIa(input: {
   nivel: string;
   tema?: string;
   quantidadeMissoes: number;
+  // Vem preenchido quando a geração parte da aba "BNCC Computação" — trava
+  // a trilha nesse eixo específico e fica salvo pra exibir o selo depois.
+  eixo?: EixoBnccComputacao;
 }): Promise<ResultadoGerarTrilhaIa> {
   const sessao = await exigirAssinaturaAtiva();
 
@@ -144,7 +148,12 @@ export async function gerarTrilhaIa(input: {
 
   let gerada;
   try {
-    gerada = await gerarTrilhaComIa({ nivel: input.nivel, tema: input.tema, quantidadeMissoes: quantidade });
+    gerada = await gerarTrilhaComIa({
+      nivel: input.nivel,
+      tema: input.tema,
+      quantidadeMissoes: quantidade,
+      eixo: input.eixo,
+    });
   } catch {
     return { ok: false, erro: "Não consegui gerar a trilha agora. Tente novamente em instantes." };
   }
@@ -161,6 +170,7 @@ export async function gerarTrilhaIa(input: {
         tipoEstrutura: "linear",
         nivel: input.nivel,
         competenciasBncc: gerada.competenciasBncc,
+        eixoBnccComputacao: input.eixo,
         turmaId: input.turmaId,
         professorId: sessao.userId,
       },
@@ -194,6 +204,7 @@ export async function gerarTrilhaIa(input: {
   });
 
   revalidatePath("/painel/trilhas");
+  revalidatePath("/painel/bncc-computacao");
   return { ok: true, trilhaId };
 }
 

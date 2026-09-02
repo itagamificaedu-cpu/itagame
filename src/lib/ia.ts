@@ -1,5 +1,6 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
+import { EIXOS_BNCC_COMPUTACAO, eixoBnccPorChave, type EixoBnccComputacao } from "@/lib/bnccComputacao";
 
 const cliente = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -142,13 +143,13 @@ export type TrilhaGerada = {
   missoes: MissaoTrilhaGerada[];
 };
 
-// Eixos oficiais da BNCC Computação (Currículo de Referência em Tecnologia e
-// Computação) — toda trilha gerada precisa se apoiar neles.
-const EIXOS_BNCC_COMPUTACAO = `
-- Pensamento Computacional: abstração, decomposição de problemas, reconhecimento de padrões, algoritmos e avaliação de soluções.
-- Mundo Digital: como computadores, redes, dispositivos e sistemas digitais funcionam por trás das tecnologias do dia a dia.
-- Cultura Digital: uso crítico, ético, seguro e responsável das tecnologias — cidadania digital, privacidade, desinformação, colaboração online.
-`.trim();
+// Eixos oficiais da BNCC Computação (Parecer CNE/CEB nº 2/2022) — toda
+// trilha gerada precisa se apoiar em pelo menos um deles. Lista completa e
+// textos em src/lib/bnccComputacao.ts (fonte única, também usada nas
+// páginas da aba "BNCC Computação").
+const TEXTO_EIXOS_BNCC_COMPUTACAO = EIXOS_BNCC_COMPUTACAO.map(
+  (eixo) => `- ${eixo.nome} (${eixo.subconceitos.join(", ")}): ${eixo.resumo}`
+).join("\n");
 
 const FERRAMENTA_SALVAR_TRILHA: Anthropic.Tool = {
   name: "salvar_trilha",
@@ -212,15 +213,23 @@ export async function gerarTrilhaComIa(params: {
   nivel: string;
   tema?: string;
   quantidadeMissoes: number;
+  // Quando vem da aba "BNCC Computação", trava a trilha inteira nesse eixo
+  // específico (e nos subconceitos dele) em vez de deixar a IA escolher
+  // livremente entre os três.
+  eixo?: EixoBnccComputacao;
 }): Promise<TrilhaGerada> {
-  const { nivel, tema, quantidadeMissoes } = params;
+  const { nivel, tema, quantidadeMissoes, eixo } = params;
+  const eixoEscolhido = eixoBnccPorChave(eixo);
+
+  const instrucaoEixo = eixoEscolhido
+    ? `A trilha precisa trabalhar especificamente o eixo "${eixoEscolhido.nome}" da BNCC Computação, cobrindo seus subconceitos (${eixoEscolhido.subconceitos.join(", ")}). Em "competenciasBncc" cite esse eixo e os subconceitos trabalhados em cada missão.`
+    : `A trilha precisa trabalhar pelo menos um dos três eixos oficiais da BNCC Computação:\n${TEXTO_EIXOS_BNCC_COMPUTACAO}`;
 
   const instrucao = `Crie uma trilha de aprendizagem gamificada em português do Brasil, sobre Computação/Tecnologia, pra uma turma de nível "${nivel}"${
     tema ? `, com foco no tema "${tema}"` : ", escolhendo você mesmo um tema interessante e adequado à idade"
   }.
 
-A trilha precisa trabalhar pelo menos um dos três eixos oficiais da BNCC Computação:
-${EIXOS_BNCC_COMPUTACAO}
+${instrucaoEixo}
 
 Gere exatamente ${quantidadeMissoes} missões, em ordem progressiva (da mais simples pra mais desafiadora), formando uma sequência linear onde cada missão prepara o aluno pra próxima.
 Varie os tipos de missão (vídeo, quiz, prática, projeto, leitura, desafio) — não deixe tudo igual.

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
+import { eixoBnccPorChave } from "@/lib/bnccComputacao";
 
 export default async function PaginaTrilhas() {
   const sessao = await exigirAssinaturaAtiva();
@@ -37,6 +38,16 @@ export default async function PaginaTrilhas() {
           </div>
         </div>
 
+        <Link
+          href="/painel/bncc-computacao"
+          className="mt-4 flex items-center gap-3 rounded-xl border border-[#1a3fd4]/30 bg-[#1a3fd4]/5 p-4 transition hover:bg-[#1a3fd4]/10"
+        >
+          <span className="text-xl">🎯</span>
+          <span className="text-sm font-bold text-[#1a3fd4]">
+            Nova: aba BNCC Computação — trilhas prontas pros 3 eixos oficiais →
+          </span>
+        </Link>
+
         {trilhas.length === 0 ? (
           <div className="mt-10 rounded-2xl border border-dashed border-neutral-300 bg-white p-8 text-center">
             <p className="text-3xl">🧭</p>
@@ -47,26 +58,39 @@ export default async function PaginaTrilhas() {
           </div>
         ) : (
           <ul className="mt-8 space-y-3">
-            {trilhas.map((trilha) => (
-              <li key={trilha.id}>
-                <Link
-                  href={`/painel/trilhas/${trilha.id}`}
-                  className="flex items-center gap-4 rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:border-[#1a3fd4] hover:bg-[#1a3fd4]/5"
-                >
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#1a3fd4]/10 text-xl">
-                    🧭
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold text-neutral-900">{trilha.nome}</p>
-                    <p className="mt-0.5 text-sm text-neutral-500">
-                      {trilha.turma.nome} · {trilha._count.missoes}{" "}
-                      {trilha._count.missoes === 1 ? "missão" : "missões"} ·{" "}
-                      {trilha.status === "publicada" ? "Publicada" : "Rascunho"}
-                    </p>
-                  </div>
-                </Link>
-              </li>
-            ))}
+            {trilhas.map((trilha) => {
+              const eixo = eixoBnccPorChave(trilha.eixoBnccComputacao);
+              return (
+                <li key={trilha.id}>
+                  <Link
+                    href={`/painel/trilhas/${trilha.id}`}
+                    className="flex items-center gap-4 rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:border-[#1a3fd4] hover:bg-[#1a3fd4]/5"
+                  >
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#1a3fd4]/10 text-xl">
+                      {eixo?.icone ?? "🧭"}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="truncate font-semibold text-neutral-900">{trilha.nome}</p>
+                        {eixo && (
+                          <span
+                            className="shrink-0 rounded-full px-2 py-0.5 text-xs font-bold"
+                            style={{ backgroundColor: `${eixo.cor}15`, color: eixo.cor }}
+                          >
+                            BNCC · {eixo.nome}
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-0.5 text-sm text-neutral-500">
+                        {trilha.turma.nome} · {trilha._count.missoes}{" "}
+                        {trilha._count.missoes === 1 ? "missão" : "missões"} ·{" "}
+                        {trilha.status === "publicada" ? "Publicada" : "Rascunho"}
+                      </p>
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
