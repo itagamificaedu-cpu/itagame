@@ -41,6 +41,16 @@ export async function buscarAlunosDaTurma(codigo: string): Promise<ResultadoBusc
 
 export type ResultadoEntrarAluno = { ok: true } | { ok: false; erro: string };
 
+// Bloqueio de força bruta: o PIN só tem 4 dígitos (10 mil combinações), então
+// sem limite de tentativas daria pra "adivinhar" o PIN de outro aluno.
+const LIMITE_TENTATIVAS_PIN = 5;
+const BLOQUEIO_MINUTOS_PIN = 10;
+
+function mensagemBloqueioPin(bloqueadoAte: Date): string {
+  const minutos = Math.max(1, Math.ceil((bloqueadoAte.getTime() - Date.now()) / 60000));
+  return `Muitas tentativas erradas. Tente de novo em ${minutos} minuto${minutos === 1 ? "" : "s"}.`;
+}
+
 export async function entrarComoAluno(alunoId: string, pin: string): Promise<ResultadoEntrarAluno> {
   const aluno = await prisma.aluno.findUnique({ where: { id: alunoId } });
 
@@ -51,9 +61,31 @@ export async function entrarComoAluno(alunoId: string, pin: string): Promise<Res
     };
   }
 
+  if (aluno.pinBloqueadoAte && aluno.pinBloqueadoAte > new Date()) {
+    return { ok: false, erro: mensagemBloqueioPin(aluno.pinBloqueadoAte) };
+  }
+
   const pinConfere = await bcrypt.compare(pin.trim(), aluno.pinHash);
   if (!pinConfere) {
-    return { ok: false, erro: "PIN incorreto." };
+    const tentativas = aluno.tentativasPinFalhas + 1;
+    const bloqueado = tentativas >= LIMITE_TENTATIVAS_PIN;
+    const bloqueadoAte = new Date(Date.now() + BLOQUEIO_MINUTOS_PIN * 60000);
+
+    await prisma.aluno.update({
+      where: { id: alunoId },
+      data: bloqueado
+        ? { tentativasPinFalhas: 0, pinBloqueadoAte: bloqueadoAte }
+        : { tentativasPinFalhas: tentativas },
+    });
+
+    return { ok: false, erro: bloqueado ? mensagemBloqueioPin(bloqueadoAte) : "PIN incorreto." };
+  }
+
+  if (aluno.tentativasPinFalhas > 0 || aluno.pinBloqueadoAte) {
+    await prisma.aluno.update({
+      where: { id: alunoId },
+      data: { tentativasPinFalhas: 0, pinBloqueadoAte: null },
+    });
   }
 
   await criarSessaoAluno({ alunoId: aluno.id, turmaId: aluno.turmaId });

@@ -102,6 +102,12 @@ model Usuario {
   sessaoAtual    String?
   ultimoAcessoEm DateTime?
 
+  // Bloqueio de força bruta no login: a cada senha errada soma 1; ao bater o
+  // limite, tranca por um tempo e zera o contador. Zera sozinho no próximo
+  // login correto.
+  tentativasLoginFalhas Int       @default(0)
+  loginBloqueadoAte     DateTime?
+
   escolaId     String?
   escola       Escola?      @relation(fields: [escolaId], references: [id])
 
@@ -149,6 +155,11 @@ model Aluno {
   // precisar de e-mail. Nulo até o professor gerar o primeiro PIN.
   pinHash   String?
   criadoEm  DateTime @default(now())
+
+  // Bloqueio de força bruta no PIN: mesmo esquema do login do professor —
+  // conta erros, tranca por um tempo ao bater o limite, zera no PIN certo.
+  tentativasPinFalhas Int       @default(0)
+  pinBloqueadoAte     DateTime?
 
   turmaId   String
   turma     Turma    @relation(fields: [turmaId], references: [id])
