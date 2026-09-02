@@ -8,6 +8,7 @@ import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { gerarTrilhaComIa, type QuestaoTrilhaGerada } from "@/lib/ia";
 import { EsquemaCriarTrilha, EstadoCriarTrilha } from "@/lib/definicoes";
 import type { EixoBnccComputacao } from "@/lib/bnccComputacao";
+import { modeloBnccPorId } from "@/lib/modelosBnccComputacao";
 
 // Ações de professor pra Trilhas Educativas: criar, publicar e excluir. A
 // criação de missão fica em missoes.ts (arquivo separado pra não ficar
@@ -188,6 +189,69 @@ export async function gerarTrilhaIa(input: {
           titulo: missao.titulo,
           descricao: missao.descricao,
           xpRecompensa: Math.max(1, Math.round(missao.xp) || 10),
+          criadaPorId: sessao.userId,
+          trilhaId: trilha.id,
+          ordem: indice,
+          tipoAtividade: missao.tipoAtividade,
+          preRequisitoId,
+          checkpointTipo: quizPerguntas ? "quiz_automatico" : "correcao_professor",
+          quizPerguntas: quizPerguntas as Prisma.InputJsonValue | undefined,
+        },
+      });
+      preRequisitoId = criada.id;
+    }
+
+    return trilha.id;
+  });
+
+  revalidatePath("/painel/trilhas");
+  revalidatePath("/painel/bncc-computacao");
+  return { ok: true, trilhaId };
+}
+
+// Adiciona uma trilha MODELO (conteúdo pronto, escrito à mão — ver
+// src/lib/modelosBnccComputacao.ts) na turma, sem chamar IA nenhuma —
+// instantâneo, ao contrário de gerarTrilhaIa. Mesma estrutura de trilha
+// "linear" com missões em sequência, já com o eixo BNCC marcado.
+export async function criarTrilhaAPartirDeModelo(input: {
+  modeloId: string;
+  turmaId: string;
+}): Promise<ResultadoGerarTrilhaIa> {
+  const sessao = await exigirAssinaturaAtiva();
+
+  const modelo = modeloBnccPorId(input.modeloId);
+  if (!modelo) {
+    return { ok: false, erro: "Modelo não encontrado." };
+  }
+
+  const turma = await prisma.turma.findUnique({ where: { id: input.turmaId } });
+  if (!turma || turma.professorId !== sessao.userId) {
+    return { ok: false, erro: "Turma não encontrada." };
+  }
+
+  const trilhaId = await prisma.$transaction(async (tx) => {
+    const trilha = await tx.trilha.create({
+      data: {
+        nome: modelo.nome,
+        descricao: modelo.descricao,
+        tipoEstrutura: "linear",
+        nivel: modelo.nivelSugerido,
+        eixoBnccComputacao: modelo.eixo,
+        turmaId: input.turmaId,
+        professorId: sessao.userId,
+      },
+    });
+
+    let preRequisitoId: string | undefined;
+    for (const [indice, missao] of modelo.missoes.entries()) {
+      const quizPerguntas =
+        missao.checkpointTipo === "quiz_automatico" ? normalizarQuizPerguntas(missao.quizPerguntas) : undefined;
+
+      const criada = await tx.missao.create({
+        data: {
+          titulo: missao.titulo,
+          descricao: missao.descricao,
+          xpRecompensa: missao.xp,
           criadaPorId: sessao.userId,
           trilhaId: trilha.id,
           ordem: indice,

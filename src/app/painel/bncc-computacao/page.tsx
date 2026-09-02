@@ -2,6 +2,7 @@ import Link from "next/link";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { EIXOS_BNCC_COMPUTACAO } from "@/lib/bnccComputacao";
+import { MODELOS_BNCC_COMPUTACAO } from "@/lib/modelosBnccComputacao";
 
 // Hub da aba "BNCC Computação" — carro-chefe da plataforma pro ano letivo de
 // 2027 (primeiro ciclo do PNLD com livro próprio de Educação Digital e
@@ -71,12 +72,29 @@ export default async function PaginaBnccComputacao() {
                   ))}
                 </div>
 
+                {MODELOS_BNCC_COMPUTACAO.filter((modelo) => modelo.eixo === eixo.chave).map((modelo) => (
+                  <Link
+                    key={modelo.id}
+                    href={`/painel/trilhas/usar-modelo/${modelo.id}`}
+                    className="mt-4 flex items-start gap-2 rounded-xl border p-3 transition hover:brightness-95"
+                    style={{ borderColor: `${eixo.cor}33`, backgroundColor: `${eixo.cor}0a` }}
+                  >
+                    <span className="text-base">⚡</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-bold text-neutral-800">{modelo.nome}</span>
+                      <span className="block text-xs text-neutral-500">
+                        Pronta · {modelo.missoes.length} desafios · adicionar em 1 clique
+                      </span>
+                    </span>
+                  </Link>
+                ))}
+
                 <Link
                   href={`/painel/trilhas/gerar-ia?eixo=${eixo.chave}`}
-                  className="mt-5 rounded-lg py-2.5 text-center text-sm font-bold text-white transition hover:brightness-110"
-                  style={{ backgroundColor: eixo.cor }}
+                  className="mt-3 rounded-lg border py-2 text-center text-sm font-bold transition hover:brightness-95"
+                  style={{ borderColor: eixo.cor, color: eixo.cor }}
                 >
-                  ✨ Gerar trilha neste eixo
+                  ✨ Ou gerar uma nova com IA
                 </Link>
 
                 {trilhasDoEixo.length > 0 && (
