@@ -39,16 +39,16 @@ export function LayoutGerador({
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-8 lg:flex-row">
+      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-3 py-5 sm:gap-6 sm:px-6 sm:py-8 lg:flex-row">
         <aside className="w-full shrink-0 space-y-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm print:hidden lg:w-72">
           {config}
         </aside>
         <div
-          className="min-w-0 flex-1 rounded-3xl p-3 print:bg-transparent print:p-0"
+          className="min-w-0 flex-1 rounded-3xl p-1.5 print:bg-transparent print:p-0 sm:p-3"
           style={{ backgroundColor: `${cor}0d` }}
         >
           <div
-            className="overflow-x-auto rounded-2xl border-[3px] bg-white p-8 shadow-md print:border print:shadow-none"
+            className="overflow-x-auto rounded-2xl border-[3px] bg-white p-4 shadow-md print:border print:shadow-none sm:p-8"
             style={{ borderColor: cor }}
           >
             {children}

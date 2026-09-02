@@ -154,26 +154,26 @@ export function GeradorVocabularioCliente() {
 
       {modo === "unir" && (
         <div
-          className="grid grid-cols-1 gap-x-10 gap-y-6 rounded-2xl border p-6 sm:grid-cols-2 sm:gap-y-4"
+          className="grid grid-cols-2 gap-x-2 gap-y-3 rounded-2xl border p-3 sm:gap-x-10 sm:gap-y-4 sm:p-6"
           style={{ borderColor: `${COR_TEMA}33` }}
         >
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {palavras.map((item, indice) => {
               const cor = PALETA_CORES[indice % PALETA_CORES.length];
               const online = modoAtividade === "online";
               const respostaEscolhida = respostas[indice] ?? "";
               const correta = respostaEscolhida.trim().toUpperCase() === letraCertaUnir(indice);
               return (
-                <div key={item.palavra} className="flex items-center gap-3">
+                <div key={item.palavra} className="flex items-center gap-1 sm:gap-3">
                   <NumeroColorido numero={indice + 1} cor={cor} />
-                  <span className="font-bold text-neutral-800">{item.palavra}</span>
-                  <span className="flex-1 border-b-2 border-dotted" style={{ borderColor: cor }} />
+                  <span className="truncate text-xs font-bold text-neutral-800 sm:text-base">{item.palavra}</span>
+                  <span className="min-w-2 flex-1 border-b-2 border-dotted" style={{ borderColor: cor }} />
                   {online ? (
                     <select
                       value={respostaEscolhida}
                       disabled={conferido}
                       onChange={(e) => setRespostas((atual) => ({ ...atual, [indice]: e.target.value }))}
-                      className={`w-14 rounded border-2 px-1 py-1 text-center text-sm font-bold outline-none disabled:opacity-100 ${
+                      className={`w-9 rounded border-2 px-0 py-1 text-center text-xs font-bold outline-none disabled:opacity-100 sm:w-14 sm:px-1 sm:text-sm ${
                         conferido
                           ? correta
                             ? "border-[#00c264] bg-[#00c264]/10 text-[#00854a]"
@@ -190,7 +190,10 @@ export function GeradorVocabularioCliente() {
                       ))}
                     </select>
                   ) : (
-                    <span className="w-8 rounded border-2 text-center text-sm font-bold" style={{ borderColor: cor, color: cor }}>
+                    <span
+                      className="w-6 shrink-0 rounded border-2 text-center text-xs font-bold sm:w-8 sm:text-sm"
+                      style={{ borderColor: cor, color: cor }}
+                    >
                       &nbsp;
                     </span>
                   )}
@@ -198,16 +201,13 @@ export function GeradorVocabularioCliente() {
               );
             })}
           </div>
-          <div
-            className="space-y-4 border-t pt-6 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-8"
-            style={{ borderColor: `${COR_TEMA}33` }}
-          >
+          <div className="space-y-3 border-l pl-2 sm:space-y-4 sm:pl-8" style={{ borderColor: `${COR_TEMA}33` }}>
             {emojisEmbaralhados.map((item, indice) => (
-              <div key={item.palavra} className="flex items-center gap-3">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-neutral-300 text-xs font-extrabold text-neutral-500">
+              <div key={item.palavra} className="flex items-center gap-1.5 sm:gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-neutral-300 text-[10px] font-extrabold text-neutral-500 sm:h-7 sm:w-7 sm:text-xs">
                   {LETRAS[indice]}
                 </span>
-                <span className="text-2xl">{item.emoji}</span>
+                <span className="text-xl sm:text-2xl">{item.emoji}</span>
               </div>
             ))}
           </div>
