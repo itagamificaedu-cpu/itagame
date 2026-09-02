@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import RegistrarServiceWorker from "@/components/RegistrarServiceWorker";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,6 +17,17 @@ export const metadata: Metadata = {
   title: "ItaGameficaEdu — IA e gamificação para a sua sala de aula",
   description:
     "Gere atividades com IA em segundos, corrija provas e redações automaticamente e transforme a turma em um jogo com ranking ao vivo.",
+  // Faz o "Adicionar à Tela de Início" do iPhone abrir em tela cheia, sem
+  // barra de navegador — no Android quem faz isso é o manifest.ts.
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ItaGameficaEdu",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#1a3fd4",
 };
 
 export default function RootLayout({
@@ -28,7 +40,10 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-white">{children}</body>
+      <body className="min-h-full flex flex-col bg-white">
+        {children}
+        <RegistrarServiceWorker />
+      </body>
     </html>
   );
 }
