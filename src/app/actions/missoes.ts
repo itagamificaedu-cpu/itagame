@@ -150,6 +150,62 @@ export async function removerMissao(trilhaId: string, missaoId: string): Promise
 
 // --- conclusão de missão: XP + badge (idempotente) + desbloqueio ---
 
+const NOME_BADGE_MESTRE_BNCC = "Mestre da Computação";
+
+async function obterOuCriarBadgeMestreBncc() {
+  const existente = await prisma.badge.findFirst({ where: { nome: NOME_BADGE_MESTRE_BNCC } });
+  if (existente) return existente;
+  return prisma.badge.create({
+    data: {
+      nome: NOME_BADGE_MESTRE_BNCC,
+      descricao: "Completou pelo menos uma trilha de cada um dos 3 eixos da BNCC Computação.",
+      icone: "🏆",
+    },
+  });
+}
+
+// Toda vez que uma missão de uma trilha de BNCC Computação é concluída,
+// confere se essa trilha específica ficou 100% completa e, se sim, se o
+// aluno já fechou pelo menos uma trilha de CADA um dos 3 eixos oficiais
+// (na turma dele) — nesse caso concede o badge especial automaticamente.
+// Não bloqueia nem atrasa a conclusão normal da missão se algo der errado
+// aqui (é só um bônus cosmético em cima do progresso de verdade).
+async function verificarConquistaBnccComputacao(alunoId: string, trilhaId: string | null) {
+  if (!trilhaId) return;
+
+  const trilhaAtual = await prisma.trilha.findUnique({ where: { id: trilhaId } });
+  if (!trilhaAtual?.eixoBnccComputacao) return;
+
+  const trilhasBncc = await prisma.trilha.findMany({
+    where: { turmaId: trilhaAtual.turmaId, eixoBnccComputacao: { not: null } },
+    include: { missoes: { select: { id: true } } },
+  });
+
+  const progressosConcluidos = await prisma.progressoAluno.findMany({
+    where: {
+      alunoId,
+      status: "concluida",
+      missao: { trilhaId: { in: trilhasBncc.map((t) => t.id) } },
+    },
+    select: { missaoId: true },
+  });
+  const missoesConcluidasIds = new Set(progressosConcluidos.map((p) => p.missaoId));
+
+  const eixosConcluidos = new Set(
+    trilhasBncc
+      .filter((t) => t.missoes.length > 0 && t.missoes.every((m) => missoesConcluidasIds.has(m.id)))
+      .map((t) => t.eixoBnccComputacao)
+  );
+
+  if (eixosConcluidos.size < 3) return;
+
+  const badge = await obterOuCriarBadgeMestreBncc();
+  await prisma.badgeConcedida.createMany({
+    data: [{ alunoId, badgeId: badge.id }],
+    skipDuplicates: true,
+  });
+}
+
 async function concluirMissao(progressoId: string) {
   const progresso = await prisma.progressoAluno.findUnique({
     where: { id: progressoId },
@@ -202,6 +258,8 @@ async function concluirMissao(progressoId: string) {
       data: { status: "disponivel" },
     });
   }
+
+  await verificarConquistaBnccComputacao(progresso.alunoId, progresso.missao.trilhaId);
 }
 
 async function buscarProgressoDoAluno(progressoId: string) {

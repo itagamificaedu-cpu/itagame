@@ -69,6 +69,19 @@ export default async function PaginaTrilhaAluno() {
           </div>
         </Link>
 
+        <Link
+          href="/trilha/bncc-computacao"
+          className="mt-3 flex items-center gap-4 rounded-2xl border border-[#1a3fd4]/30 bg-[#1a3fd4]/5 p-5 shadow-sm transition hover:bg-[#1a3fd4]/10"
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-xl">
+            🎮
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-[#1a3fd4]">Meus Desafios de Tecnologia</p>
+            <p className="mt-0.5 text-sm text-neutral-500">Complete os 3 mundos e ganhe o emblema especial</p>
+          </div>
+        </Link>
+
         {badgesConcedidas.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {badgesConcedidas.map((b) => (
