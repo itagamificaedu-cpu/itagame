@@ -61,6 +61,19 @@ export default async function PaginaDetalheTurma({
           <CopiarLinkTrilhaCliente />
         </div>
 
+        <Link
+          href={`/painel/turmas/${turma.id}/prontuario`}
+          className="mt-6 flex items-center gap-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:border-[#1a3fd4] hover:bg-[#1a3fd4]/5"
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#1a3fd4]/10 text-xl">
+            🩺
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-neutral-900">Simulador de Prontuário Eletrônico</p>
+            <p className="mt-0.5 text-sm text-neutral-500">Casos clínicos + registro estruturado de enfermagem</p>
+          </div>
+        </Link>
+
         <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
           <p className="font-bold text-neutral-900">Adicionar aluno</p>
           <div className="mt-3">

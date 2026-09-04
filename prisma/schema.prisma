@@ -158,6 +158,7 @@ model Turma {
   alunos       Aluno[]
   trilhas      Trilha[]
   itensLoja    ItemLoja[]
+  casosClinicos CasoClinicoProntuario[]
 
   @@map("turmas")
 }
@@ -183,8 +184,66 @@ model Aluno {
   xpTransacoes     XpTransacao[]
   resgates         ResgateLoja[]
   badgesConcedidas BadgeConcedida[]
+  registrosProntuario RegistroProntuario[]
 
   @@map("alunos")
+}
+
+// --- Simulador de Prontuário Eletrônico (disciplina de Informática Aplicada,
+// Curso Técnico em Enfermagem) — o professor cadastra casos clínicos por
+// turma, o aluno "atende" cada caso preenchendo um registro estruturado
+// (sinais vitais + anotação de enfermagem), igual a uma ficha de prontuário
+// eletrônico de verdade. Painel de monitoramento (professor) mostra quantos
+// registros cada aluno já finalizou.
+
+model CasoClinicoProntuario {
+  id        String   @id @default(cuid())
+  titulo    String
+  enunciado String
+  ordem     Int      @default(0)
+  criadoEm  DateTime @default(now())
+
+  turmaId   String
+  turma     Turma    @relation(fields: [turmaId], references: [id])
+
+  registros RegistroProntuario[]
+
+  @@map("casos_clinicos_prontuario")
+}
+
+enum StatusRegistroProntuario {
+  pendente
+  finalizado
+}
+
+model RegistroProntuario {
+  id     String @id @default(cuid())
+  casoId String
+  caso   CasoClinicoProntuario @relation(fields: [casoId], references: [id])
+
+  alunoId String
+  aluno   Aluno  @relation(fields: [alunoId], references: [id])
+
+  // Campos livres (o aluno digita), espelhando a planilha original de
+  // simulação — mantidos como String pra não travar formato de data/hora
+  // digitado à mão pelo aluno.
+  dataRegistro            String?
+  horaRegistro            String?
+  paciente                String?
+  leito                   String?
+  pressaoArterial         String?
+  frequenciaCardiaca      String?
+  frequenciaRespiratoria  String?
+  temperatura             String?
+  saturacaoOxigenio       String?
+  anotacaoEnfermagem      String?
+  assinaturaTecnico       String?
+
+  status       StatusRegistroProntuario @default(pendente)
+  atualizadoEm DateTime                 @updatedAt
+
+  @@unique([casoId, alunoId])
+  @@map("registros_prontuario")
 }
 
 model Matricula {
