@@ -62,6 +62,23 @@ enum EixoBnccComputacao {
   cultura_digital
 }
 
+// Os 10 eixos/temas oficiais da Matriz de Referência do SPAECE (SEDUC-CE),
+// 9º ano do Ensino Fundamental — 6 de Língua Portuguesa + 4 de Matemática.
+// Preenchido só nas trilhas geradas a partir da aba "SPAECE 9º ano" (ver
+// src/lib/spaece.ts) — trilhas comuns ficam com esse campo null.
+enum EixoSpaece9Ano {
+  lp_procedimentos_leitura
+  lp_implicacoes_suporte_genero
+  lp_relacao_textos
+  lp_coerencia_coesao
+  lp_recursos_expressivos
+  lp_variacao_linguistica
+  mt_numeros_funcoes
+  mt_geometria
+  mt_medidas
+  mt_tratamento_informacao
+}
+
 enum TipoAtividadeMissao {
   video
   quiz
@@ -392,6 +409,9 @@ model Trilha {
   // Preenchido só quando a trilha nasce na aba "BNCC Computação" (ver
   // src/lib/bnccComputacao.ts) — indica qual dos 3 eixos oficiais ela cobre.
   eixoBnccComputacao EixoBnccComputacao?
+  // Preenchido só quando a trilha nasce na aba "SPAECE 9º ano" (ver
+  // src/lib/spaece.ts) — indica qual dos 10 eixos oficiais ela cobre.
+  eixoSpaece    EixoSpaece9Ano?
   criadaEm      DateTime            @default(now())
   atualizadaEm  DateTime            @updatedAt
 

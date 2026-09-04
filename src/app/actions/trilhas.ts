@@ -9,6 +9,7 @@ import { gerarTrilhaComIa, type QuestaoTrilhaGerada } from "@/lib/ia";
 import { EsquemaCriarTrilha, EstadoCriarTrilha } from "@/lib/definicoes";
 import type { EixoBnccComputacao } from "@/lib/bnccComputacao";
 import { modeloBnccPorId } from "@/lib/modelosBnccComputacao";
+import type { EixoSpaece9Ano } from "@/lib/spaece";
 
 // Ações de professor pra Trilhas Educativas: criar, publicar e excluir. A
 // criação de missão fica em missoes.ts (arquivo separado pra não ficar
@@ -137,6 +138,9 @@ export async function gerarTrilhaIa(input: {
   // Vem preenchido quando a geração parte da aba "BNCC Computação" — trava
   // a trilha nesse eixo específico e fica salvo pra exibir o selo depois.
   eixo?: EixoBnccComputacao;
+  // Vem preenchido quando a geração parte da aba "SPAECE 9º ano" — trava a
+  // trilha nesse eixo da matriz oficial (mutuamente exclusivo com `eixo`).
+  eixoSpaece?: EixoSpaece9Ano;
 }): Promise<ResultadoGerarTrilhaIa> {
   const sessao = await exigirAssinaturaAtiva();
 
@@ -154,6 +158,7 @@ export async function gerarTrilhaIa(input: {
       tema: input.tema,
       quantidadeMissoes: quantidade,
       eixo: input.eixo,
+      eixoSpaece: input.eixoSpaece,
     });
   } catch {
     return { ok: false, erro: "Não consegui gerar a trilha agora. Tente novamente em instantes." };
@@ -172,6 +177,7 @@ export async function gerarTrilhaIa(input: {
         nivel: input.nivel,
         competenciasBncc: gerada.competenciasBncc,
         eixoBnccComputacao: input.eixo,
+        eixoSpaece: input.eixoSpaece,
         turmaId: input.turmaId,
         professorId: sessao.userId,
       },
@@ -206,6 +212,7 @@ export async function gerarTrilhaIa(input: {
 
   revalidatePath("/painel/trilhas");
   revalidatePath("/painel/bncc-computacao");
+  revalidatePath("/painel/spaece");
   return { ok: true, trilhaId };
 }
 
@@ -269,6 +276,7 @@ export async function criarTrilhaAPartirDeModelo(input: {
 
   revalidatePath("/painel/trilhas");
   revalidatePath("/painel/bncc-computacao");
+  revalidatePath("/painel/spaece");
   return { ok: true, trilhaId };
 }
 

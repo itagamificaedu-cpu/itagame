@@ -1,6 +1,7 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { EIXOS_BNCC_COMPUTACAO, eixoBnccPorChave, type EixoBnccComputacao } from "@/lib/bnccComputacao";
+import { eixoSpaecePorChave, type EixoSpaece9Ano } from "@/lib/spaece";
 
 const cliente = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -217,15 +218,26 @@ export async function gerarTrilhaComIa(params: {
   // específico (e nos subconceitos dele) em vez de deixar a IA escolher
   // livremente entre os três.
   eixo?: EixoBnccComputacao;
+  // Quando vem da aba "SPAECE 9º ano", trava a trilha inteira nesse eixo da
+  // matriz oficial (Língua Portuguesa ou Matemática), treinando os
+  // descritores reais dele — mutuamente exclusivo com `eixo` (BNCC).
+  eixoSpaece?: EixoSpaece9Ano;
 }): Promise<TrilhaGerada> {
-  const { nivel, tema, quantidadeMissoes, eixo } = params;
+  const { nivel, tema, quantidadeMissoes, eixo, eixoSpaece } = params;
   const eixoEscolhido = eixoBnccPorChave(eixo);
+  const eixoSpaeceEscolhido = eixoSpaecePorChave(eixoSpaece);
 
-  const instrucaoEixo = eixoEscolhido
-    ? `A trilha precisa trabalhar especificamente o eixo "${eixoEscolhido.nome}" da BNCC Computação, cobrindo seus subconceitos (${eixoEscolhido.subconceitos.join(", ")}). Em "competenciasBncc" cite esse eixo e os subconceitos trabalhados em cada missão.`
-    : `A trilha precisa trabalhar pelo menos um dos três eixos oficiais da BNCC Computação:\n${TEXTO_EIXOS_BNCC_COMPUTACAO}`;
+  const instrucaoEixo = eixoSpaeceEscolhido
+    ? `A trilha precisa treinar especificamente as habilidades do eixo "${eixoSpaeceEscolhido.nome}" da Matriz de Referência oficial do SPAECE (${eixoSpaeceEscolhido.disciplina === "matematica" ? "Matemática" : "Língua Portuguesa"}, 9º ano). Descritores oficiais desse eixo, cada um DEVE ser trabalhado em pelo menos uma missão/questão:\n${eixoSpaeceEscolhido.descritores.map((d) => `- ${d.codigo}: ${d.habilidade}`).join("\n")}\nEm "competenciasBncc" cite o código e o nome de cada descritor trabalhado em cada missão (ex: "D01 — Localizar informação explícita").`
+    : eixoEscolhido
+      ? `A trilha precisa trabalhar especificamente o eixo "${eixoEscolhido.nome}" da BNCC Computação, cobrindo seus subconceitos (${eixoEscolhido.subconceitos.join(", ")}). Em "competenciasBncc" cite esse eixo e os subconceitos trabalhados em cada missão.`
+      : `A trilha precisa trabalhar pelo menos um dos três eixos oficiais da BNCC Computação:\n${TEXTO_EIXOS_BNCC_COMPUTACAO}`;
 
-  const instrucao = `Crie uma trilha de aprendizagem gamificada em português do Brasil, sobre Computação/Tecnologia, pra uma turma de nível "${nivel}"${
+  const instrucao = `Crie uma trilha de aprendizagem gamificada em português do Brasil, ${
+    eixoSpaeceEscolhido
+      ? `sobre ${eixoSpaeceEscolhido.disciplina === "matematica" ? "Matemática" : "Língua Portuguesa"} (preparatória para o SPAECE)`
+      : "sobre Computação/Tecnologia"
+  }, pra uma turma de nível "${nivel}"${
     tema ? `, com foco no tema "${tema}"` : ", escolhendo você mesmo um tema interessante e adequado à idade"
   }.
 
@@ -233,7 +245,7 @@ ${instrucaoEixo}
 
 Gere exatamente ${quantidadeMissoes} missões, em ordem progressiva (da mais simples pra mais desafiadora), formando uma sequência linear onde cada missão prepara o aluno pra próxima.
 Varie os tipos de missão (vídeo, quiz, prática, projeto, leitura, desafio) — não deixe tudo igual.
-Pelo menos uma missão deve ser do tipo "quiz" com checkpointTipo "quiz_automatico".
+Pelo menos uma missão deve ser do tipo "quiz" com checkpointTipo "quiz_automatico"${eixoSpaeceEscolhido ? ", com perguntas no estilo de item de prova do SPAECE (situação-problema/texto de apoio + pergunta objetiva)" : ""}.
 Use linguagem simples e adequada à faixa etária. Chame a ferramenta "salvar_trilha" com o resultado.`;
 
   const resposta = await cliente.messages.create({

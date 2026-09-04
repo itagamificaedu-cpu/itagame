@@ -2,6 +2,7 @@ import Link from "next/link";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { eixoBnccPorChave } from "@/lib/bnccComputacao";
+import { eixoSpaecePorChave, VERDE_SPAECE } from "@/lib/spaece";
 
 export default async function PaginaTrilhas() {
   const sessao = await exigirAssinaturaAtiva();
@@ -60,6 +61,7 @@ export default async function PaginaTrilhas() {
           <ul className="mt-8 space-y-3">
             {trilhas.map((trilha) => {
               const eixo = eixoBnccPorChave(trilha.eixoBnccComputacao);
+              const eixoSpaece = eixoSpaecePorChave(trilha.eixoSpaece);
               return (
                 <li key={trilha.id}>
                   <Link
@@ -67,7 +69,7 @@ export default async function PaginaTrilhas() {
                     className="flex items-center gap-4 rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:border-[#1a3fd4] hover:bg-[#1a3fd4]/5"
                   >
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#1a3fd4]/10 text-xl">
-                      {eixo?.icone ?? "🧭"}
+                      {eixo?.icone ?? (eixoSpaece ? "🟩" : "🧭")}
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
@@ -78,6 +80,14 @@ export default async function PaginaTrilhas() {
                             style={{ backgroundColor: `${eixo.cor}15`, color: eixo.cor }}
                           >
                             BNCC · {eixo.nome}
+                          </span>
+                        )}
+                        {eixoSpaece && (
+                          <span
+                            className="shrink-0 rounded-full px-2 py-0.5 text-xs font-bold"
+                            style={{ backgroundColor: `${VERDE_SPAECE}15`, color: VERDE_SPAECE }}
+                          >
+                            SPAECE · {eixoSpaece.nome}
                           </span>
                         )}
                       </div>

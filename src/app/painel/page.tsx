@@ -122,6 +122,12 @@ export default async function PaginaPainel() {
               🎯 BNCC Computação
             </Link>
             <Link
+              href="/painel/spaece"
+              className="rounded-lg bg-white px-5 py-2.5 text-sm font-bold text-[#1e8f4e] shadow-sm transition hover:brightness-95"
+            >
+              🟩 SPAECE 9º ano
+            </Link>
+            <Link
               href="/painel/atividades/nova"
               className="rounded-lg bg-white px-5 py-2.5 text-sm font-bold text-[#1a3fd4] transition hover:brightness-95"
             >

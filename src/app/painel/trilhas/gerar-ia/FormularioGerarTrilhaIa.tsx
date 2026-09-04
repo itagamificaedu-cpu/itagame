@@ -4,15 +4,22 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { gerarTrilhaIa } from "@/app/actions/trilhas";
 import type { EixoBnccComputacao } from "@/lib/bnccComputacao";
+import type { EixoSpaece9Ano } from "@/lib/spaece";
 
 export default function FormularioGerarTrilhaIa({
   turmas,
   eixo,
+  eixoSpaece,
+  corDestaque = "#1a3fd4",
 }: {
   turmas: { id: string; nome: string }[];
   // Preenchido quando a página é aberta a partir da aba "BNCC Computação" —
   // trava a geração nesse eixo, sem seletor livre.
   eixo?: EixoBnccComputacao;
+  // Preenchido quando a página é aberta a partir da aba "SPAECE 9º ano" —
+  // trava a geração nesse eixo da matriz oficial.
+  eixoSpaece?: EixoSpaece9Ano;
+  corDestaque?: string;
 }) {
   const [turmaId, setTurmaId] = useState("");
   const [nivel, setNivel] = useState("");
@@ -40,6 +47,7 @@ export default function FormularioGerarTrilhaIa({
       tema: tema.trim() || undefined,
       quantidadeMissoes,
       eixo,
+      eixoSpaece,
     });
     setGerando(false);
 
@@ -110,7 +118,8 @@ export default function FormularioGerarTrilhaIa({
         type="button"
         onClick={gerar}
         disabled={gerando}
-        className="w-full rounded-lg bg-[#1a3fd4] py-2.5 text-sm font-bold text-white transition hover:brightness-110 disabled:opacity-60"
+        style={{ backgroundColor: corDestaque }}
+        className="w-full rounded-lg py-2.5 text-sm font-bold text-white transition hover:brightness-110 disabled:opacity-60"
       >
         {gerando ? "Gerando trilha com IA... (pode levar até 1 minuto)" : "✨ Gerar trilha"}
       </button>

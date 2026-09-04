@@ -5,6 +5,7 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { exigirAssinaturaAtiva, verificarSessaoAluno } from "@/lib/acessoDados";
 import { verificarDonoTrilha } from "@/app/actions/trilhas";
+import { DISCIPLINAS_SPAECE, eixoSpaecePorChave, type DisciplinaSpaece } from "@/lib/spaece";
 
 // Missões dentro de uma trilha (professor) + progresso do aluno (aluno):
 // entregar/responder quiz/avaliar. XP, badge e desbloqueio de missões
@@ -206,6 +207,70 @@ async function verificarConquistaBnccComputacao(alunoId: string, trilhaId: strin
   });
 }
 
+const NOME_BADGE_SPAECE: Record<DisciplinaSpaece, string> = {
+  lingua_portuguesa: "Craque do SPAECE — Língua Portuguesa",
+  matematica: "Craque do SPAECE — Matemática",
+};
+
+async function obterOuCriarBadgeSpaece(disciplina: DisciplinaSpaece) {
+  const nome = NOME_BADGE_SPAECE[disciplina];
+  const existente = await prisma.badge.findFirst({ where: { nome } });
+  if (existente) return existente;
+  return prisma.badge.create({
+    data: {
+      nome,
+      descricao: `Completou pelo menos uma trilha de cada eixo de ${disciplina === "matematica" ? "Matemática" : "Língua Portuguesa"} da Matriz de Referência do SPAECE (9º ano).`,
+      icone: "🟩",
+    },
+  });
+}
+
+// Mesmo padrão de verificarConquistaBnccComputacao, mas pro SPAECE: quando o
+// aluno fecha pelo menos uma trilha de CADA eixo oficial de uma disciplina
+// (Língua Portuguesa tem 6 eixos, Matemática tem 4), concede o badge daquela
+// disciplina automaticamente. As duas disciplinas têm badges independentes.
+async function verificarConquistaSpaece(alunoId: string, trilhaId: string | null) {
+  if (!trilhaId) return;
+
+  const trilhaAtual = await prisma.trilha.findUnique({ where: { id: trilhaId } });
+  const eixoAtual = eixoSpaecePorChave(trilhaAtual?.eixoSpaece);
+  if (!eixoAtual) return;
+
+  const disciplina = eixoAtual.disciplina;
+  const totalEixosDisciplina = DISCIPLINAS_SPAECE.find((d) => d.chave === disciplina)?.eixos.length ?? 0;
+  if (totalEixosDisciplina === 0) return;
+
+  const trilhasSpaece = await prisma.trilha.findMany({
+    where: { turmaId: trilhaAtual!.turmaId, eixoSpaece: { not: null } },
+    include: { missoes: { select: { id: true } } },
+  });
+  const trilhasDaDisciplina = trilhasSpaece.filter((t) => eixoSpaecePorChave(t.eixoSpaece)?.disciplina === disciplina);
+
+  const progressosConcluidos = await prisma.progressoAluno.findMany({
+    where: {
+      alunoId,
+      status: "concluida",
+      missao: { trilhaId: { in: trilhasDaDisciplina.map((t) => t.id) } },
+    },
+    select: { missaoId: true },
+  });
+  const missoesConcluidasIds = new Set(progressosConcluidos.map((p) => p.missaoId));
+
+  const eixosConcluidos = new Set(
+    trilhasDaDisciplina
+      .filter((t) => t.missoes.length > 0 && t.missoes.every((m) => missoesConcluidasIds.has(m.id)))
+      .map((t) => t.eixoSpaece)
+  );
+
+  if (eixosConcluidos.size < totalEixosDisciplina) return;
+
+  const badge = await obterOuCriarBadgeSpaece(disciplina);
+  await prisma.badgeConcedida.createMany({
+    data: [{ alunoId, badgeId: badge.id }],
+    skipDuplicates: true,
+  });
+}
+
 async function concluirMissao(progressoId: string) {
   const progresso = await prisma.progressoAluno.findUnique({
     where: { id: progressoId },
@@ -260,6 +325,7 @@ async function concluirMissao(progressoId: string) {
   }
 
   await verificarConquistaBnccComputacao(progresso.alunoId, progresso.missao.trilhaId);
+  await verificarConquistaSpaece(progresso.alunoId, progresso.missao.trilhaId);
 }
 
 async function buscarProgressoDoAluno(progressoId: string) {

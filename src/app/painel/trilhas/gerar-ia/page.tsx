@@ -2,35 +2,59 @@ import Link from "next/link";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { eixoBnccPorChave } from "@/lib/bnccComputacao";
+import { eixoSpaecePorChave, VERDE_SPAECE } from "@/lib/spaece";
 import FormularioGerarTrilhaIa from "./FormularioGerarTrilhaIa";
 
 export default async function PaginaGerarTrilhaIa({
   searchParams,
 }: {
-  searchParams: Promise<{ eixo?: string }>;
+  searchParams: Promise<{ eixo?: string; eixoSpaece?: string }>;
 }) {
   const sessao = await exigirAssinaturaAtiva();
-  const { eixo: eixoParam } = await searchParams;
+  const { eixo: eixoParam, eixoSpaece: eixoSpaeceParam } = await searchParams;
   const eixo = eixoBnccPorChave(eixoParam);
+  const eixoSpaece = eixoSpaecePorChave(eixoSpaeceParam);
 
   const turmas = await prisma.turma.findMany({
     where: { professorId: sessao.userId },
     orderBy: { nome: "asc" },
   });
 
+  const corDestaque = eixoSpaece ? VERDE_SPAECE : eixo?.cor ?? "#1a3fd4";
+
   return (
     <main className="min-h-screen bg-neutral-50 px-6 py-10">
       <div className="mx-auto max-w-2xl">
         <Link
-          href={eixo ? "/painel/bncc-computacao" : "/painel/trilhas"}
-          className="text-sm font-semibold text-[#1a3fd4]"
+          href={eixoSpaece ? "/painel/spaece" : eixo ? "/painel/bncc-computacao" : "/painel/trilhas"}
+          className="text-sm font-semibold"
+          style={{ color: corDestaque }}
         >
-          ← {eixo ? "BNCC Computação" : "Trilhas educativas"}
+          ← {eixoSpaece ? "SPAECE 9º ano" : eixo ? "BNCC Computação" : "Trilhas educativas"}
         </Link>
 
         <h1 className="mt-4 text-2xl font-bold text-neutral-900">✨ Gerar trilha com IA</h1>
 
-        {eixo ? (
+        {eixoSpaece ? (
+          <div
+            className="mt-4 rounded-xl border p-4"
+            style={{ borderColor: `${VERDE_SPAECE}44`, backgroundColor: `${VERDE_SPAECE}0d` }}
+          >
+            <p className="text-sm font-bold" style={{ color: VERDE_SPAECE }}>
+              Eixo travado: {eixoSpaece.nome} ({eixoSpaece.disciplina === "matematica" ? "Matemática" : "Língua Portuguesa"})
+            </p>
+            <p className="mt-1 text-xs text-neutral-600">
+              Descritores oficiais SPAECE trabalhados nessa trilha:
+            </p>
+            <ul className="mt-1 space-y-0.5 text-xs text-neutral-600">
+              {eixoSpaece.descritores.map((d) => (
+                <li key={d.codigo}>
+                  <span className="font-bold">{d.codigo}</span> — {d.habilidade}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : eixo ? (
           <div
             className="mt-4 flex items-center gap-3 rounded-xl border p-4"
             style={{ borderColor: `${eixo.cor}44`, backgroundColor: `${eixo.cor}0d` }}
@@ -65,7 +89,12 @@ export default async function PaginaGerarTrilhaIa({
             </Link>
           </div>
         ) : (
-          <FormularioGerarTrilhaIa turmas={turmas} eixo={eixo?.chave} />
+          <FormularioGerarTrilhaIa
+            turmas={turmas}
+            eixo={eixo?.chave}
+            eixoSpaece={eixoSpaece?.chave}
+            corDestaque={corDestaque}
+          />
         )}
       </div>
     </main>

@@ -3,6 +3,7 @@ import { verificarSessaoAluno } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { sairComoAluno } from "@/app/actions/trilhaAcesso";
 import { eixoBnccPorChave } from "@/lib/bnccComputacao";
+import { eixoSpaecePorChave, VERDE_SPAECE } from "@/lib/spaece";
 
 export default async function PaginaTrilhaAluno() {
   const aluno = await verificarSessaoAluno();
@@ -126,6 +127,7 @@ export default async function PaginaTrilhaAluno() {
                 (p) => p.status === "concluida" && trilha.missoes.some((m) => m.id === p.missaoId)
               ).length;
               const eixo = eixoBnccPorChave(trilha.eixoBnccComputacao);
+              const eixoSpaece = eixoSpaecePorChave(trilha.eixoSpaece);
               return (
                 <li key={trilha.id}>
                   <Link
@@ -133,7 +135,7 @@ export default async function PaginaTrilhaAluno() {
                     className="flex items-center gap-4 rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:border-[#1a3fd4] hover:bg-[#1a3fd4]/5"
                   >
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#1a3fd4]/10 text-xl">
-                      {eixo?.icone ?? "🧭"}
+                      {eixo?.icone ?? (eixoSpaece ? "🟩" : "🧭")}
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
@@ -144,6 +146,14 @@ export default async function PaginaTrilhaAluno() {
                             style={{ backgroundColor: `${eixo.cor}15`, color: eixo.cor }}
                           >
                             BNCC · {eixo.nome}
+                          </span>
+                        )}
+                        {eixoSpaece && (
+                          <span
+                            className="shrink-0 rounded-full px-2 py-0.5 text-xs font-bold"
+                            style={{ backgroundColor: `${VERDE_SPAECE}15`, color: VERDE_SPAECE }}
+                          >
+                            SPAECE · {eixoSpaece.nome}
                           </span>
                         )}
                       </div>
