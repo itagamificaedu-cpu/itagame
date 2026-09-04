@@ -136,6 +136,7 @@ model Usuario {
   salasJogoExterno    SalaJogoExterno[]
   trilhasCriadas      Trilha[]       @relation("TrilhasCriadas")
   progressosAvaliados ProgressoAluno[]
+  leadsVenda          LeadVenda[]
 
   @@map("usuarios")
 }
@@ -546,6 +547,39 @@ model Assinatura {
   professor       Usuario?          @relation("AssinaturaProfessor", fields: [professorId], references: [id])
 
   @@map("assinaturas")
+}
+
+// Funil de vendas do próprio dono da plataforma (ita_owner) — acompanha
+// escolas/professores em prospecção até fechar (ou perder) a assinatura
+// Pro. Não tem nenhuma relação com as assinaturas já pagas (Assinatura);
+// é só o CRM manual de pré-venda.
+enum StatusLead {
+  novo
+  contatado
+  demonstracao
+  negociacao
+  fechado
+  perdido
+}
+
+model LeadVenda {
+  id       String     @id @default(cuid())
+  nome     String
+  contato  String
+  origem   String?
+  status   StatusLead @default(novo)
+  notas    String?
+  // Valor mensal estimado da assinatura, em reais — só pra priorizar quem
+  // vale mais a pena focar, não é cobrança de verdade.
+  valorPotencialMensal Int?
+  proximoContatoEm     DateTime?
+
+  criadoPorId String
+  criadoPor   Usuario  @relation(fields: [criadoPorId], references: [id])
+  criadoEm    DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  @@map("leads_venda")
 }
 
 enum StatusSalaCaboGuerra {
