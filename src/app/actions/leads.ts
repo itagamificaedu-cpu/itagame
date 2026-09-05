@@ -47,6 +47,47 @@ export async function criarLead(input: {
   return { ok: true };
 }
 
+// Captura pública de interesse, direto da landing page (sem login) — quem
+// preenche não é usuário da plataforma ainda, só um visitante interessado.
+// Vai automaticamente pro funil do ita_owner (só existe 1 dono da
+// plataforma), já marcado com origem "Site (landing page)". `nomeMeio` é um
+// campo-armadilha (honeypot): fica invisível pra gente de verdade e só bot
+// preenche — se vier preenchido, ignora silenciosamente.
+export async function criarLeadPublico(input: {
+  nome: string;
+  contato: string;
+  mensagem?: string;
+  nomeMeio?: string;
+}): Promise<ResultadoAcaoLead> {
+  if (input.nomeMeio?.trim()) {
+    return { ok: true }; // bot caiu no honeypot — finge que deu certo
+  }
+
+  const nome = input.nome.trim();
+  const contato = input.contato.trim();
+  if (!nome || !contato) {
+    return { ok: false, erro: "Preencha nome e contato." };
+  }
+
+  const dono = await prisma.usuario.findFirst({ where: { papel: "ita_owner" } });
+  if (!dono) {
+    return { ok: false, erro: "Não consegui registrar seu interesse agora. Tente de novo mais tarde." };
+  }
+
+  await prisma.leadVenda.create({
+    data: {
+      nome,
+      contato,
+      origem: "Site (landing page)",
+      notas: input.mensagem?.trim() || null,
+      criadoPorId: dono.id,
+    },
+  });
+
+  revalidatePath("/painel/admin/leads");
+  return { ok: true };
+}
+
 export async function atualizarStatusLead(leadId: string, status: StatusLead) {
   await exigirDono();
   await prisma.leadVenda.update({ where: { id: leadId }, data: { status } });

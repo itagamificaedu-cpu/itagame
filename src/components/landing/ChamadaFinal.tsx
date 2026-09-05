@@ -1,6 +1,12 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { FormularioInteresse } from "@/components/landing/FormularioInteresse";
 
 export function ChamadaFinal() {
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+
   return (
     <section className="bg-[#1a3fd4] px-6 py-16 text-center">
       <h2 className="text-3xl font-extrabold text-white">
@@ -15,6 +21,21 @@ export function ChamadaFinal() {
       >
         Criar minha conta
       </Link>
+
+      {/* Alternativa pra quem prefere ser atendido antes de criar conta
+          sozinho (ex: coordenador avaliando pra escola toda) — vira um lead
+          automático no Funil de Vendas, sem precisar login. */}
+      {mostrarFormulario ? (
+        <FormularioInteresse />
+      ) : (
+        <button
+          type="button"
+          onClick={() => setMostrarFormulario(true)}
+          className="mt-4 block w-full text-sm font-semibold text-white/70 underline-offset-4 hover:text-white hover:underline"
+        >
+          Prefere que a gente te ajude? Fala com a gente
+        </button>
+      )}
     </section>
   );
 }
