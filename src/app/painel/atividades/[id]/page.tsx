@@ -4,6 +4,7 @@ import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { iniciarSala } from "@/app/actions/salas";
 import { criarSalaCaboGuerraPersonalizada } from "@/app/actions/caboGuerraOnline";
+import { BlocoCacaPalavrasCliente } from "./BlocoCacaPalavrasCliente";
 
 type Questao = { enunciado: string; alternativas: string[] };
 type ItemGabarito = { enunciado: string; respostaCorreta: string; explicacao: string | null };
@@ -117,7 +118,14 @@ export default async function PaginaDetalheAtividade({
 
         <div className="mt-8">
           {atividade.tipo === "caca_palavras" && (
-            <BlocoCacaPalavras conteudo={conteudo as ConteudoCacaPalavras} gabarito={gabarito} />
+            <>
+              <BlocoCacaPalavrasCliente
+                grade={(conteudo as ConteudoCacaPalavras).grade}
+                tamanho={(conteudo as ConteudoCacaPalavras).tamanho}
+                palavras={gabarito.map((item) => item.respostaCorreta)}
+              />
+              <BlocoDicasCacaPalavras conteudo={conteudo as ConteudoCacaPalavras} gabarito={gabarito} />
+            </>
           )}
           {atividade.tipo === "associar_colunas" && (
             <BlocoAssociarColunas conteudo={conteudo as ConteudoAssociarColunas} gabarito={gabarito} />
@@ -240,7 +248,7 @@ function BlocoAssociarColunas({
   );
 }
 
-function BlocoCacaPalavras({
+function BlocoDicasCacaPalavras({
   conteudo,
   gabarito,
 }: {
@@ -248,24 +256,8 @@ function BlocoCacaPalavras({
   gabarito: ItemGabarito[];
 }) {
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-      <div
-        className="mx-auto grid w-fit gap-0.5"
-        style={{ gridTemplateColumns: `repeat(${conteudo.tamanho}, minmax(0, 1fr))` }}
-      >
-        {conteudo.grade.map((linha, indiceLinha) =>
-          linha.map((letra, indiceColuna) => (
-            <div
-              key={`${indiceLinha}-${indiceColuna}`}
-              className="flex h-6 w-6 items-center justify-center rounded-sm bg-neutral-50 text-xs font-bold text-neutral-700 sm:h-7 sm:w-7 sm:text-sm"
-            >
-              {letra}
-            </div>
-          ))
-        )}
-      </div>
-
-      <p className="mt-6 text-sm font-bold text-neutral-500">Dicas</p>
+    <div className="mt-4 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <p className="text-sm font-bold text-neutral-500">Dicas</p>
       <ol className="mt-2 space-y-1 text-sm text-neutral-600">
         {conteudo.questoes.map((questao, indice) => (
           <li key={indice}>
