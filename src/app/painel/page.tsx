@@ -117,9 +117,12 @@ export default async function PaginaPainel() {
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href="/painel/bncc-computacao"
-              className="rounded-lg bg-white px-5 py-2.5 text-sm font-bold text-[#1a3fd4] shadow-sm transition hover:brightness-95"
+              className="relative rounded-lg bg-white px-5 py-2.5 pr-14 text-sm font-bold text-[#1a3fd4] shadow-sm transition hover:brightness-95"
             >
               🎯 BNCC Computação
+              <span className="absolute -right-1 -top-2 rounded-full bg-[#ffb020] px-1.5 py-0.5 text-[10px] font-extrabold text-white">
+                PRO+
+              </span>
             </Link>
             <Link
               href="/painel/spaece"

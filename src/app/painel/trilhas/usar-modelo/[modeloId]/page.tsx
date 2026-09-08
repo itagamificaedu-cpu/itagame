@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
+import { exigirAcessoBnccComputacao } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { eixoBnccPorChave } from "@/lib/bnccComputacao";
 import { modeloBnccPorId } from "@/lib/modelosBnccComputacao";
@@ -20,7 +20,7 @@ export default async function PaginaUsarModelo({
 }: {
   params: Promise<{ modeloId: string }>;
 }) {
-  const sessao = await exigirAssinaturaAtiva();
+  const sessao = await exigirAcessoBnccComputacao();
   const { modeloId } = await params;
   const modelo = modeloBnccPorId(modeloId);
   if (!modelo) notFound();

@@ -44,11 +44,36 @@ export async function POST(req: NextRequest) {
   const pagamento = await pagamentoMercadoPago.get({ id: dataId });
 
   if (pagamento.status === "approved" && pagamento.external_reference) {
-    // Formato novo: "<professorId>:mensal" ou "<professorId>:anual".
-    // Pagamentos antigos (antes da assinatura mensal existir) só têm o
-    // professorId puro — tratamos como anual pra não quebrar histórico.
-    const [professorId, periodicidade] = pagamento.external_reference.split(":");
-    const ehMensal = periodicidade === "mensal";
+    // Formatos possíveis do external_reference:
+    // "<professorId>"                    → combo antigo, trata como anual
+    // "<professorId>:mensal"             → Pro mensal
+    // "<professorId>:anual"              → Pro anual
+    // "<professorId>:anual:bncc"         → Pro anual JÁ com o add-on BNCC
+    // "<professorId>:addon-bncc"         → só o add-on avulso (já é Pro)
+    const [professorId, segundo, terceiro] = pagamento.external_reference.split(":");
+
+    if (segundo === "addon-bncc") {
+      // Add-on avulso: não mexe no plano/validade do Pro, só estende (ou
+      // cria) a validade do add-on de BNCC Computação por 1 ano a partir de
+      // hoje — se a atual ainda não venceu, soma em cima dela.
+      const assinaturaAtual = await prisma.assinatura.findUnique({ where: { professorId } });
+      const baseAtual =
+        assinaturaAtual?.bnccComputacaoAte && assinaturaAtual.bnccComputacaoAte > new Date()
+          ? assinaturaAtual.bnccComputacaoAte
+          : new Date();
+      const novaValidadeBncc = new Date(baseAtual);
+      novaValidadeBncc.setFullYear(novaValidadeBncc.getFullYear() + 1);
+
+      await prisma.assinatura.update({
+        where: { professorId },
+        data: { bnccComputacaoAte: novaValidadeBncc, mercadoPagoId: String(pagamento.id) },
+      });
+
+      return NextResponse.json({ ok: true });
+    }
+
+    const ehMensal = segundo === "mensal";
+    const comBncc = terceiro === "bncc";
 
     const validade = new Date();
     if (ehMensal) {
@@ -56,6 +81,8 @@ export async function POST(req: NextRequest) {
     } else {
       validade.setFullYear(validade.getFullYear() + 1);
     }
+
+    const bnccComputacaoAte = comBncc ? new Date(validade) : undefined;
 
     await prisma.assinatura.upsert({
       where: { professorId },
@@ -65,6 +92,7 @@ export async function POST(req: NextRequest) {
         mercadoPagoId: String(pagamento.id),
         validade,
         cortesia: false, // pagou de verdade — vira assinante, sem os limites do cortesia
+        ...(bnccComputacaoAte ? { bnccComputacaoAte } : {}),
       },
       create: {
         professorId,
@@ -73,6 +101,7 @@ export async function POST(req: NextRequest) {
         mercadoPagoId: String(pagamento.id),
         validade,
         cortesia: false,
+        ...(bnccComputacaoAte ? { bnccComputacaoAte } : {}),
       },
     });
   }

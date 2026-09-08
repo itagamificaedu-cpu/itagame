@@ -41,11 +41,14 @@ export default async function PaginaTrilhas() {
 
         <Link
           href="/painel/bncc-computacao"
-          className="mt-4 flex items-center gap-3 rounded-xl border border-[#1a3fd4]/30 bg-[#1a3fd4]/5 p-4 transition hover:bg-[#1a3fd4]/10"
+          className="mt-4 flex items-center gap-3 rounded-xl border border-[#1a3fd4]/30 bg-gradient-to-r from-[#1a3fd4]/5 to-[#1a3fd4]/10 p-4 transition hover:from-[#1a3fd4]/10 hover:to-[#1a3fd4]/15"
         >
           <span className="text-xl">🎯</span>
-          <span className="text-sm font-bold text-[#1a3fd4]">
-            Nova: aba BNCC Computação — trilhas prontas pros 3 eixos oficiais →
+          <span className="min-w-0 flex-1 text-sm font-bold text-[#1a3fd4]">
+            BNCC Computação — trilhas prontas pros 3 eixos oficiais →
+          </span>
+          <span className="shrink-0 rounded-full bg-[#1a3fd4] px-2.5 py-1 text-xs font-extrabold text-white">
+            PRO+
           </span>
         </Link>
 

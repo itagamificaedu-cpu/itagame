@@ -563,6 +563,11 @@ model Assinatura {
   // o professor paga pelo Mercado Pago. Usada pra limitar o cortesia a 1
   // atividade gerada por tipo, sem afetar quem já é assinante.
   cortesia        Boolean           @default(false)
+  // Add-on separado da BNCC Computação (Parecer CNE/CEB nº 2/2022) — vendido
+  // à parte do Pro normal (ver PRECO_ADDON_BNCC em mercadoPago.ts). Enquanto
+  // essa data não passar, o professor tem acesso ao hub e às trilhas de
+  // BNCC Computação; null ou data no passado = sem acesso, mesmo sendo Pro.
+  bnccComputacaoAte DateTime?
 
   escolaId        String?           @unique
   escola          Escola?           @relation(fields: [escolaId], references: [id])

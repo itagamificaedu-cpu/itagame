@@ -1,5 +1,6 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
-import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
+import { exigirAssinaturaAtiva, temAcessoBnccComputacao } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { eixoBnccPorChave } from "@/lib/bnccComputacao";
 import { eixoSpaecePorChave, VERDE_SPAECE } from "@/lib/spaece";
@@ -14,6 +15,13 @@ export default async function PaginaGerarTrilhaIa({
   const { eixo: eixoParam, eixoSpaece: eixoSpaeceParam } = await searchParams;
   const eixo = eixoBnccPorChave(eixoParam);
   const eixoSpaece = eixoSpaecePorChave(eixoSpaeceParam);
+
+  // Gerar trilha travada num eixo de BNCC Computação exige o add-on separado
+  // (ver exigirAcessoBnccComputacao) — os outros modos de geração (livre,
+  // SPAECE) continuam liberados só com o Pro normal.
+  if (eixo && sessao.papel !== "ita_owner" && !(await temAcessoBnccComputacao())) {
+    redirect("/painel/bncc-computacao/oferta");
+  }
 
   const turmas = await prisma.turma.findMany({
     where: { professorId: sessao.userId },

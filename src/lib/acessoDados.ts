@@ -66,6 +66,39 @@ export const exigirAssinaturaAtiva = cache(async () => {
   return sessao;
 });
 
+// Exige sessão + Pro ativo (igual exigirAssinaturaAtiva) E o add-on separado
+// de BNCC Computação em dia. Usar nas páginas de professor que geram ou
+// listam conteúdo de BNCC Computação (o hub, gerar-ia com eixo BNCC, usar
+// modelo pronto) — quem só tem o Pro normal cai na tela de oferta do add-on
+// em vez de ver o conteúdo.
+export const exigirAcessoBnccComputacao = cache(async () => {
+  const sessao = await exigirAssinaturaAtiva();
+
+  if (sessao.papel === "ita_owner") {
+    return sessao;
+  }
+
+  const assinatura = await prisma.assinatura.findUnique({ where: { professorId: sessao.userId } });
+  const temAcesso = assinatura?.bnccComputacaoAte != null && assinatura.bnccComputacaoAte > new Date();
+
+  if (!temAcesso) {
+    redirect("/painel/bncc-computacao/oferta");
+  }
+
+  return sessao;
+});
+
+// Versão que só INFORMA se tem acesso, sem redirecionar — usada em lugares
+// como o botão do painel principal, que precisa decidir se mostra o cadeado
+// ou não, sem travar o carregamento da página inteira.
+export const temAcessoBnccComputacao = cache(async () => {
+  const sessao = await verificarSessao();
+  if (sessao.papel === "ita_owner") return true;
+
+  const assinatura = await prisma.assinatura.findUnique({ where: { professorId: sessao.userId } });
+  return assinatura?.bnccComputacaoAte != null && assinatura.bnccComputacaoAte > new Date();
+});
+
 // Sessão do ALUNO nas Trilhas (aluno.ts / alunoSessao.ts) — sem e-mail, entra
 // com código da turma + nome + PIN. Redireciona pra tela de entrada se não
 // houver sessão, ou se o Aluno tiver sido removido da turma nesse meio tempo.

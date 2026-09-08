@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
+import { exigirAcessoBnccComputacao } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { EIXOS_BNCC_COMPUTACAO } from "@/lib/bnccComputacao";
 import { MODELOS_BNCC_COMPUTACAO } from "@/lib/modelosBnccComputacao";
@@ -11,7 +11,7 @@ import { MODELOS_BNCC_COMPUTACAO } from "@/lib/modelosBnccComputacao";
 // travada em cada eixo — nenhuma mecânica nova de gamificação, só uma
 // vitrine dedicada.
 export default async function PaginaBnccComputacao() {
-  const sessao = await exigirAssinaturaAtiva();
+  const sessao = await exigirAcessoBnccComputacao();
 
   const trilhas = await prisma.trilha.findMany({
     where: { professorId: sessao.userId, eixoBnccComputacao: { not: null } },
