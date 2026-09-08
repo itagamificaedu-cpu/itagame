@@ -68,9 +68,18 @@ export default async function PaginaTrilhas() {
                     href={`/painel/trilhas/${trilha.id}`}
                     className="flex items-center gap-4 rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:border-[#1a3fd4] hover:bg-[#1a3fd4]/5"
                   >
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#1a3fd4]/10 text-xl">
-                      {eixo?.icone ?? (eixoSpaece ? "🟩" : "🧭")}
-                    </span>
+                    {trilha.capaUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={trilha.capaUrl}
+                        alt=""
+                        className="h-11 w-11 shrink-0 rounded-xl object-cover"
+                      />
+                    ) : (
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#1a3fd4]/10 text-xl">
+                        {eixo?.icone ?? (eixoSpaece ? "🟩" : "🧭")}
+                      </span>
+                    )}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <p className="truncate font-semibold text-neutral-900">{trilha.nome}</p>

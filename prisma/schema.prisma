@@ -412,6 +412,10 @@ model Trilha {
   // Preenchido só quando a trilha nasce na aba "SPAECE 9º ano" (ver
   // src/lib/spaece.ts) — indica qual dos 10 eixos oficiais ela cobre.
   eixoSpaece    EixoSpaece9Ano?
+  // Imagem de capa da trilha (data URI base64, já comprimida no navegador
+  // antes de enviar) — guardada direto no banco pra não depender de disco
+  // do container, que é apagado a cada deploy. Opcional.
+  capaUrl       String?
   criadaEm      DateTime            @default(now())
   atualizadaEm  DateTime            @updatedAt
 

@@ -48,6 +48,15 @@ export default async function PaginaTrilhaDetalheAluno({
           ← Minhas trilhas
         </Link>
 
+        {trilha.capaUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={trilha.capaUrl}
+            alt=""
+            className="mt-4 h-40 w-full rounded-2xl object-cover sm:h-56"
+          />
+        )}
+
         <h1 className="mt-4 text-2xl font-bold text-neutral-900">{trilha.nome}</h1>
         <p className="mt-1 text-sm text-neutral-600">{trilha.descricao}</p>
 

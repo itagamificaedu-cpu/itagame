@@ -64,6 +64,29 @@ export async function criarTrilha(
   redirect(`/painel/trilhas/${trilha.id}`);
 }
 
+export type ResultadoDefinirCapa = { ok: true } | { ok: false; erro: string };
+
+// Salva (ou remove, passando null) a imagem de capa da trilha. O arquivo já
+// chega comprimido em data URI (base64) do lado do cliente — ver
+// DefinirCapaTrilhaCliente.tsx — pra não pesar demais no banco.
+const TAMANHO_MAXIMO_CAPA = 400_000; // ~400KB em base64, já dá folga pra imagem comprimida
+
+export async function definirCapaTrilha(trilhaId: string, capaUrl: string | null): Promise<ResultadoDefinirCapa> {
+  const sessao = await exigirAssinaturaAtiva();
+  const trilha = await verificarDonoTrilha(trilhaId, sessao.userId);
+
+  if (capaUrl && capaUrl.length > TAMANHO_MAXIMO_CAPA) {
+    return { ok: false, erro: "Imagem muito grande mesmo depois de comprimida. Tente uma imagem menor." };
+  }
+
+  await prisma.trilha.update({ where: { id: trilha.id }, data: { capaUrl } });
+
+  revalidatePath(`/painel/trilhas/${trilha.id}`);
+  revalidatePath("/painel/trilhas");
+  revalidatePath("/trilha");
+  return { ok: true };
+}
+
 export type ResultadoPublicarTrilha = { ok: true } | { ok: false; erro: string };
 
 // Publica a trilha: a partir de agora os alunos da turma enxergam ela em

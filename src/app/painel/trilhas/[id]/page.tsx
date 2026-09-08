@@ -7,6 +7,7 @@ import { AdicionarMissaoCliente } from "@/components/trilhas/AdicionarMissaoClie
 import { PublicarTrilhaCliente } from "@/components/trilhas/PublicarTrilhaCliente";
 import { RemoverMissaoCliente } from "@/components/trilhas/RemoverMissaoCliente";
 import { AvaliarEntregaCliente } from "@/components/trilhas/AvaliarEntregaCliente";
+import { DefinirCapaTrilhaCliente } from "@/components/trilhas/DefinirCapaTrilhaCliente";
 
 const ROTULO_TIPO: Record<string, string> = {
   video: "🎬 Vídeo",
@@ -97,6 +98,10 @@ export default async function PaginaDetalheTrilha({
               </button>
             </form>
           </div>
+        </div>
+
+        <div className="mt-6">
+          <DefinirCapaTrilhaCliente trilhaId={trilha.id} capaAtual={trilha.capaUrl} />
         </div>
 
         {entregasPendentes.length > 0 && (
