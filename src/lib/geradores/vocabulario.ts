@@ -56,6 +56,20 @@ export const CATEGORIAS_VOCABULARIO: Record<string, PalavraVocabulario[]> = {
     { palavra: "CHUVA", emoji: "🌧️" },
     { palavra: "MONTANHA", emoji: "⛰️" },
   ],
+  bnccComputacao: [
+    { palavra: "ALGORITMO", emoji: "🧩" },
+    { palavra: "BINARIO", emoji: "🔢" },
+    { palavra: "ROBOTICA", emoji: "🤖" },
+    { palavra: "INTERNET", emoji: "🌐" },
+    { palavra: "SENHA", emoji: "🔒" },
+    { palavra: "CODIGO", emoji: "💻" },
+    { palavra: "PROCESSADOR", emoji: "🖥️" },
+    { palavra: "SENSOR", emoji: "📡" },
+    { palavra: "REDE", emoji: "📶" },
+    { palavra: "DADOS", emoji: "📊" },
+    { palavra: "SOFTWARE", emoji: "💾" },
+    { palavra: "HARDWARE", emoji: "🔧" },
+  ],
 };
 
 export const ROTULO_CATEGORIA: Record<string, string> = {
@@ -64,4 +78,5 @@ export const ROTULO_CATEGORIA: Record<string, string> = {
   cores: "Cores",
   objetosEscolares: "Objetos escolares",
   natureza: "Natureza",
+  bnccComputacao: "🎯 BNCC Computação",
 };
