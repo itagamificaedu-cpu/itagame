@@ -30,6 +30,17 @@ const CATEGORIAS: { titulo: string; itens: ItemGerador[] }[] = [
     ],
   },
   {
+    titulo: "BNCC Computação",
+    itens: [
+      {
+        slug: "bncc-computacao",
+        icone: "🎯",
+        titulo: "Simulado BNCC Computação",
+        texto: "Questões por eixo: Pensamento Computacional, Mundo Digital, Cultura Digital",
+      },
+    ],
+  },
+  {
     titulo: "Simulados",
     itens: [
       {
