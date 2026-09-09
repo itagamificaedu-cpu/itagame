@@ -91,6 +91,21 @@ export async function criarSalaCaboGuerraPersonalizada(atividadeId: string, form
     throw new Error("Esta atividade não tem perguntas válidas para o Cabo de Guerra.");
   }
 
+  // Mesmo esquema/campos da sala genérica (criarSalaCaboGuerra) — essa aqui
+  // só muda por já vir com as perguntas prontas da atividade gerada por IA.
+  const camposValidados = EsquemaCriarSalaCaboGuerra.safeParse({
+    modo: formData.get("modo") || undefined,
+    nomeEquipe1: formData.get("nomeEquipe1") || undefined,
+    nomeEquipe2: formData.get("nomeEquipe2") || undefined,
+    turmaId: formData.get("turmaId") || undefined,
+  });
+  if (!camposValidados.success) {
+    throw new Error("Dados inválidos pra criar a sala.");
+  }
+  const { modo } = camposValidados.data;
+  const nomeEquipe1 = camposValidados.data.nomeEquipe1?.trim() || "Equipe Azul";
+  const nomeEquipe2 = camposValidados.data.nomeEquipe2?.trim() || "Equipe Vermelha";
+
   const turmaValidada = await validarTurmaDoProfessor(
     (formData.get("turmaId") as string) || undefined,
     sessao.userId
@@ -103,8 +118,9 @@ export async function criarSalaCaboGuerraPersonalizada(atividadeId: string, form
         data: {
           codigo: gerarCodigo(),
           professorId: sessao.userId,
-          nomeEquipe1: "Equipe Azul",
-          nomeEquipe2: "Equipe Vermelha",
+          modo,
+          nomeEquipe1,
+          nomeEquipe2,
           totalRodadas: perguntas.length,
           perguntas: perguntas as unknown as Prisma.InputJsonValue,
           turmaId: turmaValidada,

@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { iniciarSala } from "@/app/actions/salas";
-import { criarSalaCaboGuerraPersonalizada } from "@/app/actions/caboGuerraOnline";
 import { SeletorTurmaSala } from "@/components/comum/SeletorTurmaSala";
+import { IniciarCaboGuerraPersonalizadoCliente } from "@/components/caboGuerraOnline/IniciarCaboGuerraPersonalizadoCliente";
 import { BlocoCacaPalavrasCliente } from "./BlocoCacaPalavrasCliente";
 
 type Questao = { enunciado: string; alternativas: string[] };
@@ -70,25 +70,14 @@ export default async function PaginaDetalheAtividade({
             </form>
           )}
           {atividade.tipo === "cabo_de_guerra" && (
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-start gap-2">
               <Link
                 href={`/painel/cabo-de-guerra/personalizado/${atividade.id}`}
                 className="whitespace-nowrap rounded-lg bg-gradient-to-br from-[#FFD600] to-[#FF8F00] px-4 py-2 text-sm font-bold text-[#1a1a2e] hover:brightness-105"
               >
                 🪢 Jogar (projetor)
               </Link>
-              <form
-                action={criarSalaCaboGuerraPersonalizada.bind(null, atividade.id)}
-                className="flex items-center gap-2"
-              >
-                <SeletorTurmaSala turmas={turmas} />
-                <button
-                  type="submit"
-                  className="whitespace-nowrap rounded-lg border-2 border-[#1a3fd4] px-4 py-2 text-sm font-bold text-[#1a3fd4] hover:bg-[#1a3fd4]/5"
-                >
-                  📱 Jogar online
-                </button>
-              </form>
+              <IniciarCaboGuerraPersonalizadoCliente atividadeId={atividade.id} turmas={turmas} />
             </div>
           )}
         </div>
