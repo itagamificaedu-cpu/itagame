@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { criarSessaoAluno, excluirSessaoAluno } from "@/lib/alunoSessao";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
+import { verificarPinAluno } from "@/lib/alunoPin";
 
 // Acesso do ALUNO às Trilhas — sem e-mail. O aluno digita o código fixo da
 // turma (gerado quando o professor cria a turma) pra ver a lista de nomes,
@@ -41,54 +42,13 @@ export async function buscarAlunosDaTurma(codigo: string): Promise<ResultadoBusc
 
 export type ResultadoEntrarAluno = { ok: true } | { ok: false; erro: string };
 
-// Bloqueio de força bruta: o PIN só tem 4 dígitos (10 mil combinações), então
-// sem limite de tentativas daria pra "adivinhar" o PIN de outro aluno.
-const LIMITE_TENTATIVAS_PIN = 5;
-const BLOQUEIO_MINUTOS_PIN = 10;
-
-function mensagemBloqueioPin(bloqueadoAte: Date): string {
-  const minutos = Math.max(1, Math.ceil((bloqueadoAte.getTime() - Date.now()) / 60000));
-  return `Muitas tentativas erradas. Tente de novo em ${minutos} minuto${minutos === 1 ? "" : "s"}.`;
-}
-
 export async function entrarComoAluno(alunoId: string, pin: string): Promise<ResultadoEntrarAluno> {
-  const aluno = await prisma.aluno.findUnique({ where: { id: alunoId } });
-
-  if (!aluno || !aluno.pinHash) {
-    return {
-      ok: false,
-      erro: "Esse aluno ainda não tem PIN configurado. Peça pro professor gerar um na página da turma.",
-    };
+  const resultado = await verificarPinAluno(alunoId, pin);
+  if (!resultado.ok) {
+    return resultado;
   }
 
-  if (aluno.pinBloqueadoAte && aluno.pinBloqueadoAte > new Date()) {
-    return { ok: false, erro: mensagemBloqueioPin(aluno.pinBloqueadoAte) };
-  }
-
-  const pinConfere = await bcrypt.compare(pin.trim(), aluno.pinHash);
-  if (!pinConfere) {
-    const tentativas = aluno.tentativasPinFalhas + 1;
-    const bloqueado = tentativas >= LIMITE_TENTATIVAS_PIN;
-    const bloqueadoAte = new Date(Date.now() + BLOQUEIO_MINUTOS_PIN * 60000);
-
-    await prisma.aluno.update({
-      where: { id: alunoId },
-      data: bloqueado
-        ? { tentativasPinFalhas: 0, pinBloqueadoAte: bloqueadoAte }
-        : { tentativasPinFalhas: tentativas },
-    });
-
-    return { ok: false, erro: bloqueado ? mensagemBloqueioPin(bloqueadoAte) : "PIN incorreto." };
-  }
-
-  if (aluno.tentativasPinFalhas > 0 || aluno.pinBloqueadoAte) {
-    await prisma.aluno.update({
-      where: { id: alunoId },
-      data: { tentativasPinFalhas: 0, pinBloqueadoAte: null },
-    });
-  }
-
-  await criarSessaoAluno({ alunoId: aluno.id, turmaId: aluno.turmaId });
+  await criarSessaoAluno({ alunoId: resultado.aluno.id, turmaId: resultado.aluno.turmaId });
   redirect("/trilha");
 }
 

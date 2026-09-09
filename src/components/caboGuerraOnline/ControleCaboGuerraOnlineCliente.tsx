@@ -4,11 +4,13 @@ import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { iniciarPartidaCaboGuerra, encerrarSalaCaboGuerra } from "@/app/actions/caboGuerraOnline";
 import { NOMES_NIVEL, type Nivel } from "@/lib/caboGuerraPerguntas";
+import { QrCodeEntrada } from "@/components/comum/QrCodeEntrada";
 
 type Participante = { id: string; apelido: string; pontuacao: number };
 
 type EstadoSala = {
   status: "aberta" | "em_andamento" | "encerrada";
+  modo: "equipes" | "individual";
   nomeEquipe1: string;
   nomeEquipe2: string;
   rodadaAtual: number;
@@ -20,6 +22,8 @@ type EstadoSala = {
   perguntaTexto: string | null;
   tempoRestante: number;
   rodadaGanhaPor: number | null;
+  rodadaGanhaPorApelido: string | null;
+  participantes: Participante[];
   equipe1: Participante[];
   equipe2: Participante[];
   vencedorFinal: number | null;
@@ -43,7 +47,15 @@ export function ControleCaboGuerraOnlineCliente({ codigo }: { codigo: string }) 
     );
   }
 
+  const linkEntrada =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/entrar-cabo-guerra?codigo=${codigo}`
+      : "";
+
   if (dados.status === "aberta") {
+    const totalParticipantes =
+      dados.modo === "individual" ? dados.participantes.length : dados.equipe1.length + dados.equipe2.length;
+
     return (
       <main className="min-h-screen bg-neutral-50 px-6 py-10">
         <div className="mx-auto max-w-2xl">
@@ -56,42 +68,64 @@ export function ControleCaboGuerraOnlineCliente({ codigo }: { codigo: string }) 
             <p className="text-5xl font-extrabold tracking-widest text-[#1a3fd4]">{codigo}</p>
             <p className="mt-2 text-sm text-neutral-500">
               Peça para os alunos acessarem{" "}
-              <strong>itagame.itatecnologiaeducacional.tech/entrar-cabo-guerra</strong> e escolherem um time
+              <strong>itagame.itatecnologiaeducacional.tech/entrar-cabo-guerra</strong>
+              {dados.modo === "equipes" ? " e escolherem um time" : ""}, ou escanear o QR code abaixo.
             </p>
+
+            {linkEntrada && (
+              <div className="mt-4 flex justify-center">
+                <QrCodeEntrada url={linkEntrada} />
+              </div>
+            )}
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border-2 border-[#42A5F5] bg-white p-5">
-              <p className="text-center text-sm font-extrabold text-[#1565C0]">🔵 {dados.nomeEquipe1}</p>
-              <p className="mt-1 text-center text-2xl font-extrabold text-neutral-900">
-                {dados.equipe1.length}
+          {dados.modo === "individual" ? (
+            <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-5">
+              <p className="text-center text-sm font-extrabold text-neutral-700">
+                {dados.participantes.length} aluno(s) na sala
               </p>
               <ul className="mt-3 flex flex-wrap justify-center gap-2">
-                {dados.equipe1.map((p) => (
-                  <li key={p.id} className="rounded-full bg-[#1565C0]/10 px-3 py-1 text-xs text-[#1565C0]">
+                {dados.participantes.map((p) => (
+                  <li key={p.id} className="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-700">
                     {p.apelido}
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-2xl border-2 border-[#EF5350] bg-white p-5">
-              <p className="text-center text-sm font-extrabold text-[#C62828]">🔴 {dados.nomeEquipe2}</p>
-              <p className="mt-1 text-center text-2xl font-extrabold text-neutral-900">
-                {dados.equipe2.length}
-              </p>
-              <ul className="mt-3 flex flex-wrap justify-center gap-2">
-                {dados.equipe2.map((p) => (
-                  <li key={p.id} className="rounded-full bg-[#C62828]/10 px-3 py-1 text-xs text-[#C62828]">
-                    {p.apelido}
-                  </li>
-                ))}
-              </ul>
+          ) : (
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-2xl border-2 border-[#42A5F5] bg-white p-5">
+                <p className="text-center text-sm font-extrabold text-[#1565C0]">🔵 {dados.nomeEquipe1}</p>
+                <p className="mt-1 text-center text-2xl font-extrabold text-neutral-900">
+                  {dados.equipe1.length}
+                </p>
+                <ul className="mt-3 flex flex-wrap justify-center gap-2">
+                  {dados.equipe1.map((p) => (
+                    <li key={p.id} className="rounded-full bg-[#1565C0]/10 px-3 py-1 text-xs text-[#1565C0]">
+                      {p.apelido}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-2xl border-2 border-[#EF5350] bg-white p-5">
+                <p className="text-center text-sm font-extrabold text-[#C62828]">🔴 {dados.nomeEquipe2}</p>
+                <p className="mt-1 text-center text-2xl font-extrabold text-neutral-900">
+                  {dados.equipe2.length}
+                </p>
+                <ul className="mt-3 flex flex-wrap justify-center gap-2">
+                  {dados.equipe2.map((p) => (
+                    <li key={p.id} className="rounded-full bg-[#C62828]/10 px-3 py-1 text-xs text-[#C62828]">
+                      {p.apelido}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-          </div>
+          )}
 
           <button
             onClick={() => iniciarTransicao(() => iniciarPartidaCaboGuerra(codigo))}
-            disabled={pendente || dados.equipe1.length + dados.equipe2.length === 0}
+            disabled={pendente || totalParticipantes === 0}
             className="mt-6 w-full rounded-xl bg-gradient-to-br from-[#FFD600] to-[#FF8F00] py-3.5 text-base font-extrabold text-[#1a1a2e] transition disabled:opacity-50"
           >
             ⚔️ Iniciar jogo
@@ -102,6 +136,8 @@ export function ControleCaboGuerraOnlineCliente({ codigo }: { codigo: string }) 
   }
 
   if (dados.status === "em_andamento") {
+    const rankingAoVivo = [...dados.participantes].sort((a, b) => b.pontuacao - a.pontuacao).slice(0, 5);
+
     return (
       <main className="min-h-screen bg-[#0d0d1a] px-6 py-10 text-white">
         <div className="mx-auto max-w-2xl">
@@ -111,22 +147,31 @@ export function ControleCaboGuerraOnlineCliente({ codigo }: { codigo: string }) 
               : `Rodada ${dados.rodadaAtual}/${dados.totalRodadas} · ${NOMES_NIVEL[dados.nivel]}`}
           </p>
 
-          <div className="mt-4 flex items-center justify-between">
-            <div className="text-center">
-              <p className="text-xs font-bold text-[#42A5F5] uppercase">{dados.nomeEquipe1}</p>
-              <p className="text-4xl font-extrabold text-[#42A5F5]">{dados.pontosEquipe1}</p>
+          {dados.modo === "equipes" ? (
+            <div className="mt-4 flex items-center justify-between">
+              <div className="text-center">
+                <p className="text-xs font-bold text-[#42A5F5] uppercase">{dados.nomeEquipe1}</p>
+                <p className="text-4xl font-extrabold text-[#42A5F5]">{dados.pontosEquipe1}</p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-neutral-400 uppercase">Tempo</p>
+                <p className={`text-4xl font-extrabold ${dados.tempoRestante <= 5 ? "text-red-400" : "text-[#FFD600]"}`}>
+                  {dados.tempoRestante}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs font-bold text-[#EF5350] uppercase">{dados.nomeEquipe2}</p>
+                <p className="text-4xl font-extrabold text-[#EF5350]">{dados.pontosEquipe2}</p>
+              </div>
             </div>
-            <div className="text-center">
+          ) : (
+            <div className="mt-4 text-center">
               <p className="text-xs text-neutral-400 uppercase">Tempo</p>
               <p className={`text-4xl font-extrabold ${dados.tempoRestante <= 5 ? "text-red-400" : "text-[#FFD600]"}`}>
                 {dados.tempoRestante}
               </p>
             </div>
-            <div className="text-center">
-              <p className="text-xs font-bold text-[#EF5350] uppercase">{dados.nomeEquipe2}</p>
-              <p className="text-4xl font-extrabold text-[#EF5350]">{dados.pontosEquipe2}</p>
-            </div>
-          </div>
+          )}
 
           <div className="mt-6 rounded-2xl border-2 border-[#FFD600] bg-black/40 p-6 text-center">
             <p className="text-3xl font-extrabold">{dados.perguntaTexto}</p>
@@ -136,10 +181,30 @@ export function ControleCaboGuerraOnlineCliente({ codigo }: { codigo: string }) 
             <p className="mt-4 text-center text-sm font-semibold text-[#FFD600]">
               {dados.rodadaGanhaPor === 0
                 ? "⏰ Tempo esgotado — ninguém pontuou"
-                : dados.rodadaGanhaPor === 1
-                  ? `🎉 ${dados.nomeEquipe1} acertou!`
-                  : `🎉 ${dados.nomeEquipe2} acertou!`}
+                : dados.modo === "individual"
+                  ? `🎉 ${dados.rodadaGanhaPorApelido} acertou primeiro!`
+                  : dados.rodadaGanhaPor === 1
+                    ? `🎉 ${dados.nomeEquipe1} acertou!`
+                    : `🎉 ${dados.nomeEquipe2} acertou!`}
             </p>
+          )}
+
+          {dados.modo === "individual" && rankingAoVivo.length > 0 && (
+            <div className="mt-6 rounded-2xl bg-white/10 p-4">
+              <p className="text-center text-xs font-bold tracking-wide text-white/70 uppercase">
+                Ranking ao vivo
+              </p>
+              <ol className="mt-2 space-y-1">
+                {rankingAoVivo.map((p, indice) => (
+                  <li key={p.id} className="flex items-center justify-between text-sm">
+                    <span>
+                      {indice + 1}. {p.apelido}
+                    </span>
+                    <span className="font-bold">{p.pontuacao} pts</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
           )}
 
           <button
@@ -155,32 +220,43 @@ export function ControleCaboGuerraOnlineCliente({ codigo }: { codigo: string }) 
   }
 
   const corFundo =
-    dados.vencedorFinal === 1
-      ? "bg-gradient-to-br from-[#0D47A1] to-[#42A5F5]"
-      : dados.vencedorFinal === 2
-        ? "bg-gradient-to-br from-[#B71C1C] to-[#EF5350]"
-        : "bg-gradient-to-br from-[#1a1a2e] to-[#2d2d5e]";
+    dados.modo === "equipes"
+      ? dados.vencedorFinal === 1
+        ? "bg-gradient-to-br from-[#0D47A1] to-[#42A5F5]"
+        : dados.vencedorFinal === 2
+          ? "bg-gradient-to-br from-[#B71C1C] to-[#EF5350]"
+          : "bg-gradient-to-br from-[#1a1a2e] to-[#2d2d5e]"
+      : "bg-gradient-to-br from-[#1a1a2e] to-[#2d2d5e]";
 
-  const ranking = [
-    ...dados.equipe1.map((p) => ({ ...p, emoji: "🔵" })),
-    ...dados.equipe2.map((p) => ({ ...p, emoji: "🔴" })),
-  ]
-    .sort((a, b) => b.pontuacao - a.pontuacao)
-    .slice(0, 10);
+  const ranking =
+    dados.modo === "individual"
+      ? [...dados.participantes].sort((a, b) => b.pontuacao - a.pontuacao).slice(0, 10)
+      : [
+          ...dados.equipe1.map((p) => ({ ...p, emoji: "🔵" })),
+          ...dados.equipe2.map((p) => ({ ...p, emoji: "🔴" })),
+        ]
+          .sort((a, b) => b.pontuacao - a.pontuacao)
+          .slice(0, 10);
 
   return (
     <main className={`flex min-h-screen flex-col items-center justify-center gap-3 px-6 py-12 text-center ${corFundo}`}>
-      <span className="text-7xl">{dados.vencedorFinal === 0 ? "🤝" : "🏆"}</span>
+      <span className="text-7xl">
+        {dados.modo === "individual" ? "🏆" : dados.vencedorFinal === 0 ? "🤝" : "🏆"}
+      </span>
       <p className="text-3xl font-extrabold text-white">
-        {dados.vencedorFinal === 0
-          ? "EMPATE!"
-          : dados.vencedorFinal === 1
-            ? `🔵 ${dados.nomeEquipe1.toUpperCase()} VENCEU!`
-            : `🔴 ${dados.nomeEquipe2.toUpperCase()} VENCEU!`}
+        {dados.modo === "individual"
+          ? "FIM DE JOGO!"
+          : dados.vencedorFinal === 0
+            ? "EMPATE!"
+            : dados.vencedorFinal === 1
+              ? `🔵 ${dados.nomeEquipe1.toUpperCase()} VENCEU!`
+              : `🔴 ${dados.nomeEquipe2.toUpperCase()} VENCEU!`}
       </p>
-      <p className="text-lg text-white/85">
-        Placar final: {dados.pontosEquipe1} × {dados.pontosEquipe2}
-      </p>
+      {dados.modo === "equipes" && (
+        <p className="text-lg text-white/85">
+          Placar final: {dados.pontosEquipe1} × {dados.pontosEquipe2}
+        </p>
+      )}
 
       {ranking.length > 0 && (
         <div className="mt-4 w-full max-w-sm rounded-2xl bg-white/10 p-5 text-left">
@@ -192,7 +268,8 @@ export function ControleCaboGuerraOnlineCliente({ codigo }: { codigo: string }) 
                 className="flex items-center justify-between rounded-xl bg-black/20 px-3 py-2 text-sm text-white"
               >
                 <span>
-                  {indice + 1}. {p.emoji} {p.apelido}
+                  {indice + 1}. {"emoji" in p ? `${p.emoji} ` : ""}
+                  {p.apelido}
                 </span>
                 <span className="font-bold">{p.pontuacao} pts</span>
               </li>

@@ -58,7 +58,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ codigo:
               : 0;
 
           let vencedorFinal: number | null = null;
-          if (sala.status === "encerrada") {
+          if (sala.status === "encerrada" && sala.modo === "equipes") {
             if (sala.pontosEquipe1 > sala.pontosEquipe2) vencedorFinal = 1;
             else if (sala.pontosEquipe2 > sala.pontosEquipe1) vencedorFinal = 2;
             else vencedorFinal = 0;
@@ -66,8 +66,13 @@ export async function GET(_req: Request, { params }: { params: Promise<{ codigo:
 
           const modoPersonalizado = sala.perguntas !== null;
 
+          const ganhadorRodada = sala.participantes.find(
+            (p) => p.id === sala.rodadaGanhaPorParticipanteId
+          );
+
           const payload = {
             status: sala.status,
+            modo: sala.modo,
             nomeEquipe1: sala.nomeEquipe1,
             nomeEquipe2: sala.nomeEquipe2,
             rodadaAtual: sala.rodadaAtual,
@@ -80,6 +85,13 @@ export async function GET(_req: Request, { params }: { params: Promise<{ codigo:
             perguntaAlternativas: sala.perguntaAlternativas as string[] | null,
             tempoRestante,
             rodadaGanhaPor: sala.rodadaGanhaPor,
+            rodadaGanhaPorApelido: ganhadorRodada?.apelido ?? null,
+            // Lista plana — usada no modo individual pro ranking ao vivo.
+            participantes: sala.participantes.map((p) => ({
+              id: p.id,
+              apelido: p.apelido,
+              pontuacao: p.pontuacao,
+            })),
             equipe1: sala.participantes
               .filter((p) => p.equipe === 1)
               .map((p) => ({ id: p.id, apelido: p.apelido, pontuacao: p.pontuacao })),

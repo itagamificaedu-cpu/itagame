@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { avancarPergunta, encerrarSala } from "@/app/actions/salas";
+import { QrCodeEntrada } from "@/components/comum/QrCodeEntrada";
 
 type Participante = { id: string; apelido: string; pontuacao: number };
 
@@ -46,8 +47,14 @@ export function ControleSalaCliente({ codigo }: { codigo: string }) {
           <p className="mt-2 text-sm font-semibold text-neutral-500">Código da sala</p>
           <p className="text-5xl font-extrabold tracking-widest text-[#1a3fd4]">{codigo}</p>
           <p className="mt-2 text-sm text-neutral-500">
-            Peça para os alunos acessarem <strong>itagame.itatecnologiaeducacional.tech/entrar</strong>
+            Peça para os alunos acessarem <strong>itagame.itatecnologiaeducacional.tech/entrar</strong>{" "}
+            ou escanear o QR code abaixo.
           </p>
+          {typeof window !== "undefined" && (
+            <div className="mt-4 flex justify-center">
+              <QrCodeEntrada url={`${window.location.origin}/entrar?codigo=${codigo}`} />
+            </div>
+          )}
         </div>
 
         {dados.status === "aberta" && (

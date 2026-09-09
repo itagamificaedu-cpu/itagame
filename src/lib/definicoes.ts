@@ -172,15 +172,19 @@ export type EstadoAdicionarProfessorEscola =
   | undefined;
 
 export const EsquemaCriarSalaCaboGuerra = z.object({
-  nomeEquipe1: z.string().min(1, { error: "Informe o nome da equipe 1." }).max(20).trim(),
-  nomeEquipe2: z.string().min(1, { error: "Informe o nome da equipe 2." }).max(20).trim(),
+  modo: z.enum(["equipes", "individual"]).default("equipes"),
+  nomeEquipe1: z.string().max(20).trim().optional(),
+  nomeEquipe2: z.string().max(20).trim().optional(),
+  turmaId: z.string().trim().optional(),
 });
 
 export type EstadoCriarSalaCaboGuerra =
   | {
       erros?: {
+        modo?: string[];
         nomeEquipe1?: string[];
         nomeEquipe2?: string[];
+        turmaId?: string[];
       };
       mensagem?: string;
     }
@@ -214,7 +218,7 @@ export const EsquemaEntrarCaboGuerra = z.object({
     .min(2, { error: "Informe um apelido." })
     .max(20, { error: "Apelido muito longo (máx. 20 caracteres)." })
     .trim(),
-  equipe: z.coerce.number({ error: "Escolha uma equipe." }).int().min(1).max(2),
+  equipe: z.coerce.number().int().min(1).max(2).optional(),
 });
 
 export type EstadoEntrarCaboGuerra =

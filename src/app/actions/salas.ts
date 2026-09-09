@@ -5,14 +5,15 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
+import { verificarPinAluno } from "@/lib/alunoPin";
 import { criarSessaoParticipante, obterSessaoParticipante } from "@/lib/salaSessao";
-import { EsquemaEntrarSala, EstadoEntrarSala } from "@/lib/definicoes";
+import { EsquemaEntrarSala } from "@/lib/definicoes";
 
 function gerarCodigo() {
   return String(crypto.randomInt(100000, 999999));
 }
 
-export async function iniciarSala(atividadeId: string) {
+export async function iniciarSala(atividadeId: string, formData: FormData) {
   const sessao = await exigirAssinaturaAtiva();
 
   const atividade = await prisma.atividade.findUnique({ where: { id: atividadeId } });
@@ -20,11 +21,20 @@ export async function iniciarSala(atividadeId: string) {
     throw new Error("Atividade não encontrada.");
   }
 
+  const turmaIdInformada = (formData.get("turmaId") as string) || undefined;
+  let turmaId: string | null = null;
+  if (turmaIdInformada) {
+    const turma = await prisma.turma.findUnique({ where: { id: turmaIdInformada } });
+    if (turma && turma.professorId === sessao.userId) {
+      turmaId = turma.id;
+    }
+  }
+
   let sala = null;
   for (let tentativa = 0; tentativa < 5 && !sala; tentativa++) {
     try {
       sala = await prisma.salaAoVivo.create({
-        data: { codigo: gerarCodigo(), atividadeId },
+        data: { codigo: gerarCodigo(), atividadeId, turmaId },
       });
     } catch {
       sala = null;
@@ -87,36 +97,114 @@ export async function encerrarSala(codigo: string) {
   revalidatePath(`/painel/salas/${codigo}`);
 }
 
-export async function entrarNaSala(
-  _estado: EstadoEntrarSala,
-  formData: FormData
-): Promise<EstadoEntrarSala> {
-  const camposValidados = EsquemaEntrarSala.safeParse({
-    codigo: formData.get("codigo"),
-    apelido: formData.get("apelido"),
-  });
+export type ResultadoEntrarSala = { ok: true } | { ok: false; erro: string };
+
+export async function entrarNaSala(codigo: string, apelido: string): Promise<ResultadoEntrarSala> {
+  const camposValidados = EsquemaEntrarSala.safeParse({ codigo, apelido });
 
   if (!camposValidados.success) {
-    return { erros: camposValidados.error.flatten().fieldErrors };
+    const primeiroErro = Object.values(camposValidados.error.flatten().fieldErrors)[0]?.[0];
+    return { ok: false, erro: primeiroErro ?? "Dados inválidos." };
   }
 
-  const { codigo, apelido } = camposValidados.data;
+  const dados = camposValidados.data;
 
-  const sala = await prisma.salaAoVivo.findUnique({ where: { codigo } });
+  const sala = await prisma.salaAoVivo.findUnique({ where: { codigo: dados.codigo } });
   if (!sala) {
-    return { mensagem: "Código de sala não encontrado." };
+    return { ok: false, erro: "Código de sala não encontrado." };
   }
   if (sala.status === "encerrada") {
-    return { mensagem: "Esta sala já foi encerrada." };
+    return { ok: false, erro: "Esta sala já foi encerrada." };
+  }
+  if (sala.turmaId) {
+    return { ok: false, erro: "Essa sala pede pra entrar escolhendo seu nome na turma. Volte e tente de novo." };
   }
 
   let participante;
   try {
     participante = await prisma.participanteSala.create({
-      data: { salaId: sala.id, apelido },
+      data: { salaId: sala.id, apelido: dados.apelido },
     });
   } catch {
-    return { mensagem: "Esse apelido já está em uso nesta sala. Escolha outro." };
+    return { ok: false, erro: "Esse apelido já está em uso nesta sala. Escolha outro." };
+  }
+
+  await criarSessaoParticipante(dados.codigo, { participanteId: participante.id, salaId: sala.id });
+  redirect(`/sala/${dados.codigo}/jogo`);
+}
+
+export type InfoSalaEntrada =
+  | { ok: true; turma: { id: string; nome: string; alunos: { id: string; nome: string }[] } | null }
+  | { ok: false; erro: string };
+
+export async function buscarSalaParaEntrada(codigo: string): Promise<InfoSalaEntrada> {
+  const codigoLimpo = codigo.trim();
+  if (codigoLimpo.length !== 6) {
+    return { ok: false, erro: "O código tem 6 dígitos." };
+  }
+
+  const sala = await prisma.salaAoVivo.findUnique({
+    where: { codigo: codigoLimpo },
+    include: { turma: { include: { alunos: { orderBy: { nome: "asc" } } } } },
+  });
+
+  if (!sala) {
+    return { ok: false, erro: "Código de sala não encontrado." };
+  }
+  if (sala.status === "encerrada") {
+    return { ok: false, erro: "Esta sala já foi encerrada." };
+  }
+
+  return {
+    ok: true,
+    turma: sala.turma
+      ? {
+          id: sala.turma.id,
+          nome: sala.turma.nome,
+          alunos: sala.turma.alunos.map((a) => ({ id: a.id, nome: a.nome })),
+        }
+      : null,
+  };
+}
+
+// Entrada vinculada ao aluno de verdade — ver comentário equivalente em
+// entrarComoAlunoNaSalaCaboGuerra (actions/caboGuerraOnline.ts).
+export async function entrarComoAlunoNaSala(
+  codigo: string,
+  alunoId: string,
+  pin: string
+): Promise<ResultadoEntrarSala> {
+  const sala = await prisma.salaAoVivo.findUnique({ where: { codigo } });
+  if (!sala) {
+    return { ok: false, erro: "Código de sala não encontrado." };
+  }
+  if (sala.status === "encerrada") {
+    return { ok: false, erro: "Esta sala já foi encerrada." };
+  }
+  if (!sala.turmaId) {
+    return { ok: false, erro: "Essa sala não está vinculada a uma turma." };
+  }
+
+  const resultadoPin = await verificarPinAluno(alunoId, pin);
+  if (!resultadoPin.ok) {
+    return resultadoPin;
+  }
+  if (resultadoPin.aluno.turmaId !== sala.turmaId) {
+    return { ok: false, erro: "Esse aluno não é dessa turma." };
+  }
+
+  let participante = await prisma.participanteSala.findFirst({
+    where: { salaId: sala.id, alunoId: resultadoPin.aluno.id },
+  });
+
+  if (!participante) {
+    try {
+      participante = await prisma.participanteSala.create({
+        data: { salaId: sala.id, apelido: resultadoPin.aluno.nome, alunoId: resultadoPin.aluno.id },
+      });
+    } catch {
+      return { ok: false, erro: "Não foi possível entrar na sala. Tente de novo." };
+    }
   }
 
   await criarSessaoParticipante(codigo, { participanteId: participante.id, salaId: sala.id });

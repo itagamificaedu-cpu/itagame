@@ -59,6 +59,7 @@ export async function avancarSeNecessario(codigo: string) {
             perguntaAlternativas: proximaPergunta.alternativas,
             perguntaComecouEm: new Date(),
             rodadaGanhaPor: null,
+            rodadaGanhaPorParticipanteId: null,
             rodadaTerminouEm: null,
           },
         });

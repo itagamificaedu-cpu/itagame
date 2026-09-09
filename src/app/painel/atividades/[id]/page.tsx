@@ -34,6 +34,12 @@ export default async function PaginaDetalheAtividade({
     notFound();
   }
 
+  const turmas = await prisma.turma.findMany({
+    where: { professorId: sessao.userId },
+    orderBy: { nome: "asc" },
+    select: { id: true, nome: true },
+  });
+
   const conteudo = atividade.conteudoGerado as ConteudoBase;
   const gabarito = atividade.gabarito as ItemGabarito[];
   const podeIniciarSala = !TIPOS_SEM_SALA_AO_VIVO.has(atividade.tipo);
@@ -53,7 +59,8 @@ export default async function PaginaDetalheAtividade({
             </p>
           </div>
           {podeIniciarSala && (
-            <form action={iniciarSala.bind(null, atividade.id)}>
+            <form action={iniciarSala.bind(null, atividade.id)} className="flex items-center gap-2">
+              <SeletorTurmaSala turmas={turmas} />
               <button
                 type="submit"
                 className="whitespace-nowrap rounded-lg bg-[#00c264] px-4 py-2 text-sm font-bold text-white hover:brightness-110"
@@ -63,14 +70,18 @@ export default async function PaginaDetalheAtividade({
             </form>
           )}
           {atividade.tipo === "cabo_de_guerra" && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Link
                 href={`/painel/cabo-de-guerra/personalizado/${atividade.id}`}
                 className="whitespace-nowrap rounded-lg bg-gradient-to-br from-[#FFD600] to-[#FF8F00] px-4 py-2 text-sm font-bold text-[#1a1a2e] hover:brightness-105"
               >
                 🪢 Jogar (projetor)
               </Link>
-              <form action={criarSalaCaboGuerraPersonalizada.bind(null, atividade.id)}>
+              <form
+                action={criarSalaCaboGuerraPersonalizada.bind(null, atividade.id)}
+                className="flex items-center gap-2"
+              >
+                <SeletorTurmaSala turmas={turmas} />
                 <button
                   type="submit"
                   className="whitespace-nowrap rounded-lg border-2 border-[#1a3fd4] px-4 py-2 text-sm font-bold text-[#1a3fd4] hover:bg-[#1a3fd4]/5"
@@ -142,6 +153,26 @@ export default async function PaginaDetalheAtividade({
         </div>
       </div>
     </main>
+  );
+}
+
+function SeletorTurmaSala({ turmas }: { turmas: { id: string; nome: string }[] }) {
+  if (turmas.length === 0) return null;
+
+  return (
+    <select
+      name="turmaId"
+      defaultValue=""
+      title="Vincular a uma turma (opcional) — a pontuação fica ligada ao aluno entre partidas"
+      className="rounded-lg border border-neutral-300 bg-white px-2 py-2 text-xs text-neutral-600 focus:border-[#1a3fd4] focus:outline-none focus:ring-1 focus:ring-[#1a3fd4]"
+    >
+      <option value="">Sem turma (apelido livre)</option>
+      {turmas.map((turma) => (
+        <option key={turma.id} value={turma.id}>
+          {turma.nome}
+        </option>
+      ))}
+    </select>
   );
 }
 

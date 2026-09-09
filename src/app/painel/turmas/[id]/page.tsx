@@ -24,6 +24,34 @@ export default async function PaginaDetalheTurma({
     notFound();
   }
 
+  // Pontuação acumulada por aluno em jogos ao vivo (Cabo de Guerra + Salas ao
+  // Vivo) — só existe pra quem entrou pelo nome da turma + PIN, não pra quem
+  // digitou apelido avulso. Ver comentário em ParticipanteCaboGuerra.alunoId.
+  const alunoIds = turma.alunos.map((a) => a.id);
+  const [pontosCaboGuerra, pontosSalas] = await Promise.all([
+    prisma.participanteCaboGuerra.groupBy({
+      by: ["alunoId"],
+      where: { alunoId: { in: alunoIds } },
+      _sum: { pontuacao: true },
+      _count: { _all: true },
+    }),
+    prisma.participanteSala.groupBy({
+      by: ["alunoId"],
+      where: { alunoId: { in: alunoIds } },
+      _sum: { pontuacao: true },
+      _count: { _all: true },
+    }),
+  ]);
+
+  const pontuacaoPorAluno = new Map<string, { pontos: number; jogos: number }>();
+  for (const linha of [...pontosCaboGuerra, ...pontosSalas]) {
+    if (!linha.alunoId) continue;
+    const atual = pontuacaoPorAluno.get(linha.alunoId) ?? { pontos: 0, jogos: 0 };
+    atual.pontos += linha._sum.pontuacao ?? 0;
+    atual.jogos += linha._count._all;
+    pontuacaoPorAluno.set(linha.alunoId, atual);
+  }
+
   return (
     <main className="min-h-screen bg-neutral-50 px-6 py-10">
       <div className="mx-auto max-w-2xl">
@@ -88,12 +116,22 @@ export default async function PaginaDetalheTurma({
             <p className="mt-4 text-sm text-neutral-500">Nenhum aluno cadastrado ainda.</p>
           ) : (
             <ul className="mt-4 space-y-2">
-              {turma.alunos.map((aluno) => (
+              {turma.alunos.map((aluno) => {
+                const pontuacao = pontuacaoPorAluno.get(aluno.id);
+                return (
                 <li
                   key={aluno.id}
                   className="flex items-center justify-between rounded-lg border border-neutral-200 px-4 py-2"
                 >
-                  <span className="text-sm font-medium text-neutral-800">{aluno.nome}</span>
+                  <div className="min-w-0">
+                    <span className="text-sm font-medium text-neutral-800">{aluno.nome}</span>
+                    {pontuacao && (
+                      <p className="text-xs text-neutral-400">
+                        🏆 {pontuacao.pontos} pts em {pontuacao.jogos}{" "}
+                        {pontuacao.jogos === 1 ? "jogo" : "jogos"}
+                      </p>
+                    )}
+                  </div>
                   <div className="flex items-center gap-3">
                     <GerarPinCliente
                       turmaId={turma.id}
@@ -110,7 +148,8 @@ export default async function PaginaDetalheTurma({
                     </form>
                   </div>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           )}
         </div>

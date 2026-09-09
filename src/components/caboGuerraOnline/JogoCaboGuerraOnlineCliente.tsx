@@ -8,6 +8,7 @@ type Participante = { id: string; apelido: string; pontuacao: number };
 
 type EstadoSala = {
   status: "aberta" | "em_andamento" | "encerrada";
+  modo: "equipes" | "individual";
   nomeEquipe1: string;
   nomeEquipe2: string;
   rodadaAtual: number;
@@ -20,6 +21,8 @@ type EstadoSala = {
   perguntaAlternativas: string[] | null;
   tempoRestante: number;
   rodadaGanhaPor: number | null;
+  rodadaGanhaPorApelido: string | null;
+  participantes: Participante[];
   equipe1: Participante[];
   equipe2: Participante[];
   meuId: string | null;
@@ -56,8 +59,9 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
     );
   }
 
-  const cor = dados.minhaEquipe === 2 ? "vermelho" : "azul";
-  const corPrincipal = cor === "azul" ? "#1565C0" : "#C62828";
+  const individual = dados.modo === "individual";
+  const cor = !individual && dados.minhaEquipe === 2 ? "vermelho" : "azul";
+  const corPrincipal = individual ? "#1a3fd4" : cor === "azul" ? "#1565C0" : "#C62828";
   const nomeMinhaEquipe = dados.minhaEquipe === 2 ? dados.nomeEquipe2 : dados.nomeEquipe1;
 
   if (dados.status === "aberta") {
@@ -66,8 +70,10 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
         className="flex min-h-screen flex-col items-center justify-center gap-3 px-6 text-center text-white"
         style={{ background: `linear-gradient(135deg, ${corPrincipal}, #0d0d1a)` }}
       >
-        <span className="text-6xl">{cor === "azul" ? "🔵" : "🔴"}</span>
-        <p className="text-2xl font-extrabold">Você está na {nomeMinhaEquipe}</p>
+        <span className="text-6xl">{individual ? "🎯" : cor === "azul" ? "🔵" : "🔴"}</span>
+        <p className="text-2xl font-extrabold">
+          {individual ? "Você está pronto!" : `Você está na ${nomeMinhaEquipe}`}
+        </p>
         <p className="text-white/80">Aguardando o professor iniciar o jogo...</p>
       </main>
     );
@@ -118,10 +124,19 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
     return (
       <main className="flex min-h-screen flex-col bg-[#0d0d1a] text-white">
         <div className="flex items-center justify-between border-b-4 border-[#FFD600] bg-black/30 px-4 py-2">
-          <div className="rounded-xl border-2 border-white/15 bg-white/10 px-4 py-1.5">
-            <p className="text-[0.6rem] font-bold tracking-wide text-neutral-400 uppercase">{dados.nomeEquipe1}</p>
-            <p className="text-2xl font-extrabold text-[#42A5F5]">{dados.pontosEquipe1}</p>
-          </div>
+          {individual ? (
+            <div className="rounded-xl border-2 border-white/15 bg-white/10 px-4 py-1.5">
+              <p className="text-[0.6rem] font-bold tracking-wide text-neutral-400 uppercase">Seus pontos</p>
+              <p className="text-2xl font-extrabold text-[#FFD600]">
+                {dados.participantes.find((p) => p.id === dados.meuId)?.pontuacao ?? 0}
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-xl border-2 border-white/15 bg-white/10 px-4 py-1.5">
+              <p className="text-[0.6rem] font-bold tracking-wide text-neutral-400 uppercase">{dados.nomeEquipe1}</p>
+              <p className="text-2xl font-extrabold text-[#42A5F5]">{dados.pontosEquipe1}</p>
+            </div>
+          )}
           <div className="flex flex-col items-center gap-0.5">
             <div className="rounded-xl border-2 border-[#FFD600] bg-[#FFD600]/15 px-4 py-1">
               <p className="text-center text-[0.6rem] font-bold tracking-widest text-neutral-400 uppercase">Tempo</p>
@@ -146,16 +161,20 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
               )}
             </p>
           </div>
-          <div className="rounded-xl border-2 border-white/15 bg-white/10 px-4 py-1.5 text-right">
-            <p className="text-[0.6rem] font-bold tracking-wide text-neutral-400 uppercase">{dados.nomeEquipe2}</p>
-            <p className="text-2xl font-extrabold text-[#EF5350]">{dados.pontosEquipe2}</p>
-          </div>
+          {!individual && (
+            <div className="rounded-xl border-2 border-white/15 bg-white/10 px-4 py-1.5 text-right">
+              <p className="text-[0.6rem] font-bold tracking-wide text-neutral-400 uppercase">{dados.nomeEquipe2}</p>
+              <p className="text-2xl font-extrabold text-[#EF5350]">{dados.pontosEquipe2}</p>
+            </div>
+          )}
         </div>
 
         <div className="border-b-4 border-black/25 bg-gradient-to-br from-[#FFD600] to-[#FF8F00] px-4 py-3 text-center">
-          <p className="text-[0.65rem] font-semibold tracking-widest text-black/45 uppercase">
-            Você joga por: {cor === "azul" ? "🔵" : "🔴"} {nomeMinhaEquipe}
-          </p>
+          {!individual && (
+            <p className="text-[0.65rem] font-semibold tracking-widest text-black/45 uppercase">
+              Você joga por: {cor === "azul" ? "🔵" : "🔴"} {nomeMinhaEquipe}
+            </p>
+          )}
           <p
             className={`font-extrabold tracking-wide text-[#1a1a2e] ${
               dados.modoPersonalizado ? "text-xl" : "text-4xl"
@@ -169,9 +188,13 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
           <p className="mt-3 text-center text-sm font-semibold text-[#FFD600]">
             {dados.rodadaGanhaPor === 0
               ? "⏰ Tempo esgotado — ninguém pontuou"
-              : dados.rodadaGanhaPor === (dados.minhaEquipe ?? -1)
-                ? "🎉 Sua equipe acertou!"
-                : "A outra equipe acertou primeiro."}
+              : individual
+                ? dados.meuId && dados.rodadaGanhaPorApelido === dados.participantes.find((p) => p.id === dados.meuId)?.apelido
+                  ? "🎉 Você acertou primeiro!"
+                  : `${dados.rodadaGanhaPorApelido} acertou primeiro.`
+                : dados.rodadaGanhaPor === (dados.minhaEquipe ?? -1)
+                  ? "🎉 Sua equipe acertou!"
+                  : "A outra equipe acertou primeiro."}
           </p>
         )}
 
@@ -242,8 +265,9 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
     );
   }
 
-  const corFundo =
-    dados.vencedorFinal === 1
+  const corFundo = individual
+    ? "bg-gradient-to-br from-[#1a1a2e] to-[#2d2d5e]"
+    : dados.vencedorFinal === 1
       ? "bg-gradient-to-br from-[#0D47A1] to-[#42A5F5]"
       : dados.vencedorFinal === 2
         ? "bg-gradient-to-br from-[#B71C1C] to-[#EF5350]"
@@ -251,10 +275,12 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
 
   const minhaVitoria = dados.vencedorFinal === dados.minhaEquipe;
 
-  const ranking = [
-    ...dados.equipe1.map((p) => ({ ...p, emoji: "🔵" })),
-    ...dados.equipe2.map((p) => ({ ...p, emoji: "🔴" })),
-  ].sort((a, b) => b.pontuacao - a.pontuacao);
+  const ranking = individual
+    ? [...dados.participantes].sort((a, b) => b.pontuacao - a.pontuacao)
+    : [
+        ...dados.equipe1.map((p) => ({ ...p, emoji: "🔵" })),
+        ...dados.equipe2.map((p) => ({ ...p, emoji: "🔴" })),
+      ].sort((a, b) => b.pontuacao - a.pontuacao);
   const minhaPosicao = ranking.findIndex((p) => p.id === dados.meuId) + 1;
   const podio = ranking.slice(0, 3);
   const resto = ranking.slice(3, 10);
@@ -262,17 +288,23 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
 
   return (
     <main className={`flex min-h-screen flex-col items-center justify-center gap-3 px-6 py-12 text-center ${corFundo}`}>
-      <span className="text-7xl">{dados.vencedorFinal === 0 ? "🤝" : minhaVitoria ? "🏆" : "😢"}</span>
+      <span className="text-7xl">
+        {individual ? (minhaPosicao === 1 ? "🏆" : "🎮") : dados.vencedorFinal === 0 ? "🤝" : minhaVitoria ? "🏆" : "😢"}
+      </span>
       <p className="text-3xl font-extrabold text-white">
-        {dados.vencedorFinal === 0
-          ? "EMPATE!"
-          : dados.vencedorFinal === 1
-            ? `🔵 ${dados.nomeEquipe1.toUpperCase()} VENCEU!`
-            : `🔴 ${dados.nomeEquipe2.toUpperCase()} VENCEU!`}
+        {individual
+          ? "FIM DE JOGO!"
+          : dados.vencedorFinal === 0
+            ? "EMPATE!"
+            : dados.vencedorFinal === 1
+              ? `🔵 ${dados.nomeEquipe1.toUpperCase()} VENCEU!`
+              : `🔴 ${dados.nomeEquipe2.toUpperCase()} VENCEU!`}
       </p>
-      <p className="text-lg text-white/85">
-        Placar final: {dados.pontosEquipe1} × {dados.pontosEquipe2}
-      </p>
+      {!individual && (
+        <p className="text-lg text-white/85">
+          Placar final: {dados.pontosEquipe1} × {dados.pontosEquipe2}
+        </p>
+      )}
 
       {ranking.some((p) => p.pontuacao > 0) && (
         <div className="mt-4 w-full max-w-sm">
@@ -293,7 +325,8 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
                   >
                     <span className="text-2xl">{medalha[ordem === 1 ? 0 : ordem === 0 ? 1 : 2]}</span>
                     <span className="mt-1 max-w-[76px] truncate text-xs font-bold text-white">
-                      {p.emoji} {p.apelido}
+                      {"emoji" in p ? `${p.emoji} ` : ""}
+                      {p.apelido}
                     </span>
                     <span className="text-xs text-white/70">{p.pontuacao} pts</span>
                   </div>
@@ -312,7 +345,8 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
                   }`}
                 >
                   <span>
-                    {indice + 4}. {p.emoji} {p.apelido}
+                    {indice + 4}. {"emoji" in p ? `${p.emoji} ` : ""}
+                    {p.apelido}
                   </span>
                   <span>{p.pontuacao} pts</span>
                 </li>

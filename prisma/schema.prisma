@@ -177,6 +177,8 @@ model Turma {
   trilhas      Trilha[]
   itensLoja    ItemLoja[]
   casosClinicos CasoClinicoProntuario[]
+  salasCaboGuerra SalaCaboGuerra[]
+  salasAoVivo     SalaAoVivo[]
 
   @@map("turmas")
 }
@@ -203,6 +205,8 @@ model Aluno {
   resgates         ResgateLoja[]
   badgesConcedidas BadgeConcedida[]
   registrosProntuario RegistroProntuario[]
+  participacoesCaboGuerra ParticipanteCaboGuerra[]
+  participacoesSala       ParticipanteSala[]
 
   @@map("alunos")
 }
@@ -322,6 +326,13 @@ model SalaAoVivo {
   atividadeId       String
   atividade         Atividade  @relation(fields: [atividadeId], references: [id])
 
+  // Turma opcional escolhida ao abrir a sala — quando presente, o aluno entra
+  // escolhendo o próprio nome na lista da turma + PIN (em vez de digitar um
+  // apelido qualquer), o que deixa a pontuação de fato ligada ao aluno pra
+  // sempre (histórico entre partidas), não só ao apelido daquela sessão.
+  turmaId           String?
+  turma             Turma?     @relation(fields: [turmaId], references: [id])
+
   participantes     ParticipanteSala[]
 
   @@map("salas_ao_vivo")
@@ -335,6 +346,12 @@ model ParticipanteSala {
 
   salaId      String
   sala        SalaAoVivo @relation(fields: [salaId], references: [id])
+
+  // Presente quando a sala está vinculada a uma turma e o aluno entrou pelo
+  // nome da lista + PIN — permite somar a pontuação do mesmo aluno entre
+  // partidas diferentes. Nulo nas salas sem turma (apelido livre, como hoje).
+  alunoId     String?
+  aluno       Aluno?   @relation(fields: [alunoId], references: [id])
 
   respostas   RespostaParticipante[]
 
@@ -617,10 +634,19 @@ enum StatusSalaCaboGuerra {
   encerrada
 }
 
+// "equipes" é o Cabo de Guerra clássico (2 times puxando a corda). "individual"
+// é o mesmo mecanismo de pergunta-relâmpago, mas cada aluno compete sozinho —
+// sem time, só um ranking ao vivo de quem responde mais rápido e mais certo.
+enum ModoCaboGuerra {
+  equipes
+  individual
+}
+
 model SalaCaboGuerra {
   id                String               @id @default(cuid())
   codigo            String               @unique
   status            StatusSalaCaboGuerra @default(aberta)
+  modo              ModoCaboGuerra       @default(equipes)
   nomeEquipe1       String
   nomeEquipe2       String
   rodadaAtual       Int                  @default(1)
@@ -630,6 +656,9 @@ model SalaCaboGuerra {
   perguntaAlternativas Json?
   perguntaComecouEm DateTime?
   rodadaGanhaPor    Int?
+  // Só usado no modo individual: qual participante especificamente acertou
+  // primeiro nessa rodada (no modo equipes o time já basta, guardado acima).
+  rodadaGanhaPorParticipanteId String?
   rodadaTerminouEm  DateTime?
   pontosEquipe1     Int                  @default(0)
   pontosEquipe2     Int                  @default(0)
@@ -639,6 +668,10 @@ model SalaCaboGuerra {
   professorId       String
   professor         Usuario              @relation(fields: [professorId], references: [id])
 
+  // Turma opcional — mesma ideia do SalaAoVivo.turmaId (ver comentário lá).
+  turmaId           String?
+  turma             Turma?               @relation(fields: [turmaId], references: [id])
+
   participantes     ParticipanteCaboGuerra[]
 
   @@map("salas_cabo_guerra")
@@ -647,12 +680,17 @@ model SalaCaboGuerra {
 model ParticipanteCaboGuerra {
   id        String   @id @default(cuid())
   apelido   String
+  // 0 = sem time (modo individual). 1 ou 2 = time, no modo equipes.
   equipe    Int
   pontuacao Int      @default(0)
   entrouEm  DateTime @default(now())
 
   salaId    String
   sala      SalaCaboGuerra @relation(fields: [salaId], references: [id])
+
+  // Ver comentário equivalente em ParticipanteSala.alunoId.
+  alunoId   String?
+  aluno     Aluno?   @relation(fields: [alunoId], references: [id])
 
   @@unique([salaId, apelido])
   @@map("participantes_cabo_guerra")
