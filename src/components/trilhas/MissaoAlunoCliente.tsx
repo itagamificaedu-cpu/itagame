@@ -2,13 +2,16 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { entregarMissao, responderQuizMissao, type QuestaoQuizMissao } from "@/app/actions/missoes";
+import { entregarMissao, responderQuizMissao, type QuestaoQuizMissao, type PontoMapaMissao } from "@/app/actions/missoes";
+import { MapaInterativoMissaoCliente } from "@/components/trilhas/MapaInterativoMissaoCliente";
 
 type Props = {
   progressoId: string;
   status: "bloqueada" | "disponivel" | "em_andamento" | "concluida";
-  checkpointTipo: "quiz_automatico" | "correcao_professor" | "avaliacao_pratica" | "banca";
+  checkpointTipo: "quiz_automatico" | "correcao_professor" | "avaliacao_pratica" | "banca" | "mapa_interativo";
   quizPerguntas: QuestaoQuizMissao[] | null;
+  mapaImagemUrl: string | null;
+  mapaPontos: PontoMapaMissao[] | null;
   feedbackProfessor: string | null;
   entregaTextoAtual: string | null;
   xpRecompensa: number;
@@ -20,6 +23,8 @@ export function MissaoAlunoCliente({
   status,
   checkpointTipo,
   quizPerguntas,
+  mapaImagemUrl,
+  mapaPontos,
   feedbackProfessor,
   entregaTextoAtual,
   xpRecompensa,
@@ -41,6 +46,20 @@ export function MissaoAlunoCliente({
         <p className="mt-2 font-bold text-[#00854a]">Missão concluída!</p>
         <p className="mt-1 text-sm text-[#00854a]">Você ganhou {xpGanho} XP.</p>
       </div>
+    );
+  }
+
+  if (checkpointTipo === "mapa_interativo") {
+    if (!mapaImagemUrl || !mapaPontos || mapaPontos.length === 0) {
+      return <p className="text-sm text-neutral-500">Essa missão ainda não tem o mapa configurado.</p>;
+    }
+    return (
+      <MapaInterativoMissaoCliente
+        progressoId={progressoId}
+        imagemUrl={mapaImagemUrl}
+        pontos={mapaPontos}
+        xpRecompensa={xpRecompensa}
+      />
     );
   }
 

@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { adicionarMissao, type QuestaoQuizMissao } from "@/app/actions/missoes";
+import { adicionarMissao, type QuestaoQuizMissao, type PontoMapaMissao } from "@/app/actions/missoes";
+import { EditorMapaPontosMissao } from "@/components/trilhas/EditorMapaPontosMissao";
 
 type QuestaoForm = {
   enunciado: string;
@@ -40,10 +41,12 @@ export function AdicionarMissaoCliente({
   const [preRequisitoId, setPreRequisitoId] = useState("");
   const [xp, setXp] = useState(10);
   const [checkpointTipo, setCheckpointTipo] = useState<
-    "quiz_automatico" | "correcao_professor"
+    "quiz_automatico" | "correcao_professor" | "mapa_interativo"
   >("correcao_professor");
   const [notaMinima, setNotaMinima] = useState(60);
   const [questoes, setQuestoes] = useState<QuestaoForm[]>([questaoVazia()]);
+  const [mapaImagemUrl, setMapaImagemUrl] = useState("");
+  const [mapaPontos, setMapaPontos] = useState<PontoMapaMissao[]>([]);
   const [quiserBadge, setQuiserBadge] = useState(false);
   const [badgeNome, setBadgeNome] = useState("");
   const [badgeDescricao, setBadgeDescricao] = useState("");
@@ -75,6 +78,8 @@ export function AdicionarMissaoCliente({
     setPreRequisitoId("");
     setXp(10);
     setQuestoes([questaoVazia()]);
+    setMapaImagemUrl("");
+    setMapaPontos([]);
     setQuiserBadge(false);
     setBadgeNome("");
     setBadgeDescricao("");
@@ -104,8 +109,11 @@ export function AdicionarMissaoCliente({
       preRequisitoId: preRequisitoId || null,
       xp,
       checkpointTipo,
-      notaMinima: checkpointTipo === "quiz_automatico" ? notaMinima : undefined,
+      notaMinima:
+        checkpointTipo === "quiz_automatico" || checkpointTipo === "mapa_interativo" ? notaMinima : undefined,
       quizPerguntas,
+      mapaImagemUrl: checkpointTipo === "mapa_interativo" ? mapaImagemUrl : undefined,
+      mapaPontos: checkpointTipo === "mapa_interativo" ? mapaPontos : undefined,
       badgeNovo: quiserBadge && badgeNome.trim() ? { nome: badgeNome, descricao: badgeDescricao, icone: badgeIcone } : null,
     });
 
@@ -214,6 +222,17 @@ export function AdicionarMissaoCliente({
           >
             ❓ Quiz automático
           </button>
+          <button
+            type="button"
+            onClick={() => setCheckpointTipo("mapa_interativo")}
+            className={`flex-1 rounded-lg border-2 py-2 text-sm font-bold ${
+              checkpointTipo === "mapa_interativo"
+                ? "border-[#1a3fd4] bg-[#1a3fd4]/10 text-[#1a3fd4]"
+                : "border-neutral-200 text-neutral-500 hover:border-neutral-300"
+            }`}
+          >
+            🗺️ Mapa interativo
+          </button>
         </div>
       </div>
 
@@ -300,6 +319,28 @@ export function AdicionarMissaoCliente({
           >
             + Adicionar pergunta
           </button>
+        </div>
+      ) : checkpointTipo === "mapa_interativo" ? (
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium text-neutral-700">
+              Nota mínima pra aprovar (% de pontos certos)
+            </label>
+            <input
+              type="number"
+              min={1}
+              max={100}
+              value={notaMinima}
+              onChange={(e) => setNotaMinima(Number(e.target.value))}
+              className="mt-1 w-32 rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#1a3fd4] focus:outline-none focus:ring-1 focus:ring-[#1a3fd4]"
+            />
+          </div>
+          <EditorMapaPontosMissao
+            imagemUrl={mapaImagemUrl}
+            pontos={mapaPontos}
+            onChangeImagem={setMapaImagemUrl}
+            onChangePontos={setMapaPontos}
+          />
         </div>
       ) : (
         <p className="rounded-lg bg-neutral-50 px-4 py-3 text-sm text-neutral-500">

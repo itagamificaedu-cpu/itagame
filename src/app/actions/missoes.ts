@@ -19,6 +19,15 @@ export type QuestaoQuizMissao = {
   respostaCorreta: string;
 };
 
+// Ponto clicável do mapa interativo — x/y em % (0-100) da imagem, mesmo
+// formato usado no Professor Conectado (EditorMapaPontos.jsx / JogoMapaInterativo.jsx).
+export type PontoMapaMissao = {
+  id: string;
+  label: string;
+  x: number;
+  y: number;
+};
+
 export type EntradaAdicionarMissao = {
   trilhaId: string;
   titulo: string;
@@ -28,15 +37,21 @@ export type EntradaAdicionarMissao = {
   preRequisitoId?: string | null;
   criterioDesbloqueio?: string;
   xp: number;
-  checkpointTipo: "quiz_automatico" | "correcao_professor" | "avaliacao_pratica" | "banca";
+  checkpointTipo: "quiz_automatico" | "correcao_professor" | "avaliacao_pratica" | "banca" | "mapa_interativo";
   notaMinima?: number | null;
   quizPerguntas?: QuestaoQuizMissao[];
+  mapaImagemUrl?: string;
+  mapaPontos?: PontoMapaMissao[];
   // Se preenchido, cria um badge novo e vincula à missão. Ícone é um emoji
   // (sem upload de imagem, pra manter simples na v1).
   badgeNovo?: { nome: string; descricao: string; icone?: string } | null;
 };
 
 export type ResultadoAcaoMissao = { ok: true } | { ok: false; erro: string };
+
+// ~1.5MB em base64 — folga maior que a capa da trilha (400KB) porque um
+// mapa precisa de mais resolução pra dar pra clicar com precisão.
+const TAMANHO_MAXIMO_MAPA = 1_500_000;
 
 export async function adicionarMissao(input: EntradaAdicionarMissao): Promise<ResultadoAcaoMissao> {
   const sessao = await exigirAssinaturaAtiva();
@@ -87,6 +102,28 @@ export async function adicionarMissao(input: EntradaAdicionarMissao): Promise<Re
     }));
   }
 
+  let mapaImagemUrl: string | undefined;
+  let mapaPontosLimpos: PontoMapaMissao[] | undefined;
+  if (input.checkpointTipo === "mapa_interativo") {
+    const imagem = input.mapaImagemUrl?.trim();
+    const pontos = input.mapaPontos ?? [];
+    if (!imagem) return { ok: false, erro: "Adicione a imagem do mapa." };
+    if (imagem.length > TAMANHO_MAXIMO_MAPA) {
+      return { ok: false, erro: "Essa imagem é muito grande. Escolha uma imagem menor." };
+    }
+    if (pontos.length < 2) {
+      return { ok: false, erro: "Marque pelo menos 2 pontos no mapa." };
+    }
+    for (const [indice, ponto] of pontos.entries()) {
+      if (!ponto.label.trim()) return { ok: false, erro: `Dê um nome ao ponto ${indice + 1} do mapa.` };
+      if (ponto.x < 0 || ponto.x > 100 || ponto.y < 0 || ponto.y > 100) {
+        return { ok: false, erro: `Posição inválida no ponto ${indice + 1} do mapa.` };
+      }
+    }
+    mapaImagemUrl = imagem;
+    mapaPontosLimpos = pontos.map((p) => ({ ...p, label: p.label.trim() }));
+  }
+
   let badgeId: string | undefined;
   if (input.badgeNovo?.nome.trim()) {
     const badge = await prisma.badge.create({
@@ -116,6 +153,8 @@ export async function adicionarMissao(input: EntradaAdicionarMissao): Promise<Re
       checkpointTipo: input.checkpointTipo,
       notaMinima: input.notaMinima ?? undefined,
       quizPerguntas: quizPerguntasLimpas as Prisma.InputJsonValue | undefined,
+      mapaImagemUrl,
+      mapaPontos: mapaPontosLimpos as Prisma.InputJsonValue | undefined,
       badgeId,
     },
   });
@@ -355,6 +394,9 @@ export async function entregarMissao(
   if (progresso.missao.checkpointTipo === "quiz_automatico") {
     return { ok: false, erro: "Essa missão é de quiz — responda pelo formulário do quiz." };
   }
+  if (progresso.missao.checkpointTipo === "mapa_interativo") {
+    return { ok: false, erro: "Essa missão é de mapa interativo — jogue pela tela do mapa." };
+  }
 
   const texto = entregaTexto.trim();
   if (!texto) return { ok: false, erro: "Escreva ou cole sua entrega antes de enviar." };
@@ -409,6 +451,58 @@ export async function responderQuizMissao(
 
   revalidatePath(`/trilha/${progresso.missao.trilhaId}`);
   return { ok: true, aprovado, acertos, total: perguntas.length };
+}
+
+export type ResultadoMapaMissao =
+  | { ok: true; aprovado: boolean; acertos: number; total: number }
+  | { ok: false; erro: string };
+
+// Mesmo padrão de responderQuizMissao: o jogo do mapa roda inteiro no
+// navegador (clique-a-clique, com timer — ver MapaInterativoMissaoCliente),
+// e só manda o placar final pra cá. `acertos` é quantos pontos o aluno
+// identificou certo; `total` precisa bater com a quantidade de pontos
+// cadastrados na missão (senão o placar não é dessa missão).
+export async function responderMapaMissao(
+  progressoId: string,
+  acertos: number,
+  total: number
+): Promise<ResultadoMapaMissao> {
+  const progresso = await buscarProgressoDoAluno(progressoId);
+  if (!progresso) return { ok: false, erro: "Missão não encontrada." };
+  if (progresso.status !== "disponivel" && progresso.status !== "em_andamento") {
+    return { ok: false, erro: "Essa missão ainda está bloqueada." };
+  }
+  if (progresso.missao.checkpointTipo !== "mapa_interativo") {
+    return { ok: false, erro: "Essa missão não é de mapa interativo." };
+  }
+
+  const pontos = (progresso.missao.mapaPontos as PontoMapaMissao[] | null) ?? [];
+  if (
+    pontos.length === 0 ||
+    !Number.isInteger(acertos) ||
+    !Number.isInteger(total) ||
+    total !== pontos.length ||
+    acertos < 0 ||
+    acertos > total
+  ) {
+    return { ok: false, erro: "Resultado do jogo inválido." };
+  }
+
+  const percentual = (acertos / total) * 100;
+  const notaMinima = progresso.missao.notaMinima ?? 60;
+  const aprovado = percentual >= notaMinima;
+
+  if (aprovado) {
+    await concluirMissao(progressoId);
+  } else {
+    await prisma.progressoAluno.update({
+      where: { id: progressoId },
+      data: { status: "em_andamento" },
+    });
+  }
+
+  revalidatePath(`/trilha/${progresso.missao.trilhaId}`);
+  return { ok: true, aprovado, acertos, total };
 }
 
 export async function avaliarMissao(

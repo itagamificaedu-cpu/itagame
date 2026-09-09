@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { verificarSessaoAluno } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { MissaoAlunoCliente } from "@/components/trilhas/MissaoAlunoCliente";
-import type { QuestaoQuizMissao } from "@/app/actions/missoes";
+import type { QuestaoQuizMissao, PontoMapaMissao } from "@/app/actions/missoes";
 
 export default async function PaginaMissaoAluno({
   params,
@@ -42,6 +42,8 @@ export default async function PaginaMissaoAluno({
             status={progresso.status}
             checkpointTipo={missao.checkpointTipo}
             quizPerguntas={missao.quizPerguntas as QuestaoQuizMissao[] | null}
+            mapaImagemUrl={missao.mapaImagemUrl}
+            mapaPontos={missao.mapaPontos as PontoMapaMissao[] | null}
             feedbackProfessor={progresso.feedbackProfessor}
             entregaTextoAtual={progresso.entregaTexto}
             xpRecompensa={missao.xpRecompensa}

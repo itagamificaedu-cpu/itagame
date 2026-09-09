@@ -93,6 +93,7 @@ enum CheckpointTipo {
   correcao_professor
   avaliacao_pratica
   banca
+  mapa_interativo
 }
 
 enum StatusProgressoMissao {
@@ -488,6 +489,12 @@ model Missao {
   // — mesmo formato usado nas atividades geradas por IA. Só é lido quando
   // checkpointTipo = quiz_automatico.
   quizPerguntas       Json?
+  // Mapa interativo (checkpointTipo = mapa_interativo): o aluno clica no
+  // ponto certo da imagem. Imagem em base64 (mesmo padrão de Trilha.capaUrl
+  // — sem disco persistente no container). mapaPontos: [{ id, label, x, y }],
+  // x/y em % (0-100) da imagem, mesmo formato do Professor Conectado.
+  mapaImagemUrl       String?
+  mapaPontos          Json?
 
   progressos          ProgressoAluno[]
 
