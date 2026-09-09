@@ -89,11 +89,17 @@ function montarInstrucao(params: {
   serie: string;
   tema: string;
   quantidadeQuestoes: number;
+  eixoSpaece?: EixoSpaece9Ano;
 }) {
-  const { tipo, disciplina, serie, tema, quantidadeQuestoes } = params;
+  const { tipo, disciplina, serie, tema, quantidadeQuestoes, eixoSpaece } = params;
+
+  const eixoSpaeceEscolhido = eixoSpaecePorChave(eixoSpaece);
+  const instrucaoSpaece = eixoSpaeceEscolhido
+    ? `\nAs questões precisam treinar especificamente as habilidades do eixo "${eixoSpaeceEscolhido.nome}" da Matriz de Referência oficial do SPAECE (9º ano), no estilo de item de prova do SPAECE (situação-problema/texto de apoio + pergunta objetiva). Descritores oficiais desse eixo, cada um DEVE ser trabalhado em pelo menos uma questão:\n${eixoSpaeceEscolhido.descritores.map((d) => `- ${d.codigo}: ${d.habilidade}`).join("\n")}\nEm "competenciasBncc" cite o código e o nome de cada descritor trabalhado (ex: "D01 — Localizar informação explícita").`
+    : "";
 
   return `Crie uma atividade pedagógica em português do Brasil para uma turma de ${serie}, na disciplina de ${disciplina}, sobre o tema "${tema}".
-Gere exatamente ${quantidadeQuestoes} questões do tipo ${tipo}. ${ORIENTACAO_POR_TIPO[tipo]}
+Gere exatamente ${quantidadeQuestoes} questões do tipo ${tipo}. ${ORIENTACAO_POR_TIPO[tipo]}${instrucaoSpaece}
 Alinhe o conteúdo à BNCC e informe as competências trabalhadas. Use linguagem adequada à faixa etária. Chame a ferramenta "salvar_atividade" com o resultado.`;
 }
 
@@ -103,6 +109,7 @@ export async function gerarAtividadeComIa(params: {
   serie: string;
   tema: string;
   quantidadeQuestoes: number;
+  eixoSpaece?: EixoSpaece9Ano;
 }): Promise<AtividadeGerada> {
   const resposta = await cliente.messages.create({
     model: MODELO,

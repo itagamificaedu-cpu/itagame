@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { gerarAtividadeComIa } from "@/lib/ia";
 import { gerarGradeCacaPalavras } from "@/lib/cacaPalavras";
+import { eixoSpaecePorChave, type EixoSpaece9Ano } from "@/lib/spaece";
 import { EsquemaGeracaoAtividade, EstadoGeracaoAtividade } from "@/lib/definicoes";
 
 function embaralhar<T>(itens: T[]): T[] {
@@ -92,6 +93,62 @@ export async function gerarAtividade(
       serie,
       tema,
       conteudoGerado: conteudoGerado as Prisma.InputJsonValue,
+      gabarito: atividadeGerada.questoes.map((questao) => ({
+        enunciado: questao.enunciado,
+        respostaCorreta: questao.respostaCorreta,
+        explicacao: questao.explicacao ?? null,
+      })),
+      competenciasBncc: atividadeGerada.competenciasBncc,
+      professorId: sessao.userId,
+    },
+  });
+
+  revalidatePath("/painel/atividades");
+  redirect(`/painel/atividades/${atividade.id}`);
+}
+
+// Atalho "1 clique" da aba SPAECE 9º ano: gera uma atividade (quiz pra Sala
+// Ao Vivo, ou cabo_de_guerra pro jogo por times/individual) já travada nos
+// descritores oficiais do eixo escolhido, e manda pra tela da atividade —
+// de lá o professor já tem os botões de jogar online prontos (QR code,
+// turma opcional etc.), sem duplicar nenhuma dessas telas.
+export async function gerarAtividadeSpaece(eixoChave: EixoSpaece9Ano, tipo: "quiz" | "cabo_de_guerra") {
+  const sessao = await exigirAssinaturaAtiva();
+
+  const eixo = eixoSpaecePorChave(eixoChave);
+  if (!eixo) {
+    throw new Error("Eixo do SPAECE não encontrado.");
+  }
+
+  const disciplina = eixo.disciplina === "matematica" ? "Matemática" : "Língua Portuguesa";
+
+  let atividadeGerada;
+  try {
+    atividadeGerada = await gerarAtividadeComIa({
+      tipo,
+      disciplina,
+      serie: "9º ano",
+      tema: `${eixo.nome} (SPAECE)`,
+      quantidadeQuestoes: tipo === "cabo_de_guerra" ? 12 : 8,
+      eixoSpaece: eixoChave,
+    });
+  } catch {
+    throw new Error("Não consegui gerar o simulado agora. Tente novamente em instantes.");
+  }
+
+  const atividade = await prisma.atividade.create({
+    data: {
+      tipo,
+      disciplina,
+      serie: "9º ano",
+      tema: `${eixo.nome} (SPAECE)`,
+      conteudoGerado: {
+        titulo: atividadeGerada.titulo,
+        questoes: atividadeGerada.questoes.map((questao) => ({
+          enunciado: questao.enunciado,
+          alternativas: questao.alternativas ?? [],
+        })),
+      } as Prisma.InputJsonValue,
       gabarito: atividadeGerada.questoes.map((questao) => ({
         enunciado: questao.enunciado,
         respostaCorreta: questao.respostaCorreta,

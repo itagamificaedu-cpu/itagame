@@ -84,6 +84,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ codigo:
 
         const payload = {
           status: sala.status,
+          tipoAtividade: sala.atividade.tipo,
           perguntaAtual: sala.perguntaAtual,
           totalQuestoes: conteudo.questoes.length,
           titulo: conteudo.titulo,

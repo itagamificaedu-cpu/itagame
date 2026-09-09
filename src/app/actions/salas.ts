@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { verificarPinAluno } from "@/lib/alunoPin";
 import { criarSessaoParticipante, obterSessaoParticipante } from "@/lib/salaSessao";
+import { normalizarResposta } from "@/lib/normalizarResposta";
 import { EsquemaEntrarSala } from "@/lib/definicoes";
 
 function gerarCodigo() {
@@ -234,7 +235,16 @@ export async function responder(
 
   const gabarito = sala.atividade.gabarito as { respostaCorreta: string }[];
   const respostaCorreta = gabarito[sala.perguntaAtual]?.respostaCorreta;
-  const correta = alternativaEscolhida === respostaCorreta;
+
+  // Quiz e verdadeiro/falso comparam exato (a resposta vem de um botão, sem
+  // margem de digitação). Completar frase e associar colunas o aluno digita
+  // de próprio punho, então compara normalizado (sem acento/maiúscula/
+  // pontuação) pra não travar por causa de "sao paulo" vs "São Paulo".
+  const respostaLivre =
+    sala.atividade.tipo === "completar_frase" || sala.atividade.tipo === "associar_colunas";
+  const correta = respostaLivre
+    ? normalizarResposta(alternativaEscolhida) === normalizarResposta(respostaCorreta ?? "")
+    : alternativaEscolhida === respostaCorreta;
 
   const segundos = sala.perguntaComecouEm
     ? (Date.now() - sala.perguntaComecouEm.getTime()) / 1000

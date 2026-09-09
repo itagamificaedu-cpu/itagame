@@ -7,6 +7,7 @@ type Participante = { id: string; apelido: string; pontuacao: number };
 
 type EstadoSala = {
   status: "aberta" | "em_andamento" | "encerrada";
+  tipoAtividade: string;
   perguntaAtual: number;
   totalQuestoes: number;
   titulo: string;
@@ -71,6 +72,7 @@ export function JogoCliente({ codigo }: { codigo: string }) {
   const [respostaEnviada, setRespostaEnviada] = useState(false);
   const [feedback, setFeedback] = useState<{ correta: boolean; pontosGanhos: number } | null>(null);
   const [enviando, setEnviando] = useState(false);
+  const [textoResposta, setTextoResposta] = useState("");
 
   useEffect(() => {
     const origem = new EventSource(`/api/salas/${codigo}/eventos`);
@@ -81,6 +83,7 @@ export function JogoCliente({ codigo }: { codigo: string }) {
         if (anterior && anterior.perguntaAtual !== payload.perguntaAtual) {
           setRespostaEnviada(false);
           setFeedback(null);
+          setTextoResposta("");
         }
         return payload;
       });
@@ -229,33 +232,64 @@ export function JogoCliente({ codigo }: { codigo: string }) {
           {dados.perguntaAtualConteudo.enunciado}
         </h1>
 
-        <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {dados.perguntaAtualConteudo.alternativas.length > 0
-            ? dados.perguntaAtualConteudo.alternativas.map((alternativa, indice) => (
-                <button
-                  key={alternativa}
-                  onClick={() => enviarResposta(alternativa)}
-                  disabled={enviando}
-                  className={`flex items-center gap-3 rounded-2xl px-5 py-5 text-left font-bold text-white shadow-sm transition active:scale-[0.98] disabled:opacity-60 ${FORMAS[indice % 4].cor}`}
-                >
-                  <Forma indice={indice} />
-                  {alternativa}
-                </button>
-              ))
-            : ["verdadeiro", "falso"].map((opcao, indice) => (
-                <button
-                  key={opcao}
-                  onClick={() => enviarResposta(opcao)}
-                  disabled={enviando}
-                  className={`flex items-center justify-center gap-3 rounded-2xl px-5 py-6 text-center text-lg font-extrabold text-white shadow-sm transition active:scale-[0.98] disabled:opacity-60 ${
-                    opcao === "verdadeiro" ? "bg-[#00c264]" : "bg-[#ff5470]"
-                  }`}
-                >
-                  <Forma indice={indice} />
-                  {opcao === "verdadeiro" ? "Verdadeiro" : "Falso"}
-                </button>
-              ))}
-        </div>
+        {dados.perguntaAtualConteudo.alternativas.length === 0 &&
+        (dados.tipoAtividade === "completar_frase" || dados.tipoAtividade === "associar_colunas") ? (
+          <form
+            className="mt-8 flex flex-col gap-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (textoResposta.trim()) enviarResposta(textoResposta.trim());
+            }}
+          >
+            <input
+              autoFocus
+              value={textoResposta}
+              onChange={(e) => setTextoResposta(e.target.value)}
+              disabled={enviando}
+              placeholder={
+                dados.tipoAtividade === "associar_colunas"
+                  ? "Digite a definição correspondente"
+                  : "Digite a palavra ou expressão que completa"
+              }
+              className="rounded-2xl border-2 border-neutral-200 bg-white px-5 py-4 text-center text-lg font-bold text-neutral-900 focus:border-[#1a3fd4] focus:outline-none"
+            />
+            <button
+              type="submit"
+              disabled={enviando || !textoResposta.trim()}
+              className="rounded-2xl bg-[#1a3fd4] px-5 py-4 text-center text-lg font-extrabold text-white shadow-sm transition active:scale-[0.98] disabled:opacity-60"
+            >
+              Enviar resposta
+            </button>
+          </form>
+        ) : (
+          <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {dados.perguntaAtualConteudo.alternativas.length > 0
+              ? dados.perguntaAtualConteudo.alternativas.map((alternativa, indice) => (
+                  <button
+                    key={alternativa}
+                    onClick={() => enviarResposta(alternativa)}
+                    disabled={enviando}
+                    className={`flex items-center gap-3 rounded-2xl px-5 py-5 text-left font-bold text-white shadow-sm transition active:scale-[0.98] disabled:opacity-60 ${FORMAS[indice % 4].cor}`}
+                  >
+                    <Forma indice={indice} />
+                    {alternativa}
+                  </button>
+                ))
+              : ["verdadeiro", "falso"].map((opcao, indice) => (
+                  <button
+                    key={opcao}
+                    onClick={() => enviarResposta(opcao)}
+                    disabled={enviando}
+                    className={`flex items-center justify-center gap-3 rounded-2xl px-5 py-6 text-center text-lg font-extrabold text-white shadow-sm transition active:scale-[0.98] disabled:opacity-60 ${
+                      opcao === "verdadeiro" ? "bg-[#00c264]" : "bg-[#ff5470]"
+                    }`}
+                  >
+                    <Forma indice={indice} />
+                    {opcao === "verdadeiro" ? "Verdadeiro" : "Falso"}
+                  </button>
+                ))}
+          </div>
+        )}
       </div>
     </main>
   );

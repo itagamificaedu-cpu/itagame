@@ -4,6 +4,7 @@ import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { iniciarSala } from "@/app/actions/salas";
 import { criarSalaCaboGuerraPersonalizada } from "@/app/actions/caboGuerraOnline";
+import { SeletorTurmaSala } from "@/components/comum/SeletorTurmaSala";
 import { BlocoCacaPalavrasCliente } from "./BlocoCacaPalavrasCliente";
 
 type Questao = { enunciado: string; alternativas: string[] };
@@ -13,13 +14,12 @@ type ConteudoBase = { titulo: string; questoes: Questao[] };
 type ConteudoAssociarColunas = ConteudoBase & { colunaB: string[] };
 type ConteudoCacaPalavras = ConteudoBase & { tamanho: number; grade: string[][] };
 
-const TIPOS_SEM_SALA_AO_VIVO = new Set([
-  "completar_frase",
-  "caca_palavras",
-  "associar_colunas",
-  "apresentacao",
-  "cabo_de_guerra",
-]);
+// Quiz, V/F, completar frase e associar colunas dá pra jogar pergunta a
+// pergunta numa Sala Ao Vivo (a diferença é só como a resposta é conferida —
+// ver responder() em actions/salas.ts). Caça-palavras (grade única, não é
+// sequência de perguntas), apresentação (não tem certo/errado) e cabo de
+// guerra (tem o próprio jogo dedicado, com times/individual) ficam de fora.
+const TIPOS_SEM_SALA_AO_VIVO = new Set(["caca_palavras", "apresentacao", "cabo_de_guerra"]);
 
 export default async function PaginaDetalheAtividade({
   params,
@@ -153,26 +153,6 @@ export default async function PaginaDetalheAtividade({
         </div>
       </div>
     </main>
-  );
-}
-
-function SeletorTurmaSala({ turmas }: { turmas: { id: string; nome: string }[] }) {
-  if (turmas.length === 0) return null;
-
-  return (
-    <select
-      name="turmaId"
-      defaultValue=""
-      title="Vincular a uma turma (opcional) — a pontuação fica ligada ao aluno entre partidas"
-      className="rounded-lg border border-neutral-300 bg-white px-2 py-2 text-xs text-neutral-600 focus:border-[#1a3fd4] focus:outline-none focus:ring-1 focus:ring-[#1a3fd4]"
-    >
-      <option value="">Sem turma (apelido livre)</option>
-      {turmas.map((turma) => (
-        <option key={turma.id} value={turma.id}>
-          {turma.nome}
-        </option>
-      ))}
-    </select>
   );
 }
 

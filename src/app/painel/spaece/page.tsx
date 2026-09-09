@@ -2,6 +2,7 @@ import Link from "next/link";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { DISCIPLINAS_SPAECE, VERDE_SPAECE, VERDE_SPAECE_ESCURO } from "@/lib/spaece";
+import { gerarAtividadeSpaece } from "@/app/actions/atividades";
 
 // Hub da aba "SPAECE 9º ano" — mesmo padrão da "BNCC Computação": reaproveita
 // o motor de Trilhas já existente, organizado pelos eixos oficiais da
@@ -86,6 +87,26 @@ export default async function PaginaSpaece() {
                     >
                       ✨ Gerar trilha com IA
                     </Link>
+
+                    <form action={gerarAtividadeSpaece.bind(null, eixo.chave, "quiz")} className="mt-2">
+                      <button
+                        type="submit"
+                        className="w-full rounded-lg py-2 text-center text-sm font-bold text-white transition hover:brightness-95"
+                        style={{ backgroundColor: VERDE_SPAECE }}
+                      >
+                        🎮 Simulado ao vivo (Quiz)
+                      </button>
+                    </form>
+
+                    <form action={gerarAtividadeSpaece.bind(null, eixo.chave, "cabo_de_guerra")} className="mt-2">
+                      <button
+                        type="submit"
+                        className="w-full rounded-lg border-2 border-dashed py-2 text-center text-sm font-bold transition hover:bg-neutral-50"
+                        style={{ borderColor: VERDE_SPAECE, color: VERDE_SPAECE_ESCURO }}
+                      >
+                        🪢 Cabo de Guerra SPAECE
+                      </button>
+                    </form>
 
                     {trilhasDoEixo.length > 0 && (
                       <ul className="mt-4 space-y-2 border-t border-neutral-100 pt-4">
