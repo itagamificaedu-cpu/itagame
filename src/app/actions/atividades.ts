@@ -107,17 +107,32 @@ export async function gerarAtividade(
   redirect(`/painel/atividades/${atividade.id}`);
 }
 
+export type ResultadoAtividadeSpaece =
+  | { ok: true; atividadeId: string }
+  | { ok: false; erro: string };
+
 // Atalho "1 clique" da aba SPAECE 9º ano: gera uma atividade (quiz pra Sala
 // Ao Vivo, ou cabo_de_guerra pro jogo por times/individual) já travada nos
-// descritores oficiais do eixo escolhido, e manda pra tela da atividade —
-// de lá o professor já tem os botões de jogar online prontos (QR code,
-// turma opcional etc.), sem duplicar nenhuma dessas telas.
-export async function gerarAtividadeSpaece(eixoChave: EixoSpaece9Ano, tipo: "quiz" | "cabo_de_guerra") {
+// descritores oficiais do eixo escolhido — de lá o professor já tem os
+// botões de jogar online prontos (QR code, turma opcional etc.), sem
+// duplicar nenhuma dessas telas.
+//
+// Não usa redirect() aqui de propósito: com várias dessas ações na mesma
+// página (uma por eixo do SPAECE), o redirect do servidor ficava competindo
+// com os prefetches dos links "Gerar trilha com IA" da mesma tela e o
+// navegador abortava a navegação (ERR_ABORTED) — o professor clicava, a
+// atividade era criada de verdade no banco, mas a tela não saía do lugar.
+// Devolver o id e deixar o componente cliente navegar com router.push()
+// evita essa disputa.
+export async function gerarAtividadeSpaece(
+  eixoChave: EixoSpaece9Ano,
+  tipo: "quiz" | "cabo_de_guerra"
+): Promise<ResultadoAtividadeSpaece> {
   const sessao = await exigirAssinaturaAtiva();
 
   const eixo = eixoSpaecePorChave(eixoChave);
   if (!eixo) {
-    throw new Error("Eixo do SPAECE não encontrado.");
+    return { ok: false, erro: "Eixo do SPAECE não encontrado." };
   }
 
   const disciplina = eixo.disciplina === "matematica" ? "Matemática" : "Língua Portuguesa";
@@ -133,7 +148,7 @@ export async function gerarAtividadeSpaece(eixoChave: EixoSpaece9Ano, tipo: "qui
       eixoSpaece: eixoChave,
     });
   } catch {
-    throw new Error("Não consegui gerar o simulado agora. Tente novamente em instantes.");
+    return { ok: false, erro: "Não consegui gerar o simulado agora. Tente novamente em instantes." };
   }
 
   const atividade = await prisma.atividade.create({
@@ -160,5 +175,5 @@ export async function gerarAtividadeSpaece(eixoChave: EixoSpaece9Ano, tipo: "qui
   });
 
   revalidatePath("/painel/atividades");
-  redirect(`/painel/atividades/${atividade.id}`);
+  return { ok: true, atividadeId: atividade.id };
 }
