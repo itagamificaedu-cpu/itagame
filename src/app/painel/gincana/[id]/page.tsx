@@ -6,6 +6,12 @@ import { PainelGincanaCliente } from "@/components/gincana/PainelGincanaCliente"
 
 const TIPOS_QUIZ_AO_VIVO = ["quiz", "verdadeiro_falso", "completar_frase", "associar_colunas"];
 
+// Mesma lógica de actions/gincana.ts — turma com nome repetido (ex: "8ANO"
+// várias vezes) só se distingue de verdade pela série (A, B, C).
+function nomeExibicaoTurma(turma: { nome: string; serie: string }) {
+  return turma.serie ? `${turma.nome} (${turma.serie})` : turma.nome;
+}
+
 export default async function PaginaGincana({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const sessao = await exigirAssinaturaAtiva();
@@ -32,12 +38,14 @@ export default async function PaginaGincana({ params }: { params: Promise<{ id: 
     prisma.turma.findMany({
       where: { professorId: sessao.userId },
       orderBy: { nome: "asc" },
-      select: { id: true, nome: true },
+      select: { id: true, nome: true, serie: true },
     }),
   ]);
 
   const turmaIdsNaGincana = new Set(gincana.times.map((t) => t.turmaId));
-  const turmasDisponiveis = todasTurmas.filter((t) => !turmaIdsNaGincana.has(t.id));
+  const turmasDisponiveis = todasTurmas
+    .filter((t) => !turmaIdsNaGincana.has(t.id))
+    .map((t) => ({ id: t.id, nome: nomeExibicaoTurma(t) }));
 
   const paraOpcao = (a: { id: string; conteudoGerado: unknown; disciplina: string; serie: string }) => ({
     id: a.id,
@@ -58,7 +66,11 @@ export default async function PaginaGincana({ params }: { params: Promise<{ id: 
           nome={gincana.nome}
           atividadesQuiz={atividadesQuiz.map(paraOpcao)}
           atividadesCaboGuerra={atividadesCaboGuerra.map(paraOpcao)}
-          timesAtuais={gincana.times.map((t) => ({ id: t.id, turmaId: t.turmaId, turmaNome: t.turma.nome }))}
+          timesAtuais={gincana.times.map((t) => ({
+            id: t.id,
+            turmaId: t.turmaId,
+            turmaNome: nomeExibicaoTurma(t.turma),
+          }))}
           turmasDisponiveis={turmasDisponiveis}
         />
       </div>

@@ -24,6 +24,13 @@ function gerarCodigo() {
   return String(crypto.randomInt(100000, 999999));
 }
 
+// Muita escola nomeia as turmas todas iguais (ex: "8ANO") e usa o campo
+// série pra diferenciar de verdade (A, B, C) — sem isso aqui, o painel da
+// gincana mostrava "8ANO" três vezes, impossível saber qual é qual.
+function nomeExibicaoTurma(turma: { nome: string; serie: string }) {
+  return turma.serie ? `${turma.nome} (${turma.serie})` : turma.nome;
+}
+
 async function buscarGincanaDoProfessor(gincanaId: string, professorId: string) {
   const gincana = await prisma.gincana.findUnique({
     where: { id: gincanaId },
@@ -132,7 +139,7 @@ export async function criarRodadaQuiz(gincanaId: string, atividadeId: string) {
       }
     }
     if (!sala) {
-      throw new Error(`Não foi possível criar a sala pra turma ${time.turma.nome}.`);
+      throw new Error(`Não foi possível criar a sala pra turma ${nomeExibicaoTurma(time.turma)}.`);
     }
     salasPorTurma.push({ turmaId: time.turmaId, salaCodigo: sala.codigo });
   }
@@ -188,8 +195,8 @@ export async function criarRodadaCaboDeGuerra(
           codigo: gerarCodigo(),
           professorId: sessao.userId,
           modo: "equipes",
-          nomeEquipe1: time1.turma.nome,
-          nomeEquipe2: time2.turma.nome,
+          nomeEquipe1: nomeExibicaoTurma(time1.turma),
+          nomeEquipe2: nomeExibicaoTurma(time2.turma),
           totalRodadas: perguntas.length,
           perguntas: perguntas as unknown as Prisma.InputJsonValue,
         },
@@ -289,7 +296,7 @@ export async function obterEstadoGincana(gincanaId: string): Promise<EstadoGinca
           item.turmaId,
           (pontosQuizPorTurma.get(item.turmaId) ?? 0) + pontosDaSala
         );
-        salasQuiz.push({ turmaNome: time.turma.nome, salaCodigo: item.salaCodigo });
+        salasQuiz.push({ turmaNome: nomeExibicaoTurma(time.turma), salaCodigo: item.salaCodigo });
       }
 
       rodadasResumo.push({
@@ -330,8 +337,8 @@ export async function obterEstadoGincana(gincanaId: string): Promise<EstadoGinca
         criadaEm: rodada.criadaEm.toISOString(),
         salaCaboGuerra: {
           salaCodigo: rodada.salaCaboGuerraCodigo,
-          equipe1Nome: time1?.turma.nome ?? "?",
-          equipe2Nome: time2?.turma.nome ?? "?",
+          equipe1Nome: time1 ? nomeExibicaoTurma(time1.turma) : "?",
+          equipe2Nome: time2 ? nomeExibicaoTurma(time2.turma) : "?",
         },
       });
     }
@@ -344,7 +351,7 @@ export async function obterEstadoGincana(gincanaId: string): Promise<EstadoGinca
       return {
         timeId: time.id,
         turmaId: time.turmaId,
-        turmaNome: time.turma.nome,
+        turmaNome: nomeExibicaoTurma(time.turma),
         pontosManuais: time.pontosManuais,
         pontosQuiz,
         pontosCaboGuerra,
