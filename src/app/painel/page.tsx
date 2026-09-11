@@ -173,6 +173,12 @@ export default async function PaginaPainel() {
               🪢 Cabo de Guerra
             </Link>
             <Link
+              href="/painel/gincana"
+              className="rounded-lg border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
+            >
+              🏆 Gincana Interativa
+            </Link>
+            <Link
               href="/painel/jogos"
               className="rounded-lg border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
             >

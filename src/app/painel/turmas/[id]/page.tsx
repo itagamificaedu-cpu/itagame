@@ -4,6 +4,7 @@ import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { excluirTurma, removerAluno } from "@/app/actions/turmas";
 import FormularioAdicionarAluno from "./FormularioAdicionarAluno";
+import FormularioImportarAlunosXls from "./FormularioImportarAlunosXls";
 import GerarPinCliente from "./GerarPinCliente";
 import CopiarLinkTrilhaCliente from "./CopiarLinkTrilhaCliente";
 
@@ -106,6 +107,17 @@ export default async function PaginaDetalheTurma({
           <p className="font-bold text-neutral-900">Adicionar aluno</p>
           <div className="mt-3">
             <FormularioAdicionarAluno turmaId={turma.id} />
+          </div>
+
+          <p className="mt-5 border-t border-neutral-100 pt-4 font-bold text-neutral-900">
+            Ou importar vários de uma vez
+          </p>
+          <p className="mt-1 text-xs text-neutral-500">
+            Planilha .xlsx com um nome de aluno por linha, numa coluna só (pode ter ou não uma
+            linha de cabeçalho tipo &quot;Nome&quot;).
+          </p>
+          <div className="mt-3">
+            <FormularioImportarAlunosXls turmaId={turma.id} />
           </div>
         </div>
 
