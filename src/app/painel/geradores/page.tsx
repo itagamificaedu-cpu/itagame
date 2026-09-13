@@ -38,6 +38,12 @@ const CATEGORIAS: { titulo: string; itens: ItemGerador[] }[] = [
         titulo: "Simulado BNCC Computação",
         texto: "Questões por eixo: Pensamento Computacional, Mundo Digital, Cultura Digital",
       },
+      {
+        slug: "bncc-computacao-desplugada",
+        icone: "🧠",
+        titulo: "BNCC Computação Desplugada",
+        texto: "Atividades sem tela: programe o robô, complete o padrão, organize os passos",
+      },
     ],
   },
   {

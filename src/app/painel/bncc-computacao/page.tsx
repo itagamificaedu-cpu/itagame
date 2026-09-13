@@ -2,7 +2,7 @@ import Link from "next/link";
 import { exigirAcessoBnccComputacao } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { EIXOS_BNCC_COMPUTACAO } from "@/lib/bnccComputacao";
-import { MODELOS_BNCC_COMPUTACAO } from "@/lib/modelosBnccComputacao";
+import { ETAPAS_BNCC, MODELOS_BNCC_COMPUTACAO } from "@/lib/modelosBnccComputacao";
 
 // Hub da aba "BNCC Computação" — carro-chefe da plataforma pro ano letivo de
 // 2027 (primeiro ciclo do PNLD com livro próprio de Educação Digital e
@@ -40,6 +40,12 @@ export default async function PaginaBnccComputacao() {
             Midiática. Aqui você monta trilhas gamificadas prontas para os 3 eixos oficiais, geradas
             com IA em minutos.
           </p>
+          <Link
+            href="/painel/bncc-computacao/mapa"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold text-white backdrop-blur transition hover:bg-white/25"
+          >
+            🗺️ Ver Mapa BNCC (planejamento pra coordenação)
+          </Link>
         </div>
 
         <div className="mt-8 grid gap-5 sm:grid-cols-3">
@@ -72,22 +78,30 @@ export default async function PaginaBnccComputacao() {
                   ))}
                 </div>
 
-                {MODELOS_BNCC_COMPUTACAO.filter((modelo) => modelo.eixo === eixo.chave).map((modelo) => (
-                  <Link
-                    key={modelo.id}
-                    href={`/painel/trilhas/usar-modelo/${modelo.id}`}
-                    className="mt-4 flex items-start gap-2 rounded-xl border p-3 transition hover:brightness-95"
-                    style={{ borderColor: `${eixo.cor}33`, backgroundColor: `${eixo.cor}0a` }}
-                  >
-                    <span className="text-base">⚡</span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-bold text-neutral-800">{modelo.nome}</span>
-                      <span className="block text-xs text-neutral-500">
-                        Pronta · {modelo.missoes.length} desafios · adicionar em 1 clique
-                      </span>
-                    </span>
-                  </Link>
-                ))}
+                <div className="mt-4 space-y-2">
+                  {ETAPAS_BNCC.map((etapa) => {
+                    const modelo = MODELOS_BNCC_COMPUTACAO.find(
+                      (m) => m.eixo === eixo.chave && m.etapa === etapa.chave
+                    );
+                    if (!modelo) return null;
+                    return (
+                      <Link
+                        key={modelo.id}
+                        href={`/painel/trilhas/usar-modelo/${modelo.id}`}
+                        className="flex items-start gap-2 rounded-xl border p-3 transition hover:brightness-95"
+                        style={{ borderColor: `${eixo.cor}33`, backgroundColor: `${eixo.cor}0a` }}
+                      >
+                        <span className="text-base">⚡</span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-bold text-neutral-800">{modelo.nome}</span>
+                          <span className="block text-xs text-neutral-500">
+                            {etapa.nome} ({etapa.faixa}) · {modelo.missoes.length} desafios · adicionar em 1 clique
+                          </span>
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
 
                 <Link
                   href={`/painel/trilhas/gerar-ia?eixo=${eixo.chave}`}
