@@ -149,3 +149,47 @@ export function sortearTarefaDesplugada(indiceExcluir?: number): { tarefa: Taref
 export function embaralharPassos(tarefa: TarefaDesplugada): string[] {
   return embaralhar(tarefa.passos);
 }
+
+// ---------------------------------------------------------------------------
+// 4) Binário com os Dedos — clássico "unplugged" do eixo Mundo Digital
+// (CS Unplugged): contar em binário só com os dedos da mão, cada dedo valendo
+// uma potência de 2 (16-8-4-2-1). O aluno recebe um número e circula os
+// dedos que precisam ficar "levantados" pra formar aquele valor.
+// ---------------------------------------------------------------------------
+
+export const VALORES_DEDOS = [16, 8, 4, 2, 1] as const;
+
+export function gerarBinarioComOsDedos(): { numero: number; dedosLevantados: boolean[] } {
+  const numero = aleatorioInt(1, 31);
+  const dedosLevantados = VALORES_DEDOS.map((valor) => (numero & valor) !== 0);
+  return { numero, dedosLevantados };
+}
+
+// ---------------------------------------------------------------------------
+// 5) Semáforo Digital — situações do dia a dia online que o aluno classifica
+// como 🟢 seguro, 🟡 cuidado ou 🔴 perigo, e escreve o que faria. Eixo
+// Cultura Digital, mesmo espírito das trilhas-modelo (cidadania digital),
+// só que em formato de folha rápida pra imprimir.
+// ---------------------------------------------------------------------------
+
+export type ClassificacaoSemaforo = "seguro" | "cuidado" | "perigo";
+export type SituacaoSemaforo = { situacao: string; classificacao: ClassificacaoSemaforo };
+
+export const BANCO_SEMAFORO_DIGITAL: SituacaoSemaforo[] = [
+  { situacao: "Um estranho pede seu endereço de casa numa rede social.", classificacao: "perigo" },
+  { situacao: "Uma pop-up diz que você ganhou um prêmio e pede seus dados.", classificacao: "perigo" },
+  { situacao: "Você recebe uma mensagem de um amigo conhecido combinando um trabalho da escola.", classificacao: "seguro" },
+  { situacao: "Um colega te manda a senha dele 'pra confiar'.", classificacao: "cuidado" },
+  { situacao: "Um vídeo promete 'dinheiro fácil' se você clicar num link.", classificacao: "perigo" },
+  { situacao: "Você posta uma foto do seu almoço no perfil da família.", classificacao: "seguro" },
+  { situacao: "Alguém te chama pra uma videochamada que seus pais não conhecem.", classificacao: "cuidado" },
+  { situacao: "Um jogo pede seu nome completo, escola e telefone pra 'liberar um prêmio'.", classificacao: "perigo" },
+  { situacao: "Você usa uma senha com letras, números e símbolos misturados.", classificacao: "seguro" },
+  { situacao: "Uma notícia chocante circula no grupo da turma sem nenhuma fonte.", classificacao: "cuidado" },
+  { situacao: "Você pede ajuda a um adulto de confiança antes de instalar um aplicativo novo.", classificacao: "seguro" },
+  { situacao: "Alguém insiste pra você mandar uma foto que te deixa desconfortável.", classificacao: "perigo" },
+];
+
+export function sortearSemaforoDigital(quantidade: number): SituacaoSemaforo[] {
+  return embaralhar(BANCO_SEMAFORO_DIGITAL).slice(0, Math.min(quantidade, BANCO_SEMAFORO_DIGITAL.length));
+}

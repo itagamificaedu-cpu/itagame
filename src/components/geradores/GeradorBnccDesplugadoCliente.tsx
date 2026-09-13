@@ -13,6 +13,9 @@ import {
   gerarPadraoDesplugado,
   sortearTarefaDesplugada,
   embaralharPassos,
+  gerarBinarioComOsDedos,
+  sortearSemaforoDigital,
+  VALORES_DEDOS,
   type TemaPadrao,
   type DificuldadePadrao,
 } from "@/lib/geradores/bnccDesplugado";
@@ -20,12 +23,22 @@ import {
 const COR_TEMA = "#1a3fd4";
 const CELULA = 34;
 
-type Atividade = "robo" | "padrao" | "passos";
+type Atividade = "robo" | "padrao" | "passos" | "binario" | "semaforo";
 
 const NOME_ATIVIDADE: Record<Atividade, string> = {
   robo: "🤖 Programe o Robô",
   padrao: "🔁 Complete o Padrão",
   passos: "🧩 Organize os Passos",
+  binario: "🖐️ Binário com os Dedos",
+  semaforo: "🚦 Semáforo Digital",
+};
+
+const EIXO_ATIVIDADE: Record<Atividade, string> = {
+  robo: "Pensamento Computacional",
+  padrao: "Pensamento Computacional",
+  passos: "Pensamento Computacional",
+  binario: "Mundo Digital",
+  semaforo: "Cultura Digital",
 };
 
 export function GeradorBnccDesplugadoCliente() {
@@ -43,6 +56,14 @@ export function GeradorBnccDesplugadoCliente() {
 
   // Organize os Passos
   const [mostrarRespostaTarefa, setMostrarRespostaTarefa] = useState(false);
+
+  // Binário com os Dedos
+  const [quantidadeBinarios, setQuantidadeBinarios] = useState(4);
+  const [mostrarRespostaBinario, setMostrarRespostaBinario] = useState(false);
+
+  // Semáforo Digital
+  const [quantidadeSemaforo, setQuantidadeSemaforo] = useState(6);
+  const [mostrarRespostaSemaforo, setMostrarRespostaSemaforo] = useState(false);
 
   const [semente, setSemente] = useState(0);
 
@@ -64,6 +85,18 @@ export function GeradorBnccDesplugadoCliente() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [semente]);
 
+  const binarios = useMemo(
+    () => Array.from({ length: quantidadeBinarios }, () => gerarBinarioComOsDedos()),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [quantidadeBinarios, semente]
+  );
+
+  const situacoesSemaforo = useMemo(
+    () => sortearSemaforoDigital(quantidadeSemaforo),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [quantidadeSemaforo, semente]
+  );
+
   const larguraLabirinto = tamanhoLabirinto * CELULA;
 
   return (
@@ -81,6 +114,8 @@ export function GeradorBnccDesplugadoCliente() {
               <option value="robo">🤖 Programe o Robô</option>
               <option value="padrao">🔁 Complete o Padrão</option>
               <option value="passos">🧩 Organize os Passos</option>
+              <option value="binario">🖐️ Binário com os Dedos</option>
+              <option value="semaforo">🚦 Semáforo Digital</option>
             </select>
           </CampoConfig>
 
@@ -164,6 +199,52 @@ export function GeradorBnccDesplugadoCliente() {
             </label>
           )}
 
+          {atividade === "binario" && (
+            <>
+              <CampoConfig rotulo="Quantidade de números">
+                <input
+                  type="number"
+                  min={1}
+                  max={10}
+                  value={quantidadeBinarios}
+                  onChange={(e) => setQuantidadeBinarios(Number(e.target.value))}
+                  className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
+                />
+              </CampoConfig>
+              <label className="flex items-center gap-2 text-sm text-neutral-700">
+                <input
+                  type="checkbox"
+                  checked={mostrarRespostaBinario}
+                  onChange={(e) => setMostrarRespostaBinario(e.target.checked)}
+                />
+                Mostrar dedos certos (gabarito)
+              </label>
+            </>
+          )}
+
+          {atividade === "semaforo" && (
+            <>
+              <CampoConfig rotulo="Quantidade de situações">
+                <input
+                  type="number"
+                  min={1}
+                  max={12}
+                  value={quantidadeSemaforo}
+                  onChange={(e) => setQuantidadeSemaforo(Number(e.target.value))}
+                  className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
+                />
+              </CampoConfig>
+              <label className="flex items-center gap-2 text-sm text-neutral-700">
+                <input
+                  type="checkbox"
+                  checked={mostrarRespostaSemaforo}
+                  onChange={(e) => setMostrarRespostaSemaforo(e.target.checked)}
+                />
+                Mostrar classificação sugerida (gabarito)
+              </label>
+            </>
+          )}
+
           <button
             onClick={() => setSemente((s) => s + 1)}
             className="w-full rounded-lg bg-[#1a3fd4] py-2.5 text-sm font-bold text-white transition hover:brightness-110"
@@ -173,7 +254,11 @@ export function GeradorBnccDesplugadoCliente() {
         </>
       }
     >
-      <CabecalhoFolha titulo={NOME_ATIVIDADE[atividade]} subtitulo="BNCC Computação · atividade sem tela" cor={COR_TEMA} />
+      <CabecalhoFolha
+        titulo={NOME_ATIVIDADE[atividade]}
+        subtitulo={`BNCC Computação · ${EIXO_ATIVIDADE[atividade]} · atividade sem tela`}
+        cor={COR_TEMA}
+      />
 
       {atividade === "robo" && (
         <>
@@ -260,6 +345,76 @@ export function GeradorBnccDesplugadoCliente() {
                 </li>
               );
             })}
+          </ul>
+        </>
+      )}
+
+      {atividade === "binario" && (
+        <>
+          <p className="mb-6 text-center text-sm font-bold text-neutral-500">
+            Cada dedo vale um número (16, 8, 4, 2, 1). Circule os dedos que precisam ficar levantados pra formar o
+            número da linha.
+          </p>
+          <div className="space-y-6">
+            {binarios.map((item, indice) => (
+              <div key={indice} className="flex items-center gap-4 rounded-xl border border-neutral-200 p-4">
+                <NumeroColorido numero={indice + 1} cor={COR_TEMA} />
+                <span className="text-2xl font-extrabold text-neutral-800">{item.numero}</span>
+                <div className="flex flex-1 justify-around">
+                  {VALORES_DEDOS.map((valor, i) => {
+                    const levantado = item.dedosLevantados[i];
+                    return (
+                      <div key={valor} className="flex flex-col items-center gap-1">
+                        <span
+                          className={`flex h-11 w-11 items-center justify-center rounded-full border-2 text-lg ${
+                            mostrarRespostaBinario && levantado ? "border-[#00c264] bg-[#00c264]/10" : "border-dashed border-neutral-300"
+                          }`}
+                        >
+                          {mostrarRespostaBinario ? (levantado ? "☝️" : "✊") : "✋"}
+                        </span>
+                        <span className="text-xs font-bold text-neutral-400">{valor}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {atividade === "semaforo" && (
+        <>
+          <p className="mb-4 text-center text-sm font-bold text-neutral-500">
+            Leia cada situação e marque: 🟢 seguro, 🟡 cuidado ou 🔴 perigo. Depois escreva o que você faria.
+          </p>
+          <ul className="space-y-4">
+            {situacoesSemaforo.map((item, indice) => (
+              <li key={indice} className="rounded-xl border border-neutral-200 p-4">
+                <p className="text-sm font-semibold text-neutral-800">
+                  {indice + 1}. {item.situacao}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-3 text-sm">
+                  {(["seguro", "cuidado", "perigo"] as const).map((opcao) => {
+                    const emoji = opcao === "seguro" ? "🟢" : opcao === "cuidado" ? "🟡" : "🔴";
+                    const marcado = mostrarRespostaSemaforo && item.classificacao === opcao;
+                    return (
+                      <span
+                        key={opcao}
+                        className={`rounded-full border-2 px-3 py-1 font-bold ${
+                          marcado ? "border-[#00c264] bg-[#00c264]/10 text-[#00854a]" : "border-neutral-200 text-neutral-500"
+                        }`}
+                      >
+                        {emoji} {opcao}
+                      </span>
+                    );
+                  })}
+                </div>
+                <div className="mt-3 border-b-2 border-dashed border-neutral-300 pb-1 text-xs text-neutral-400">
+                  O que eu faço: ________________________________________
+                </div>
+              </li>
+            ))}
           </ul>
         </>
       )}
