@@ -156,6 +156,7 @@ model Usuario {
   progressosAvaliados ProgressoAluno[]
   leadsVenda          LeadVenda[]
   gincanas            Gincana[]
+  progressoCursoBncc  ProgressoCursoBnccComputacao?
 
   @@map("usuarios")
 }
@@ -603,6 +604,27 @@ model Assinatura {
   professor       Usuario?          @relation("AssinaturaProfessor", fields: [professorId], references: [id])
 
   @@map("assinaturas")
+}
+
+// Progresso do professor no "Curso de Formação BNCC Computação" (40h,
+// formação continuada) — produto separado das trilhas gamificadas dos
+// alunos, incluso pra quem já tem o add-on BNCC Computação em dia
+// (bnccComputacaoAte em Assinatura). Guarda só quais das 40 semanas da
+// grade curricular já foram marcadas como concluídas pelo professor e,
+// quando ele termina as 40, o código do certificado emitido (gerado 1 vez
+// só — reemitir mostra sempre o mesmo código).
+model ProgressoCursoBnccComputacao {
+  id                String    @id @default(cuid())
+  semanasConcluidas Int[]     @default([])
+  concluidoEm       DateTime?
+  codigoCertificado String?   @unique
+  criadoEm          DateTime  @default(now())
+  atualizadoEm      DateTime  @updatedAt
+
+  professorId String  @unique
+  professor   Usuario @relation(fields: [professorId], references: [id])
+
+  @@map("progresso_curso_bncc_computacao")
 }
 
 // Funil de vendas do próprio dono da plataforma (ita_owner) — acompanha

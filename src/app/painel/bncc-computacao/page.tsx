@@ -40,12 +40,20 @@ export default async function PaginaBnccComputacao() {
             Midiática. Aqui você monta trilhas gamificadas prontas para os 3 eixos oficiais, geradas
             com IA em minutos.
           </p>
-          <Link
-            href="/painel/bncc-computacao/mapa"
-            className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold text-white backdrop-blur transition hover:bg-white/25"
-          >
-            🗺️ Ver Mapa BNCC (planejamento pra coordenação)
-          </Link>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link
+              href="/painel/bncc-computacao/curso"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold text-white backdrop-blur transition hover:bg-white/25"
+            >
+              🎓 Curso de Formação (40h) — apostila e certificado
+            </Link>
+            <Link
+              href="/painel/bncc-computacao/mapa"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold text-white backdrop-blur transition hover:bg-white/25"
+            >
+              🗺️ Ver Mapa BNCC (planejamento pra coordenação)
+            </Link>
+          </div>
         </div>
 
         <div className="mt-8 grid gap-5 sm:grid-cols-3">
