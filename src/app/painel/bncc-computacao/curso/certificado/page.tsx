@@ -21,7 +21,7 @@ export default async function PaginaCertificadoCurso() {
             <p className="text-3xl">🔒</p>
             <p className="mt-3 font-bold text-neutral-800">Certificado ainda não liberado</p>
             <p className="mt-1 text-sm text-neutral-500">
-              Conclua as 40 semanas do curso na página anterior pra emitir seu certificado.
+              Conclua as 40 aulas dos 4 módulos do curso na página anterior pra emitir seu certificado.
             </p>
           </div>
         </div>

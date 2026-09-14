@@ -6,7 +6,7 @@ import { exigirAcessoBnccComputacao } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { TOTAL_SEMANAS_CURSO } from "@/lib/cursoBnccComputacao";
 
-// Progresso do professor no Curso de Formação BNCC Computação (40h). Cria o
+// Progresso do professor no Curso de Formação BNCC Computação (80h). Cria o
 // registro na primeira visita (upsert), pra não precisar de uma tela de
 // "começar o curso" separada.
 export async function buscarOuCriarProgressoCurso() {
@@ -49,7 +49,7 @@ export async function emitirCertificadoCurso() {
   });
 
   if (!progresso || progresso.semanasConcluidas.length < TOTAL_SEMANAS_CURSO) {
-    throw new Error("Conclua as 40 semanas do curso antes de emitir o certificado.");
+    throw new Error("Conclua as 40 aulas dos 4 módulos do curso antes de emitir o certificado.");
   }
 
   if (progresso.codigoCertificado) {

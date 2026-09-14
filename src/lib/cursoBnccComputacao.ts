@@ -1,15 +1,86 @@
 import type { EixoBnccComputacao } from "@/lib/bnccComputacao";
 
-// Conteúdo do "Curso de Formação — BNCC Computação (40h)", produto de
+// Conteúdo do "Curso de Formação — BNCC Computação (80h)", produto de
 // formação continuada pro professor (não confundir com as trilhas
 // gamificadas do aluno). Fonte: material próprio ItaGamificaEdu (apostila,
-// grade semanal, coletânea de atividades desplugadas), reorganizado nos 3
-// eixos OFICIAIS da BNCC Computação (Parecer CNE/CEB nº 2/2022) — o "Módulo
-// 4: Programação e Cultura Maker" do material original não é um eixo
-// oficial, então vira aqui o bloco de fechamento "Projeto Integrador"
-// (aplicação prática dos 3 eixos), não um 4º eixo.
-
+// grade semanal, coletânea de atividades desplugadas, apostila ilustrada
+// complementar), reorganizado nos 3 eixos OFICIAIS da BNCC Computação
+// (Parecer CNE/CEB nº 2/2022) — o "Módulo 4: Programação e Cultura Maker" do
+// material original não é um eixo oficial, então vira aqui o Módulo 4 de
+// fechamento "Projeto Integrador" (aplicação prática dos 3 eixos), não um 4º
+// eixo oficial.
+//
+// O curso é apresentado ao professor por MÓDULOS (não mais por "semana X de
+// 40"): Módulo 1 a 3 = os 3 eixos oficiais, Módulo 4 = Projeto Integrador.
+// Cada módulo tem 10 aulas. Internamente cada aula ainda carrega um número
+// sequencial de 1 a 40 (campo `semana`, mantido por compatibilidade de dados
+// já salvos no banco — nenhuma tela mostra mais essa numeração global ao
+// professor, só "Aula N do Módulo X").
+//
+// Carga horária: 2h por aula (ida de 40h para 80h não é só relabelamento —
+// reflete o que já era pedido ao professor cursista, agora contabilizado de
+// forma explícita e auditável no certificado): 50min de estudo do conteúdo
+// da aula + 40min de aplicação prática da mesma atividade com a própria
+// turma em sala + 30min de registro reflexivo no Diário de Bordo. Ver
+// `COMPOSICAO_CARGA_HORARIA_AULA`.
 export type BlocoCurso = EixoBnccComputacao | "projeto_integrador";
+
+// Numeração de módulo exibida ao professor (Módulo 1..4).
+export const NUMERO_MODULO: Record<BlocoCurso, number> = {
+  pensamento_computacional: 1,
+  mundo_digital: 2,
+  cultura_digital: 3,
+  projeto_integrador: 4,
+};
+
+// Carga horária por aula e composição — ida de 40h pra 80h de forma
+// auditável (não é só dobrar o número na tela do certificado).
+export const HORAS_POR_AULA = 2;
+export const TOTAL_MODULOS_CURSO = 4;
+
+export const COMPOSICAO_CARGA_HORARIA_AULA: { etapa: string; minutos: number }[] = [
+  { etapa: "Estudo do conteúdo da aula (formação teórica e leitura da atividade guiada)", minutos: 50 },
+  { etapa: "Aplicação prática da atividade com a própria turma em sala de aula", minutos: 40 },
+  { etapa: "Registro reflexivo no Diário de Bordo (evidência de aplicação)", minutos: 30 },
+];
+
+// Fundamentação teórica de cada módulo — texto próprio (não é relabelamento:
+// é conteúdo novo escrito pra apostila), fundamentado no Parecer CNE/CEB nº
+// 2/2022, na BNCC e em Wing (2006) sobre Pensamento Computacional.
+export const FUNDAMENTACAO_MODULOS: Record<BlocoCurso, { titulo: string; paragrafos: string[] }> = {
+  pensamento_computacional: {
+    titulo: "Módulo 1 — Pensamento Computacional: por que ensinar a pensar antes de programar",
+    paragrafos: [
+      "Pensamento Computacional não é sinônimo de programar — é a capacidade de decompor um problema complexo em partes menores, reconhecer padrões entre elas, abstrair o que é essencial e desenhar algoritmos (sequências ordenadas de passos) para resolvê-lo. Jeannette Wing (2006) definiu esse conjunto de habilidades como fundamental para qualquer pessoa, não apenas para cientistas da computação — e é exatamente essa definição que a BNCC Computação adota como primeiro eixo.",
+      "Na Educação Básica, isso significa que um aluno do 1º ano já pode exercitar Pensamento Computacional ao ordenar os passos de escovar os dentes, e um aluno do 9º ano ao depurar a lógica de um jogo que criou — sem que nenhum dos dois precise, necessariamente, escrever uma linha de código. É por isso que a maior parte das atividades deste módulo é desplugada: o objetivo pedagógico (decompor, reconhecer padrões, sequenciar, testar e corrigir) é alcançado com cartões de papel, o corpo e o espaço da sala tão bem quanto com um computador.",
+      "As 10 aulas deste módulo seguem uma progressão deliberada: primeiro sensibilização (o que é tecnologia no cotidiano), depois os subconceitos centrais em ordem crescente de abstração (decomposição → padrões → algoritmo → simbologia de comandos → execução física com debugging), fechando com tomada de decisão condicional e uma avaliação formativa por rubrica. Essa sequência prepara diretamente o terreno para a lógica de blocos de programação trabalhada no Módulo 4 (Projeto Integrador).",
+    ],
+  },
+  mundo_digital: {
+    titulo: "Módulo 2 — Mundo Digital: como a informação é representada e transmitida",
+    paragrafos: [
+      "Enquanto o Módulo 1 trabalha a lógica de resolver problemas, o Módulo 2 trabalha a base técnica de como os sistemas digitais representam, organizam e transmitem informação: a diferença entre hardware e software, a classificação de dados, os sistemas de codificação (do código binário aos sistemas simbólicos do dia a dia, como o próprio alfabeto) e as noções iniciais de redes e conectividade.",
+      "A escolha pedagógica deste módulo é tornar concreto o que normalmente é ensinado de forma abstrata: uma matriz de Pixel Art com números mostra, na prática, como uma imagem digital é apenas uma tabela de valores; cartões binários mostram como qualquer número pode ser representado como uma sequência de ligado/desligado; o jogo de envio de pacotes em envelopes mostra, fisicamente, como a internet fragmenta e remonta uma mensagem. Isso cumpre o princípio da BNCC Computação de que a compreensão do funcionamento dos sistemas digitais deve preceder — e não substituir — o uso instrumental de aplicativos.",
+      "A progressão das 10 aulas vai do concreto (objetos físicos, hardware) ao mais abstrato (coordenadas, matrizes, código binário, grafos e rotas), preparando o professor para conduzir discussões que conectam essas ideias a exemplos do cotidiano do aluno, como aplicativos de mapa e redes sociais, sem exigir qualquer equipamento além de papel, lápis e materiais recicláveis.",
+    ],
+  },
+  cultura_digital: {
+    titulo: "Módulo 3 — Cultura Digital: cidadania, ética e segurança no ambiente digital",
+    paragrafos: [
+      "O terceiro eixo oficial desloca o foco da técnica para a formação cidadã: como agir, se proteger e pensar criticamente diante da cultura digital que já atravessa a vida de crianças e adolescentes independentemente da escola. Isso inclui privacidade e pegada digital, criação de senhas seguras, letramento midiático, verificação de fontes e combate à desinformação, netiqueta, prevenção ao cyberbullying e direitos autorais.",
+      "Esse módulo dialoga diretamente com uma das competências gerais da BNCC (uso crítico, significativo, reflexivo e ético das tecnologias) e é o eixo em que o papel de mediação do professor é mais evidente: não há uma 'resposta técnica correta' isolada, e sim um julgamento ético a ser construído coletivamente com a turma, através de debates, estudos de caso e produção coletiva de normas (como o Guia de Boas Práticas da Turma, produzido na Aula 9).",
+      "As 10 aulas terminam com uma autoavaliação de atitudes digitais — coerente com a natureza do eixo, cujo indicador de sucesso não é apenas 'saber a regra', mas demonstrar mudança de atitude concreta no uso da internet.",
+    ],
+  },
+  projeto_integrador: {
+    titulo: "Módulo 4 — Projeto Integrador: prototipagem aplicando os 3 eixos juntos",
+    paragrafos: [
+      "O Módulo 4 não é um quarto eixo oficial da BNCC Computação — é o bloco de fechamento prático do curso, no qual o professor aplica, de forma integrada, os conceitos dos Módulos 1 a 3 na criação de um artefato digital (um jogo simples ou uma história interativa), usando lógica de blocos de programação, controle de eventos e variáveis.",
+      "Pedagogicamente, este módulo cumpre duas funções: primeiro, mostra ao professor cursista, na prática, como a lógica de blocos (Scratch e similares) é uma continuação direta — não algo desconectado — dos algoritmos desplugados trabalhados desde a Aula 1; segundo, oferece um modelo replicável de projeto integrador que o próprio professor pode aplicar com sua turma ao longo do ano letivo, fechando o ciclo entre formação e prática de sala de aula.",
+      "A sequência de 10 aulas segue o ciclo real de desenvolvimento de um produto digital: planejamento (storyboard), construção incremental (cenário, personagens, regras), teste com pares (inclusive teste às cegas do projeto de outra dupla — uma prática real de controle de qualidade), refinamento e, por fim, uma mostra pública dos projetos e o encerramento formal do curso com emissão de certificado.",
+    ],
+  },
+};
 
 export const BLOCO_PROJETO_INTEGRADOR = {
   chave: "projeto_integrador" as const,
@@ -86,6 +157,9 @@ export const SEMANAS_CURSO_BNCC: SemanaCurso[] = [
 ];
 
 export const TOTAL_SEMANAS_CURSO = SEMANAS_CURSO_BNCC.length;
+
+// 40 aulas × 2h (composição em COMPOSICAO_CARGA_HORARIA_AULA) = 80h.
+export const TOTAL_HORAS_CURSO = TOTAL_SEMANAS_CURSO * HORAS_POR_AULA;
 
 // Atividades-modelo guiadas (passo a passo completo), 3 por eixo — extraídas
 // da coletânea de atividades desplugadas ItaGamificaEdu, com o código de

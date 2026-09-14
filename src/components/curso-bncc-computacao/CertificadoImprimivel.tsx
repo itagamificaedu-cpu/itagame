@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { BotaoImprimirCurso } from "./BotaoImprimirCurso";
+import { COMPOSICAO_CARGA_HORARIA_AULA, TOTAL_HORAS_CURSO, TOTAL_SEMANAS_CURSO } from "@/lib/cursoBnccComputacao";
 
 export function CertificadoImprimivel({ codigo, dataEmissao }: { codigo: string; dataEmissao: string }) {
   const [nome, setNome] = useState("");
@@ -47,29 +48,44 @@ export function CertificadoImprimivel({ codigo, dataEmissao }: { codigo: string;
           portador(a) do CPF nº{" "}
           <span className="font-bold text-neutral-900">{cpf || "______.______.______-____"}</span>, concluiu com
           êxito o curso de formação <span className="font-semibold">BNCC Computação na Prática: Estrutura
-          Curricular e Atividades Práticas</span>, com carga horária total de <span className="font-bold">40 horas</span>.
+          Curricular e Atividades Práticas</span>, com carga horária total de{" "}
+          <span className="font-bold">{TOTAL_HORAS_CURSO} horas</span>.
         </p>
 
         <div className="mt-6 rounded-xl border border-[#ffb020]/40 bg-[#ffb020]/10 p-4">
-          <p className="text-center text-xs font-bold text-[#8a5a00]">CONTEÚDO PROGRAMÁTICO (40 HORAS)</p>
+          <p className="text-center text-xs font-bold text-[#8a5a00]">CONTEÚDO PROGRAMÁTICO ({TOTAL_HORAS_CURSO} HORAS)</p>
           <div className="mt-2 grid gap-2 text-xs text-neutral-700 sm:grid-cols-2">
             <p>
-              <span className="font-bold">Eixo 1 — Pensamento Computacional:</span> decomposição, reconhecimento de
+              <span className="font-bold">Módulo 1 — Pensamento Computacional:</span> decomposição, reconhecimento de
               padrões, algoritmos e lógica desplugada.
             </p>
             <p>
-              <span className="font-bold">Eixo 2 — Mundo Digital:</span> hardware, software, representação de dados,
+              <span className="font-bold">Módulo 2 — Mundo Digital:</span> hardware, software, representação de dados,
               binário e matrizes.
             </p>
             <p>
-              <span className="font-bold">Eixo 3 — Cultura Digital:</span> segurança na rede, ética virtual, combate
+              <span className="font-bold">Módulo 3 — Cultura Digital:</span> segurança na rede, ética virtual, combate
               a fake news e cidadania.
             </p>
             <p>
-              <span className="font-bold">Projeto Integrador Final:</span> prototipagem de artefato digital
+              <span className="font-bold">Módulo 4 — Projeto Integrador Final:</span> prototipagem de artefato digital
               aplicando os 3 eixos.
             </p>
           </div>
+        </div>
+
+        <div className="mt-4 rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+          <p className="text-center text-xs font-bold text-neutral-600">
+            COMPOSIÇÃO DA CARGA HORÁRIA · {TOTAL_SEMANAS_CURSO} aulas × {TOTAL_HORAS_CURSO / TOTAL_SEMANAS_CURSO}h
+          </p>
+          <ul className="mt-2 space-y-1 text-xs text-neutral-600">
+            {COMPOSICAO_CARGA_HORARIA_AULA.map((item) => (
+              <li key={item.etapa} className="flex justify-between gap-3">
+                <span>{item.etapa}</span>
+                <span className="shrink-0 font-semibold text-neutral-500">{item.minutos} min</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <p className="mt-6 text-center text-xs text-neutral-400">

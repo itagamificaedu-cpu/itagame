@@ -2,13 +2,14 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import type { AtividadeGuiadaCurso, SemanaCurso } from "@/lib/cursoBnccComputacao";
+import type { AtividadeGuiadaCurso, BlocoCurso, SemanaCurso } from "@/lib/cursoBnccComputacao";
+import { HORAS_POR_AULA, NUMERO_MODULO } from "@/lib/cursoBnccComputacao";
 import { alternarSemanaConcluidaCurso, emitirCertificadoCurso } from "@/app/actions/cursoBnccComputacao";
 
 type SemanaExibicao = SemanaCurso & { atividadeGuiada?: AtividadeGuiadaCurso };
 
 type BlocoExibicao = {
-  chave: string;
+  chave: BlocoCurso;
   nome: string;
   icone: string;
   cor: string;
@@ -71,7 +72,7 @@ export function PainelProgressoCurso({
           <div>
             <p className="text-sm font-bold text-neutral-800">Seu progresso no curso</p>
             <p className="text-xs text-neutral-500">
-              {totalConcluidas} de {totalSemanas} semanas concluídas
+              {totalConcluidas} de {totalSemanas} aulas concluídas
             </p>
           </div>
           <span className="text-2xl font-extrabold text-[#1a3fd4]">{percentual}%</span>
@@ -99,14 +100,15 @@ export function PainelProgressoCurso({
                 disabled={emitindo}
                 className="inline-flex items-center gap-2 rounded-lg bg-[#00c264] px-4 py-2 text-sm font-bold text-white hover:brightness-110 disabled:opacity-60"
               >
-                {emitindo ? "Emitindo..." : "🎓 Emitir certificado (40h)"}
+                {emitindo ? "Emitindo..." : `🎓 Emitir certificado (${totalSemanas * HORAS_POR_AULA}h)`}
               </button>
               {erroEmissao && <p className="mt-2 text-xs font-semibold text-[#a8283f]">{erroEmissao}</p>}
             </div>
           )
         ) : (
           <p className="mt-3 text-xs text-neutral-400">
-            Marque as semanas conforme for aplicando em sala — o certificado libera ao concluir as {totalSemanas}.
+            Marque as aulas conforme for aplicando em sala — o certificado libera ao concluir as {totalSemanas}{" "}
+            aulas dos 4 módulos.
           </p>
         )}
       </div>
@@ -131,10 +133,11 @@ export function PainelProgressoCurso({
                     {bloco.icone}
                   </span>
                   <span>
-                    <span className="block text-sm font-extrabold text-neutral-900">{bloco.nome}</span>
+                    <span className="block text-sm font-extrabold text-neutral-900">
+                      Módulo {NUMERO_MODULO[bloco.chave]} — {bloco.nome}
+                    </span>
                     <span className="block text-xs text-neutral-500">
-                      Semanas {bloco.semanas[0]?.semana}–{bloco.semanas[bloco.semanas.length - 1]?.semana} ·{" "}
-                      {concluidasDoBloco}/{bloco.semanas.length} concluídas
+                      {bloco.semanas.length} aulas · {concluidasDoBloco}/{bloco.semanas.length} concluídas
                     </span>
                   </span>
                 </span>
@@ -143,7 +146,7 @@ export function PainelProgressoCurso({
 
               {aberto && (
                 <ul className="divide-y divide-neutral-100 border-t border-neutral-100 bg-white">
-                  {bloco.semanas.map((s) => {
+                  {bloco.semanas.map((s, indice) => {
                     const feita = concluidas.has(s.semana);
                     const expandida = semanaExpandida === s.semana;
                     return (
@@ -167,7 +170,7 @@ export function PainelProgressoCurso({
                             onClick={() => setSemanaExpandida(expandida ? null : s.semana)}
                             className="min-w-0 flex-1 text-left"
                           >
-                            <span className="block text-xs font-bold text-neutral-400">Semana {s.semana}</span>
+                            <span className="block text-xs font-bold text-neutral-400">Aula {indice + 1}</span>
                             <span className="block text-sm font-semibold text-neutral-800">{s.tema}</span>
                             <span className="block text-xs text-neutral-500">{s.atividade}</span>
                             <span className="mt-0.5 flex flex-wrap items-center gap-2">
