@@ -207,6 +207,12 @@ export default async function PaginaApostilaCurso() {
                         {atividade.habilidadeBncc && (
                           <p className="mt-2 text-xs font-semibold text-neutral-400">{atividade.habilidadeBncc}</p>
                         )}
+                        <Link
+                          href={`/painel/bncc-computacao/curso/ficha/${encodeURIComponent(atividade.nome)}`}
+                          className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-[#1a3fd4] print:hidden"
+                        >
+                          🖨️ Ficha do aluno (imprimir)
+                        </Link>
                       </div>
                     ))}
                   </div>

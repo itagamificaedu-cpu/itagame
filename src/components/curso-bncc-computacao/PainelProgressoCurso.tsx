@@ -203,6 +203,12 @@ export function PainelProgressoCurso({
                                 {s.atividadeGuiada.habilidadeBncc}
                               </p>
                             )}
+                            <Link
+                              href={`/painel/bncc-computacao/curso/ficha/${encodeURIComponent(s.atividadeGuiada.nome)}`}
+                              className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-[#1a3fd4]"
+                            >
+                              🖨️ Imprimir ficha do aluno
+                            </Link>
                           </div>
                         )}
                       </li>
