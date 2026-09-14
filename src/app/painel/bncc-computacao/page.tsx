@@ -3,6 +3,7 @@ import { exigirAcessoBnccComputacao } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { EIXOS_BNCC_COMPUTACAO } from "@/lib/bnccComputacao";
 import { ETAPAS_BNCC, MODELOS_BNCC_COMPUTACAO } from "@/lib/modelosBnccComputacao";
+import { TOTAL_HORAS_CURSO } from "@/lib/cursoBnccComputacao";
 
 // Hub da aba "BNCC Computação" — carro-chefe da plataforma pro ano letivo de
 // 2027 (primeiro ciclo do PNLD com livro próprio de Educação Digital e
@@ -45,7 +46,7 @@ export default async function PaginaBnccComputacao() {
               href="/painel/bncc-computacao/curso"
               className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold text-white backdrop-blur transition hover:bg-white/25"
             >
-              🎓 Curso de Formação (40h) — apostila e certificado
+              🎓 Curso de Formação ({TOTAL_HORAS_CURSO}h) — apostila e certificado
             </Link>
             <Link
               href="/painel/bncc-computacao/mapa"

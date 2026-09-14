@@ -103,9 +103,11 @@ export type SemanaCurso = {
   atividadeGuiadaNome?: string;
 };
 
-// As 40 semanas (1 aula de 50min/semana). Semanas 1–30: um eixo oficial por
-// bloco de 10 semanas (igual à grade original). Semanas 31–40: fechamento
-// prático, reaproveitando o antigo "Módulo 4" como projeto de aplicação.
+// As 40 aulas (2h cada, ver HORAS_POR_AULA), numeradas 1–40 só internamente
+// (nenhuma tela mostra essa numeração global). Aulas 1–30: um eixo oficial
+// por módulo de 10 aulas (igual à grade original). Aulas 31–40: Módulo 4,
+// fechamento prático reaproveitando o antigo "Módulo 4" do material de
+// origem como projeto de aplicação.
 export const SEMANAS_CURSO_BNCC: SemanaCurso[] = [
   // Eixo 1 — Pensamento Computacional (semanas 1–10)
   { semana: 1, bloco: "pensamento_computacional", tema: "Introdução à Computação", atividade: "Roda de conversa e tempestade de ideias sobre tecnologia no cotidiano.", modalidade: "Conversação / Roda livre", atividadeGuiadaNome: "Tempestade de Ideias: Tecnologia no Meu Dia a Dia" },
@@ -677,7 +679,7 @@ export const ATIVIDADES_GUIADAS_CURSO: AtividadeGuiadaCurso[] = [
     recursos: "Certificados de conclusão (emitidos pela plataforma), registros/rubricas dos 3 eixos.",
     passoAPasso: [
       "Revise coletivamente os 3 eixos trabalhados ao longo do curso e os principais aprendizados de cada um.",
-      "Emita e entregue os certificados de 40h de formação aos professores/participantes.",
+      "Emita e entregue os certificados de 80h de formação aos professores/participantes.",
       "Recolha um feedback rápido sobre o curso pra próximas turmas.",
       "Aponte os próximos passos: aplicar as trilhas gamificadas e os geradores da plataforma com os alunos ao longo do ano.",
     ],
