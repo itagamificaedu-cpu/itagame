@@ -92,11 +92,11 @@ export default async function PaginaApostilaCurso() {
             </div>
           </section>
 
-          {/* Atividades guiadas por eixo */}
+          {/* Atividades guiadas por eixo (+ Projeto Integrador de fechamento) */}
           <section className="mt-8">
             <h2 className="text-lg font-extrabold text-neutral-900">3. Atividades Práticas Guiadas</h2>
             <div className="mt-3 space-y-6">
-              {EIXOS_BNCC_COMPUTACAO.map((eixo) => (
+              {[...EIXOS_BNCC_COMPUTACAO, BLOCO_PROJETO_INTEGRADOR].map((eixo) => (
                 <div key={eixo.chave} className="break-inside-avoid">
                   <h3 className="border-b-2 pb-1 text-sm font-extrabold text-neutral-800" style={{ borderColor: eixo.cor }}>
                     {eixo.icone} {eixo.nome}

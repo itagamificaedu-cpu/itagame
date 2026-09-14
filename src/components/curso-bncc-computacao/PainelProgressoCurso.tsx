@@ -2,15 +2,17 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import type { SemanaCurso } from "@/lib/cursoBnccComputacao";
+import type { AtividadeGuiadaCurso, SemanaCurso } from "@/lib/cursoBnccComputacao";
 import { alternarSemanaConcluidaCurso, emitirCertificadoCurso } from "@/app/actions/cursoBnccComputacao";
+
+type SemanaExibicao = SemanaCurso & { atividadeGuiada?: AtividadeGuiadaCurso };
 
 type BlocoExibicao = {
   chave: string;
   nome: string;
   icone: string;
   cor: string;
-  semanas: SemanaCurso[];
+  semanas: SemanaExibicao[];
 };
 
 export function PainelProgressoCurso({
@@ -26,6 +28,7 @@ export function PainelProgressoCurso({
 }) {
   const [concluidas, setConcluidas] = useState<Set<number>>(new Set(semanasConcluidasIniciais));
   const [blocoAberto, setBlocoAberto] = useState<string | null>(blocos[0]?.chave ?? null);
+  const [semanaExpandida, setSemanaExpandida] = useState<number | null>(null);
   const [pendente, iniciarTransicao] = useTransition();
   const [erroEmissao, setErroEmissao] = useState<string | null>(null);
   const [emitindo, setEmitindo] = useState(false);
@@ -142,29 +145,63 @@ export function PainelProgressoCurso({
                 <ul className="divide-y divide-neutral-100 border-t border-neutral-100 bg-white">
                   {bloco.semanas.map((s) => {
                     const feita = concluidas.has(s.semana);
+                    const expandida = semanaExpandida === s.semana;
                     return (
-                      <li key={s.semana} className="flex items-start gap-3 p-3">
-                        <button
-                          type="button"
-                          onClick={() => alternarSemana(s.semana)}
-                          disabled={pendente}
-                          aria-label={feita ? "Marcar como não concluída" : "Marcar como concluída"}
-                          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold transition ${
-                            feita
-                              ? "border-[#00c264] bg-[#00c264] text-white"
-                              : "border-neutral-300 text-transparent hover:border-neutral-400"
-                          }`}
-                        >
-                          ✓
-                        </button>
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-xs font-bold text-neutral-400">Semana {s.semana}</span>
-                          <span className="block text-sm font-semibold text-neutral-800">{s.tema}</span>
-                          <span className="block text-xs text-neutral-500">{s.atividade}</span>
-                          <span className="mt-0.5 inline-block text-[11px] font-medium text-neutral-400">
-                            {s.modalidade}
-                          </span>
-                        </span>
+                      <li key={s.semana}>
+                        <div className="flex items-start gap-3 p-3">
+                          <button
+                            type="button"
+                            onClick={() => alternarSemana(s.semana)}
+                            disabled={pendente}
+                            aria-label={feita ? "Marcar como não concluída" : "Marcar como concluída"}
+                            className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold transition ${
+                              feita
+                                ? "border-[#00c264] bg-[#00c264] text-white"
+                                : "border-neutral-300 text-transparent hover:border-neutral-400"
+                            }`}
+                          >
+                            ✓
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSemanaExpandida(expandida ? null : s.semana)}
+                            className="min-w-0 flex-1 text-left"
+                          >
+                            <span className="block text-xs font-bold text-neutral-400">Semana {s.semana}</span>
+                            <span className="block text-sm font-semibold text-neutral-800">{s.tema}</span>
+                            <span className="block text-xs text-neutral-500">{s.atividade}</span>
+                            <span className="mt-0.5 flex flex-wrap items-center gap-2">
+                              <span className="text-[11px] font-medium text-neutral-400">{s.modalidade}</span>
+                              {s.atividadeGuiada && (
+                                <span className="text-[11px] font-bold text-[#1a3fd4]">
+                                  {expandida ? "▲ fechar conteúdo da aula" : "📖 ver conteúdo completo da aula"}
+                                </span>
+                              )}
+                            </span>
+                          </button>
+                        </div>
+
+                        {expandida && s.atividadeGuiada && (
+                          <div className="mx-3 mb-3 rounded-xl border border-[#1a3fd4]/20 bg-[#1a3fd4]/5 p-4">
+                            <p className="text-sm font-bold text-neutral-900">{s.atividadeGuiada.nome}</p>
+                            <p className="mt-1 text-xs text-neutral-500">
+                              Faixa etária: {s.atividadeGuiada.faixaEtaria} · Recursos: {s.atividadeGuiada.recursos}
+                            </p>
+                            <p className="mt-2 text-sm text-neutral-700">
+                              <span className="font-semibold">Objetivo:</span> {s.atividadeGuiada.objetivo}
+                            </p>
+                            <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-neutral-700">
+                              {s.atividadeGuiada.passoAPasso.map((passo, indice) => (
+                                <li key={indice}>{passo}</li>
+                              ))}
+                            </ol>
+                            {s.atividadeGuiada.habilidadeBncc && (
+                              <p className="mt-2 text-xs font-semibold text-neutral-400">
+                                {s.atividadeGuiada.habilidadeBncc}
+                              </p>
+                            )}
+                          </div>
+                        )}
                       </li>
                     );
                   })}

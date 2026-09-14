@@ -5,6 +5,7 @@ import {
   BLOCO_PROJETO_INTEGRADOR,
   SEMANAS_CURSO_BNCC,
   TOTAL_SEMANAS_CURSO,
+  atividadeGuiadaDaSemana,
   semanasDoBloco,
 } from "@/lib/cursoBnccComputacao";
 import { buscarOuCriarProgressoCurso } from "@/app/actions/cursoBnccComputacao";
@@ -18,20 +19,26 @@ export default async function PaginaCursoBnccComputacao() {
   await exigirAcessoBnccComputacao();
   const progresso = await buscarOuCriarProgressoCurso();
 
+  // Cada semana carrega, quando existir, a atividade guiada completa
+  // (objetivo, materiais, passo a passo, código BNCC) — é isso que a UI
+  // mostra ao expandir a semana, sem precisar abrir a apostila à parte.
+  const comAtividadeGuiada = (semanas: typeof SEMANAS_CURSO_BNCC) =>
+    semanas.map((s) => ({ ...s, atividadeGuiada: atividadeGuiadaDaSemana(s) }));
+
   const blocos = [
     ...EIXOS_BNCC_COMPUTACAO.map((eixo) => ({
       chave: eixo.chave,
       nome: eixo.nome,
       icone: eixo.icone,
       cor: eixo.cor,
-      semanas: semanasDoBloco(eixo.chave),
+      semanas: comAtividadeGuiada(semanasDoBloco(eixo.chave)),
     })),
     {
       chave: BLOCO_PROJETO_INTEGRADOR.chave,
       nome: BLOCO_PROJETO_INTEGRADOR.nome,
       icone: BLOCO_PROJETO_INTEGRADOR.icone,
       cor: BLOCO_PROJETO_INTEGRADOR.cor,
-      semanas: semanasDoBloco(BLOCO_PROJETO_INTEGRADOR.chave),
+      semanas: comAtividadeGuiada(semanasDoBloco(BLOCO_PROJETO_INTEGRADOR.chave)),
     },
   ];
 
