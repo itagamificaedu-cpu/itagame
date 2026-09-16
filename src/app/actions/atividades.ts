@@ -62,9 +62,15 @@ export async function gerarAtividade(
     return { mensagem: "Não consegui gerar a atividade agora. Tente novamente em instantes." };
   }
 
+  // A IA tende a sempre colocar a resposta certa como a primeira alternativa
+  // (viés conhecido de LLM). Sem embaralhar, todo quiz/cabo de guerra gerado
+  // tem a certa sempre na letra A — embaralha aqui, uma vez, na geração.
+  const tiposComAlternativasEmbaralhaveis = new Set(["quiz", "cabo_de_guerra"]);
   const questoesBase = atividadeGerada.questoes.map((questao) => ({
     enunciado: questao.enunciado,
-    alternativas: questao.alternativas ?? [],
+    alternativas: tiposComAlternativasEmbaralhaveis.has(tipo)
+      ? embaralhar(questao.alternativas ?? [])
+      : (questao.alternativas ?? []),
   }));
 
   let conteudoGerado: Record<string, unknown> = {
