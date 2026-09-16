@@ -8,6 +8,7 @@ import {
   PRECO_PRO_MENSAL,
   PRECO_COMBO_PRO,
   PRECO_ADDON_BNCC,
+  PRECO_KIT_VITALICIO_BNCC,
 } from "@/lib/mercadoPago";
 import { prisma } from "@/lib/prisma";
 
@@ -144,6 +145,46 @@ export async function iniciarCheckoutAddonBncc() {
         },
       ],
       external_reference: `${sessao.userId}:addon-bncc`,
+      back_urls: {
+        success: `${urlBase}/painel/bncc-computacao?status=sucesso`,
+        pending: `${urlBase}/painel/bncc-computacao?status=pendente`,
+        failure: `${urlBase}/painel/bncc-computacao/oferta?status=falha`,
+      },
+      auto_return: "approved",
+      notification_url: `${urlBase}/api/mercadopago/webhook`,
+    },
+  });
+
+  const urlCheckout = preferencia.init_point ?? preferencia.sandbox_init_point;
+
+  if (!urlCheckout) {
+    throw new Error("Não foi possível iniciar o checkout do Mercado Pago.");
+  }
+
+  redirect(urlCheckout);
+}
+
+// Kit Vitalício BNCC Computação — pagamento único, sem exigir Pro. O
+// webhook reconhece o sufixo ":vitalicio-bncc" e grava bnccComputacaoAte
+// bem no futuro (ver ANOS_VITALICIO_BNCC lá), sem mexer no plano/validade
+// do Pro — quem só comprou o Kit continua sem Sala Ao Vivo, que é a
+// diferença combinada em relação à assinatura.
+export async function iniciarCheckoutKitVitalicioBncc() {
+  const sessao = await verificarSessao();
+  const urlBase = process.env.NEXT_PUBLIC_APP_URL as string;
+
+  const preferencia = await preferenciaMercadoPago.create({
+    body: {
+      items: [
+        {
+          id: "itagame-kit-vitalicio-bncc",
+          title: "Kit Vitalício BNCC Computação — acesso vitalício",
+          quantity: 1,
+          unit_price: PRECO_KIT_VITALICIO_BNCC,
+          currency_id: "BRL",
+        },
+      ],
+      external_reference: `${sessao.userId}:vitalicio-bncc`,
       back_urls: {
         success: `${urlBase}/painel/bncc-computacao?status=sucesso`,
         pending: `${urlBase}/painel/bncc-computacao?status=pendente`,

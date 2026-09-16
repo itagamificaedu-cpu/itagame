@@ -3,8 +3,9 @@ import {
   buscarAssinaturaAtual,
   iniciarCheckoutAddonBncc,
   iniciarCheckoutAssinaturaProComBncc,
+  iniciarCheckoutKitVitalicioBncc,
 } from "@/app/actions/assinatura";
-import { PRECO_PRO_ANUAL, PRECO_ADDON_BNCC } from "@/lib/mercadoPago";
+import { PRECO_PRO_ANUAL, PRECO_ADDON_BNCC, PRECO_KIT_VITALICIO_BNCC } from "@/lib/mercadoPago";
 import { ETAPAS_BNCC } from "@/lib/modelosBnccComputacao";
 
 // Página de oferta do add-on BNCC Computação. Layout reconstruído a partir
@@ -266,6 +267,38 @@ export default async function PaginaOfertaBnccComputacao({
               </div>
             </div>
           )}
+
+          {/* Alternativa sem assinatura: pagamento único, não mexe no Pro. */}
+          <div className="relative mt-6">
+            <div className="absolute left-0 right-0 top-1/2 h-px bg-neutral-200" />
+            <span className="relative mx-auto block w-fit bg-neutral-50 px-3 text-xs font-bold uppercase tracking-wide text-neutral-400">
+              ou pague uma vez só
+            </span>
+          </div>
+
+          <div className="mt-6 overflow-hidden rounded-2xl border border-[#1a3fd4]/30 bg-white">
+            <div className="p-6">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#1a3fd4]/10 px-3 py-1 text-xs font-bold text-[#1a3fd4]">
+                🎯 Kit Vitalício BNCC Computação
+              </span>
+              <p className="mt-3 text-2xl font-extrabold text-neutral-900">
+                R$ {PRECO_KIT_VITALICIO_BNCC.toFixed(2).replace(".", ",")}
+                <span className="text-sm font-medium text-neutral-400"> pagamento único</span>
+              </p>
+              <p className="mt-1 text-sm text-neutral-500">
+                Curso de Formação (80h) + certificado, apostila completa e geradores de simulado, sem
+                limite, pra sempre — sem mensalidade. Sala Ao Vivo com a turma continua exigindo o Pro.
+              </p>
+              <form action={iniciarCheckoutKitVitalicioBncc} className="mt-4">
+                <button
+                  type="submit"
+                  className="w-full rounded-lg border-2 border-[#1a3fd4] py-3 text-sm font-bold text-[#1a3fd4] hover:bg-[#1a3fd4]/5"
+                >
+                  Quero o acesso vitalício
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     </main>

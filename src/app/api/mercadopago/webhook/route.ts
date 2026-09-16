@@ -50,7 +50,30 @@ export async function POST(req: NextRequest) {
     // "<professorId>:anual"              → Pro anual
     // "<professorId>:anual:bncc"         → Pro anual JÁ com o add-on BNCC
     // "<professorId>:addon-bncc"         → só o add-on avulso (já é Pro)
+    // "<professorId>:vitalicio-bncc"     → Kit Vitalício (pagamento único, sem exigir Pro)
     const [professorId, segundo, terceiro] = pagamento.external_reference.split(":");
+
+    if (segundo === "vitalicio-bncc") {
+      // "Vitalício" na prática: joga bnccComputacaoAte bem pra frente (não
+      // existe "sem data" no modelo, e não precisa — o gate só checa
+      // `> new Date()`). Não mexe em plano/validade/status: quem só comprou
+      // o Kit continua sem Sala Ao Vivo, que exige Pro ativo à parte.
+      const ANOS_VITALICIO_BNCC = 100;
+      const bnccVitalicioAte = new Date();
+      bnccVitalicioAte.setFullYear(bnccVitalicioAte.getFullYear() + ANOS_VITALICIO_BNCC);
+
+      await prisma.assinatura.upsert({
+        where: { professorId },
+        update: { bnccComputacaoAte: bnccVitalicioAte, mercadoPagoId: String(pagamento.id) },
+        create: {
+          professorId,
+          bnccComputacaoAte: bnccVitalicioAte,
+          mercadoPagoId: String(pagamento.id),
+        },
+      });
+
+      return NextResponse.json({ ok: true });
+    }
 
     if (segundo === "addon-bncc") {
       // Add-on avulso: não mexe no plano/validade do Pro, só estende (ou

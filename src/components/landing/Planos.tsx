@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PRECO_PRO_ANUAL, PRECO_PRO_MENSAL } from "@/lib/mercadoPago";
+import { PRECO_PRO_ANUAL, PRECO_PRO_MENSAL, PRECO_KIT_VITALICIO_BNCC } from "@/lib/mercadoPago";
 
 const recursosPro = [
   "Atividades ilimitadas",
@@ -10,14 +10,23 @@ const recursosPro = [
   "Suporte prioritário",
 ];
 
+const recursosKitVitalicio = [
+  "Curso de Formação BNCC Computação (80h) + certificado",
+  "Apostila completa + geradores de simulado, sem limite",
+  "Modo \"Responder na tela\" pra correção rápida",
+  "Pagamento único — sem mensalidade",
+];
+
 export function Planos() {
   return (
     <section id="planos" className="px-6 py-20">
       <div className="mx-auto max-w-3xl text-center">
         <h2 className="text-3xl font-extrabold text-neutral-900">Assinatura ItaGameficaEdu</h2>
-        <p className="mt-3 text-neutral-600">Acesso completo à plataforma — escolha mensal ou anual.</p>
+        <p className="mt-3 text-neutral-600">
+          Acesso completo à plataforma — mensal, anual, ou vitalício só pra BNCC Computação.
+        </p>
 
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 sm:text-left">
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 sm:text-left lg:grid-cols-3">
           <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-8">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white">
               👑 ItaGameficaEdu Pro
@@ -63,6 +72,30 @@ export function Planos() {
               className="mt-8 block rounded-lg bg-[#00c264] py-2.5 text-center text-sm font-bold text-white hover:brightness-110"
             >
               Assinar plano anual
+            </Link>
+          </div>
+
+          <div className="rounded-2xl border border-[#1a3fd4]/40 bg-neutral-900 p-8">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#1a3fd4]/15 px-3 py-1 text-xs font-bold text-[#7c93f5]">
+              🎯 Kit Vitalício BNCC Computação
+            </span>
+            <p className="mt-4 text-3xl font-extrabold text-white">
+              R$ {PRECO_KIT_VITALICIO_BNCC.toFixed(2).replace(".", ",")}
+              <span className="text-base font-medium text-neutral-400"> pagamento único</span>
+            </p>
+            <p className="text-xs text-neutral-400">pague uma vez, use pra sempre — não é assinatura</p>
+            <ul className="mt-6 space-y-2 text-sm text-neutral-300">
+              {recursosKitVitalicio.map((r) => (
+                <li key={r}>
+                  <span className="text-[#7c93f5]">✓</span> {r}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/cadastro"
+              className="mt-8 block rounded-lg bg-[#1a3fd4] py-2.5 text-center text-sm font-bold text-white hover:brightness-110"
+            >
+              Quero o acesso vitalício
             </Link>
           </div>
         </div>
