@@ -212,8 +212,16 @@ export async function entrarComoAlunoNaSala(
   redirect(`/sala/${codigo}/jogo`);
 }
 
+// XP real (permanente, some pro saldo do aluno) dado por questão acertada
+// numa Sala Ao Vivo — flat, sem bônus de velocidade (esse bônus continua só
+// no placar `pontosGanhos` da partida, pra não deixar o XP permanente
+// dependente de conexão/lag do aluno). Só é concedido quando o participante
+// entrou vinculado a um Aluno de verdade (nome da turma + PIN) — apelido
+// livre (sala sem turma) não tem XP porque não tem Aluno pra creditar.
+const XP_POR_ACERTO_SALA_AO_VIVO = 10;
+
 type ResultadoResposta =
-  | { ok: true; correta: boolean; pontosGanhos: number; respostaCorreta: string | undefined }
+  | { ok: true; correta: boolean; pontosGanhos: number; xpGanho: number; respostaCorreta: string | undefined }
   | { ok: false; mensagem: string };
 
 export async function responder(
@@ -232,6 +240,11 @@ export async function responder(
   if (!sala || sala.status !== "em_andamento") {
     return { ok: false, mensagem: "A pergunta não está mais disponível." };
   }
+
+  const participante = await prisma.participanteSala.findUnique({
+    where: { id: sessaoParticipante.participanteId },
+    select: { alunoId: true },
+  });
 
   const gabarito = sala.atividade.gabarito as { respostaCorreta: string }[];
   const respostaCorreta = gabarito[sala.perguntaAtual]?.respostaCorreta;
@@ -252,6 +265,8 @@ export async function responder(
   const penalidade = Math.min(50, Math.floor(segundos * 2));
   const pontosGanhos = correta ? 100 - penalidade : 0;
 
+  const concedeXp = correta && Boolean(participante?.alunoId);
+
   try {
     await prisma.$transaction([
       prisma.respostaParticipante.create({
@@ -266,10 +281,21 @@ export async function responder(
         where: { id: sessaoParticipante.participanteId },
         data: { pontuacao: { increment: pontosGanhos } },
       }),
+      ...(concedeXp
+        ? [
+            prisma.xpTransacao.create({
+              data: {
+                alunoId: participante!.alunoId!,
+                origem: `Sala Ao Vivo: ${sala.atividade.tema}`,
+                quantidade: XP_POR_ACERTO_SALA_AO_VIVO,
+              },
+            }),
+          ]
+        : []),
     ]);
   } catch {
     return { ok: false, mensagem: "Você já respondeu esta pergunta." };
   }
 
-  return { ok: true, correta, pontosGanhos, respostaCorreta };
+  return { ok: true, correta, pontosGanhos, xpGanho: concedeXp ? XP_POR_ACERTO_SALA_AO_VIVO : 0, respostaCorreta };
 }

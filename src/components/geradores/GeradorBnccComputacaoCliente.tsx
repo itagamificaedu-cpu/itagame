@@ -16,11 +16,12 @@ import {
   eixoBnccPorChave,
 } from "@/lib/geradores/bancoBnccComputacao";
 import type { EixoBnccComputacao } from "@/lib/bnccComputacao";
+import { LancarSimuladoComoSala } from "./LancarSimuladoComoSala";
 
 const COR_TEMA = "#1a3fd4";
 const LETRAS = ["A", "B", "C", "D"];
 
-export function GeradorBnccComputacaoCliente() {
+export function GeradorBnccComputacaoCliente({ turmas }: { turmas: { id: string; nome: string }[] }) {
   const [eixo, setEixo] = useState<EixoBnccComputacao | "todos">("todos");
   const [quantidade, setQuantidade] = useState(10);
   const [mostrarRespostas, setMostrarRespostas] = useState(false);
@@ -42,6 +43,9 @@ export function GeradorBnccComputacaoCliente() {
   }
 
   const acertos = questoes.filter((q, i) => respostas[i] === q.respostaCorreta).length;
+
+  const nomeEixo = eixo === "todos" ? "Todos os eixos" : eixoBnccPorChave(eixo)?.nome ?? "Todos os eixos";
+  const temaSimulado = `Simulado BNCC Computação — ${nomeEixo}`;
 
   return (
     <LayoutGerador
@@ -107,6 +111,20 @@ export function GeradorBnccComputacaoCliente() {
               }}
               cor={COR_TEMA}
             />
+          )}
+
+          {modo === "online" && (
+            <div className="border-t border-neutral-200 pt-3">
+              <p className="mb-2 text-xs font-bold tracking-wide text-neutral-500 uppercase">Turma real (Sala Ao Vivo)</p>
+              <LancarSimuladoComoSala
+                disciplina="Computação"
+                serie={nomeEixo}
+                tema={temaSimulado}
+                questoes={questoes}
+                turmas={turmas}
+                cor={COR_TEMA}
+              />
+            </div>
           )}
 
           <p className="text-xs leading-relaxed text-neutral-400">

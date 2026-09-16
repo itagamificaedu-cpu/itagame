@@ -70,7 +70,7 @@ function PontinhosCarregando() {
 export function JogoCliente({ codigo }: { codigo: string }) {
   const [dados, setDados] = useState<EstadoSala | null>(null);
   const [respostaEnviada, setRespostaEnviada] = useState(false);
-  const [feedback, setFeedback] = useState<{ correta: boolean; pontosGanhos: number } | null>(null);
+  const [feedback, setFeedback] = useState<{ correta: boolean; pontosGanhos: number; xpGanho: number } | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [textoResposta, setTextoResposta] = useState("");
 
@@ -100,7 +100,7 @@ export function JogoCliente({ codigo }: { codigo: string }) {
 
     if (resultado.ok) {
       setRespostaEnviada(true);
-      setFeedback({ correta: resultado.correta, pontosGanhos: resultado.pontosGanhos });
+      setFeedback({ correta: resultado.correta, pontosGanhos: resultado.pontosGanhos, xpGanho: resultado.xpGanho });
     }
   }
 
@@ -214,6 +214,11 @@ export function JogoCliente({ codigo }: { codigo: string }) {
               : "Não foi dessa vez"
             : "Resposta enviada!"}
         </p>
+        {feedback && feedback.xpGanho > 0 && (
+          <p className="rounded-full bg-white/20 px-3 py-1 text-sm font-bold text-white">
+            +{feedback.xpGanho} XP
+          </p>
+        )}
         <p className={`text-sm ${feedback ? "text-white/80" : "text-neutral-500"}`}>
           Aguardando os outros colegas...
         </p>

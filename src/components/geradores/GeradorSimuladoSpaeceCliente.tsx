@@ -15,11 +15,12 @@ import {
   ROTULO_TEMA_SIMULADO,
   type TemaSimulado,
 } from "@/lib/geradores/bancoSimuladoSpaece";
+import { LancarSimuladoComoSala } from "./LancarSimuladoComoSala";
 
 const COR_TEMA = "#1e3a8a";
 const LETRAS = ["A", "B", "C", "D"];
 
-export function GeradorSimuladoSpaeceCliente() {
+export function GeradorSimuladoSpaeceCliente({ turmas }: { turmas: { id: string; nome: string }[] }) {
   const [tema, setTema] = useState<TemaSimulado | "todos">("todos");
   const [quantidade, setQuantidade] = useState(10);
   const [mostrarRespostas, setMostrarRespostas] = useState(false);
@@ -41,6 +42,9 @@ export function GeradorSimuladoSpaeceCliente() {
   }
 
   const acertos = questoes.filter((q, i) => respostas[i] === q.respostaCorreta).length;
+
+  const nomeTema = tema === "todos" ? "Todos os conteúdos" : ROTULO_TEMA_SIMULADO[tema];
+  const temaSimulado = `Simulado SPAECE/SAEB — ${nomeTema}`;
 
   return (
     <LayoutGerador
@@ -106,6 +110,20 @@ export function GeradorSimuladoSpaeceCliente() {
               }}
               cor={COR_TEMA}
             />
+          )}
+
+          {modo === "online" && (
+            <div className="border-t border-neutral-200 pt-3">
+              <p className="mb-2 text-xs font-bold tracking-wide text-neutral-500 uppercase">Turma real (Sala Ao Vivo)</p>
+              <LancarSimuladoComoSala
+                disciplina="Matemática"
+                serie="9º ano"
+                tema={temaSimulado}
+                questoes={questoes}
+                turmas={turmas}
+                cor={COR_TEMA}
+              />
+            </div>
           )}
 
           <p className="text-xs leading-relaxed text-neutral-400">
