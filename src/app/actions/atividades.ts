@@ -163,11 +163,14 @@ export async function gerarAtividadeSpaece(
       disciplina,
       serie: "9º ano",
       tema: `${eixo.nome} (SPAECE)`,
+      // Mesmo viés da IA de sempre colocar a certa em 1º lugar (ver
+      // comentário em gerarAtividade acima) — embaralha aqui também, senão
+      // os simulados do SPAECE saem com a certa quase sempre no item A.
       conteudoGerado: {
         titulo: atividadeGerada.titulo,
         questoes: atividadeGerada.questoes.map((questao) => ({
           enunciado: questao.enunciado,
-          alternativas: questao.alternativas ?? [],
+          alternativas: embaralhar(questao.alternativas ?? []),
         })),
       } as Prisma.InputJsonValue,
       gabarito: atividadeGerada.questoes.map((questao) => ({

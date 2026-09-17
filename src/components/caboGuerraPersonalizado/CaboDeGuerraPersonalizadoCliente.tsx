@@ -76,6 +76,8 @@ function Alternativas({
   revelar: boolean;
   onEscolher: (indice: number) => void;
 }) {
+  const LETRAS = ["a", "b", "c", "d", "e", "f"];
+
   return (
     <div className="flex w-full max-w-[240px] flex-col gap-1.5">
       {opcoes.map((opcao, indice) => {
@@ -93,7 +95,7 @@ function Alternativas({
                   : "bg-white/15 hover:bg-white/25"
             }`}
           >
-            {opcao}
+            {LETRAS[indice] ?? indice + 1}) {opcao}
           </button>
         );
       })}
