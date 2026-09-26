@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { CURSO_FORMACAO_IA, MODULOS_FORMACAO_IA } from "@/lib/formacaoIA";
+import { ModulosAccordion } from "./ModulosAccordion";
 
 // Contagem de vagas muda a cada inscrição — nunca cachear/prerenderizar.
 export const dynamic = "force-dynamic";
@@ -84,18 +85,9 @@ export default async function FormacaoIALanding() {
 
       <section className="mx-auto max-w-2xl px-6 py-14">
         <h2 className="text-center text-2xl font-extrabold text-neutral-900">Programa — 7 módulos</h2>
-        <div className="mt-6 space-y-3">
-          {MODULOS_FORMACAO_IA.map((modulo) => (
-            <div key={modulo.numero} className="rounded-xl border border-neutral-200 bg-white p-4">
-              <div className="flex items-baseline justify-between gap-2">
-                <p className="text-xs font-bold uppercase tracking-wide text-[#1a3fd4]">
-                  Módulo {modulo.numero} · {modulo.formato}
-                </p>
-                <p className="text-xs text-neutral-400">{modulo.cargaHoraria}h</p>
-              </div>
-              <p className="mt-1 text-sm font-semibold text-neutral-900">{modulo.titulo}</p>
-            </div>
-          ))}
+        <p className="mt-1 text-center text-xs text-neutral-400">Clique em um módulo para ver o conteúdo completo</p>
+        <div className="mt-6">
+          <ModulosAccordion modulos={MODULOS_FORMACAO_IA} />
         </div>
       </section>
 
