@@ -133,6 +133,12 @@ export default async function PaginaPainel() {
               </span>
             </Link>
             <Link
+              href="/formacao-ia"
+              className="rounded-lg bg-white px-5 py-2.5 text-sm font-bold text-[#7c3aed] shadow-sm transition hover:brightness-95"
+            >
+              🎓 Formação em IA
+            </Link>
+            <Link
               href="/painel/spaece"
               className="rounded-lg bg-white px-5 py-2.5 text-sm font-bold text-[#1e8f4e] shadow-sm transition hover:brightness-95"
             >
