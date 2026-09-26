@@ -19,6 +19,21 @@ export const CURSO_FORMACAO_IA = {
     "Certificado de Extensão/Aperfeiçoamento, mediante 75% de frequência e aproveitamento mínimo (nota final ≥ 6,0)",
 };
 
+// Introdução, justificativa, metodologia geral e organização curricular —
+// texto redigido a partir da estrutura já definida do curso (módulos,
+// carga horária e critérios de avaliação), já que o documento original
+// com essas seções em prosa não estava disponível no momento da implementação.
+export const SOBRE_CURSO_FORMACAO_IA = {
+  introducao:
+    "A Inteligência Artificial já faz parte da rotina de qualquer sala de aula, mesmo quando ninguém percebe: alunos usam ferramentas de IA generativa pra fazer trabalho, professores recebem redações escritas por chatbot, e o mercado de trabalho que espera esses alunos já mudou. A Formação em IA Aplicada à Educação é uma resposta prática da ITA Tecnologia Educacional a essa mudança: um curso de extensão de 120 horas, pensado para professores da Educação Básica de Itapipoca e região, que combina fundamentação teórica com oficinas mão na massa.",
+  justificativa:
+    "Poucos professores tiveram, na formação inicial ou continuada, algum contato estruturado com IA generativa aplicada à docência. O resultado é um uso desorganizado — ora por medo e rejeição, ora por uso ingênuo, sem critério pedagógico ou atenção à LGPD. Este curso existe para fechar essa lacuna: formar professores capazes de usar IA de forma crítica e responsável no planejamento, na produção de materiais, na avaliação e na gestão da sala de aula, sem abrir mão da autoria docente nem da segurança dos dados dos alunos.",
+  metodologiaGeral:
+    "O curso é híbrido: 96 horas em plataforma online (EAD), cursadas no próprio ritmo do professor ao longo de novembro, e 24 horas presenciais em Itapipoca, em dezembro, divididas em 3 dias. Cada sessão combina exposição dialogada, estudo de caso e oficina prática — o professor sai de cada aula com um produto concreto (um plano de aula, um prompt testado, uma rubrica), não só com teoria. A etapa presencial abre e fecha o curso: o Dia 1 (dezembro) trabalha os fundamentos de IA e educação, o Dia 2 aprofunda robótica e cultura maker aplicadas à IA, e o Dia 3 é a apresentação do projeto aplicado final, com mentoria assíncrona ao longo do módulo 7.",
+  organizacaoCurricular:
+    "A carga horária de 120h está distribuída em 7 módulos sequenciais, do fundamento (Módulo 1) até o projeto aplicado final (Módulo 7), passando por planejamento pedagógico com IA generativa, ética e LGPD, gamificação, e avaliação/correção assistida por IA. A avaliação final combina 4 critérios: 40% prova/projeto presencial, 20% atividades por módulo, 10% participação nos fóruns, e 30% o projeto aplicado final — exigindo frequência mínima de 75% e nota final ≥ 6,0 para a emissão do certificado de Extensão/Aperfeiçoamento.",
+};
+
 export interface SessaoFormacaoIA {
   codigo: string;
   titulo: string;

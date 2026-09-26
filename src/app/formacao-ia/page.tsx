@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { CURSO_FORMACAO_IA, MODULOS_FORMACAO_IA } from "@/lib/formacaoIA";
+import { CURSO_FORMACAO_IA, MODULOS_FORMACAO_IA, SOBRE_CURSO_FORMACAO_IA } from "@/lib/formacaoIA";
 import { ModulosAccordion } from "./ModulosAccordion";
 
 // Contagem de vagas muda a cada inscrição — nunca cachear/prerenderizar.
@@ -80,6 +80,30 @@ export default async function FormacaoIALanding() {
               ❌ Vagas esgotadas nesta turma
             </p>
           )}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-2xl px-6 py-14">
+        <h2 className="text-center text-2xl font-extrabold text-neutral-900">Sobre o curso</h2>
+        <div className="mt-6 space-y-4">
+          <div className="rounded-xl border border-neutral-200 bg-white p-5">
+            <p className="text-xs font-bold uppercase tracking-wide text-[#1a3fd4]">Introdução</p>
+            <p className="mt-2 text-sm leading-relaxed text-neutral-600">{SOBRE_CURSO_FORMACAO_IA.introducao}</p>
+          </div>
+          <div className="rounded-xl border border-neutral-200 bg-white p-5">
+            <p className="text-xs font-bold uppercase tracking-wide text-[#1a3fd4]">Justificativa</p>
+            <p className="mt-2 text-sm leading-relaxed text-neutral-600">{SOBRE_CURSO_FORMACAO_IA.justificativa}</p>
+          </div>
+          <div className="rounded-xl border border-neutral-200 bg-white p-5">
+            <p className="text-xs font-bold uppercase tracking-wide text-[#1a3fd4]">Metodologia geral</p>
+            <p className="mt-2 text-sm leading-relaxed text-neutral-600">{SOBRE_CURSO_FORMACAO_IA.metodologiaGeral}</p>
+          </div>
+          <div className="rounded-xl border border-neutral-200 bg-white p-5">
+            <p className="text-xs font-bold uppercase tracking-wide text-[#1a3fd4]">Organização curricular</p>
+            <p className="mt-2 text-sm leading-relaxed text-neutral-600">
+              {SOBRE_CURSO_FORMACAO_IA.organizacaoCurricular}
+            </p>
+          </div>
         </div>
       </section>
 
