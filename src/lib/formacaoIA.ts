@@ -174,11 +174,15 @@ export const MODULOS_FORMACAO_IA: ModuloFormacaoIA[] = [
         objetivo: "Criar materiais didáticos (textos, questões, slides) usando IA como copiloto.",
         conteudo: [
           "Geração de questões de múltipla escolha e discursivas por nível de dificuldade",
-          "Criação de slides e resumos visuais com IA, como Canva IA e Gamma",
+          "Passo a passo para criar slides com IA: primeiro pedir um roteiro de tópicos da aula e só depois gerar o design visual em cima desse roteiro",
+          "Ferramentas prontas para montar a apresentação: Gamma (cola o roteiro e ele monta os slides completos) e Canva IA/Magic Design (gera o layout a partir do texto do plano de aula)",
+          "Como pedir boas imagens para cada slide: descrever o tema de cada tela e pedir sugestão de ícone ou foto, usando os bancos de imagem já integrados nessas ferramentas",
+          "Boas práticas de slide gerado por IA: no máximo 20 palavras por tela, um tópico por slide e uma pausa para pergunta a cada 3 ou 4 slides",
           "Revisão e adequação de linguagem ao público-alvo",
         ],
         metodologia: "Produção prática de um mini-kit didático, com questões e slide, sobre um tema da disciplina do cursista.",
-        exemploPratico: "Gerar 5 questões sobre um tema à escolha e um slide-resumo, usando Canva IA ou Gamma.",
+        exemploPratico:
+          "Gerar 5 questões sobre um tema à escolha e, para o mesmo tema, um roteiro de 8 slides no Gamma ou no Canva IA, revisando o texto e trocando as imagens sugeridas pelas mais adequadas à turma.",
         recursos: ["Canva IA / Gamma", "banco de questões geradas"],
         avaliacaoProduto: "Mini-kit didático postado na plataforma.",
         referencias: ["Documentação oficial Canva IA e Gamma", "Boas práticas de design instrucional"],
