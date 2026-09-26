@@ -23,7 +23,7 @@ export function ModulosAccordion({ modulos }: { modulos: ModuloFormacaoIA[] }) {
 
           <div className="mt-4 space-y-4 border-t border-neutral-100 pt-4">
             {modulo.fundamentacaoTeorica && (
-              <p className="text-xs italic text-neutral-500">📚 {modulo.fundamentacaoTeorica}</p>
+              <p className="text-justify text-xs italic text-neutral-500">📚 {modulo.fundamentacaoTeorica}</p>
             )}
 
             {modulo.sessoes.map((sessao) => (
@@ -36,7 +36,7 @@ export function ModulosAccordion({ modulos }: { modulos: ModuloFormacaoIA[] }) {
                 </div>
 
                 {sessao.objetivo && (
-                  <p className="mt-2 text-xs text-neutral-600">
+                  <p className="mt-2 text-justify text-xs text-neutral-600">
                     <span className="font-bold text-neutral-700">Objetivo:</span> {sessao.objetivo}
                   </p>
                 )}
@@ -44,33 +44,39 @@ export function ModulosAccordion({ modulos }: { modulos: ModuloFormacaoIA[] }) {
                 {sessao.conteudo && sessao.conteudo.length > 0 && (
                   <ul className="mt-2 list-disc space-y-0.5 pl-4 text-xs text-neutral-600">
                     {sessao.conteudo.map((item) => (
-                      <li key={item}>{item}</li>
+                      <li key={item} className="text-justify">{item}</li>
                     ))}
                   </ul>
                 )}
 
                 {sessao.metodologia && (
-                  <p className="mt-2 text-xs text-neutral-600">
+                  <p className="mt-2 text-justify text-xs text-neutral-600">
                     <span className="font-bold text-neutral-700">Metodologia:</span> {sessao.metodologia}
                   </p>
                 )}
 
                 {sessao.exemploPratico && (
-                  <p className="mt-1 text-xs text-neutral-600">
+                  <p className="mt-1 text-justify text-xs text-neutral-600">
                     <span className="font-bold text-neutral-700">Exemplo prático:</span> {sessao.exemploPratico}
                   </p>
                 )}
 
                 {sessao.recursos && sessao.recursos.length > 0 && (
-                  <p className="mt-1 text-xs text-neutral-600">
+                  <p className="mt-1 text-justify text-xs text-neutral-600">
                     <span className="font-bold text-neutral-700">Recursos:</span> {sessao.recursos.join(", ")}
                   </p>
                 )}
 
                 {sessao.avaliacaoProduto && (
-                  <p className="mt-1 text-xs text-neutral-600">
+                  <p className="mt-1 text-justify text-xs text-neutral-600">
                     <span className="font-bold text-neutral-700">Produto avaliativo:</span>{" "}
                     {sessao.avaliacaoProduto}
+                  </p>
+                )}
+
+                {sessao.referencias && sessao.referencias.length > 0 && (
+                  <p className="mt-1 text-justify text-xs text-neutral-500">
+                    <span className="font-bold text-neutral-600">Referências:</span> {sessao.referencias.join("; ")}
                   </p>
                 )}
               </div>
