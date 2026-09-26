@@ -86,6 +86,15 @@ export default async function FormacaoIALanding() {
       <section className="mx-auto max-w-2xl px-6 py-14">
         <h2 className="text-center text-2xl font-extrabold text-neutral-900">Programa — 7 módulos</h2>
         <p className="mt-1 text-center text-xs text-neutral-400">Clique em um módulo para ver o conteúdo completo</p>
+
+        <div className="mx-auto mt-4 flex max-w-md items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-800">
+          <span className="text-base leading-none">🔒</span>
+          <p>
+            Conteúdo exclusivo de quem se inscrever nesta <strong>Formação em IA</strong> — não faz parte da
+            assinatura Pro do ItaGame nem de nenhum outro plano da plataforma.
+          </p>
+        </div>
+
         <div className="mt-6">
           <ModulosAccordion modulos={MODULOS_FORMACAO_IA} />
         </div>
