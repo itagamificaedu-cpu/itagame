@@ -95,14 +95,26 @@ export default async function FormacaoIALanding() {
             <p className="mt-2 text-sm leading-relaxed text-neutral-600">{SOBRE_CURSO_FORMACAO_IA.justificativa}</p>
           </div>
           <div className="rounded-xl border border-neutral-200 bg-white p-5">
-            <p className="text-xs font-bold uppercase tracking-wide text-[#1a3fd4]">Metodologia geral</p>
-            <p className="mt-2 text-sm leading-relaxed text-neutral-600">{SOBRE_CURSO_FORMACAO_IA.metodologiaGeral}</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-[#1a3fd4]">Metodologia</p>
+            <p className="mt-2 text-sm leading-relaxed text-neutral-600">
+              {SOBRE_CURSO_FORMACAO_IA.metodologiaGeral.intro}
+            </p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-neutral-600">
+              {SOBRE_CURSO_FORMACAO_IA.metodologiaGeral.itens.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
           </div>
           <div className="rounded-xl border border-neutral-200 bg-white p-5">
             <p className="text-xs font-bold uppercase tracking-wide text-[#1a3fd4]">Organização curricular</p>
             <p className="mt-2 text-sm leading-relaxed text-neutral-600">
-              {SOBRE_CURSO_FORMACAO_IA.organizacaoCurricular}
+              {SOBRE_CURSO_FORMACAO_IA.organizacaoCurricular.intro}
             </p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-neutral-600">
+              {SOBRE_CURSO_FORMACAO_IA.organizacaoCurricular.itens.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>

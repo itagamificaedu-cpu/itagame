@@ -20,18 +20,33 @@ export const CURSO_FORMACAO_IA = {
 };
 
 // Introdução, justificativa, metodologia geral e organização curricular —
-// texto redigido a partir da estrutura já definida do curso (módulos,
-// carga horária e critérios de avaliação), já que o documento original
-// com essas seções em prosa não estava disponível no momento da implementação.
+// texto original do documento-fonte do curso (Claude Docs), seções
+// "2. Apresentação e Justificativa", "6. Cronograma Híbrido" e "7. Metodologia".
 export const SOBRE_CURSO_FORMACAO_IA = {
   introducao:
-    "A Inteligência Artificial já faz parte da rotina de qualquer sala de aula, mesmo quando ninguém percebe: alunos usam ferramentas de IA generativa pra fazer trabalho, professores recebem redações escritas por chatbot, e o mercado de trabalho que espera esses alunos já mudou. A Formação em IA Aplicada à Educação é uma resposta prática da ITA Tecnologia Educacional a essa mudança: um curso de extensão de 120 horas, pensado para professores da Educação Básica de Itapipoca e região, que combina fundamentação teórica com oficinas mão na massa.",
+    "A Inteligência Artificial (IA) já integra ferramentas de planejamento, correção, personalização do ensino e gamificação utilizadas no cotidiano escolar. No entanto, grande parte dos professores da Educação Básica ainda não teve formação estruturada para compreender, avaliar criticamente e aplicar essas tecnologias em sala de aula.",
   justificativa:
-    "Poucos professores tiveram, na formação inicial ou continuada, algum contato estruturado com IA generativa aplicada à docência. O resultado é um uso desorganizado — ora por medo e rejeição, ora por uso ingênuo, sem critério pedagógico ou atenção à LGPD. Este curso existe para fechar essa lacuna: formar professores capazes de usar IA de forma crítica e responsável no planejamento, na produção de materiais, na avaliação e na gestão da sala de aula, sem abrir mão da autoria docente nem da segurança dos dados dos alunos.",
-  metodologiaGeral:
-    "O curso é híbrido: 96 horas em plataforma online (EAD), cursadas no próprio ritmo do professor ao longo de novembro, e 24 horas presenciais em Itapipoca, em dezembro, divididas em 3 dias. Cada sessão combina exposição dialogada, estudo de caso e oficina prática — o professor sai de cada aula com um produto concreto (um plano de aula, um prompt testado, uma rubrica), não só com teoria. A etapa presencial abre e fecha o curso: o Dia 1 (dezembro) trabalha os fundamentos de IA e educação, o Dia 2 aprofunda robótica e cultura maker aplicadas à IA, e o Dia 3 é a apresentação do projeto aplicado final, com mentoria assíncrona ao longo do módulo 7.",
-  organizacaoCurricular:
-    "A carga horária de 120h está distribuída em 7 módulos sequenciais, do fundamento (Módulo 1) até o projeto aplicado final (Módulo 7), passando por planejamento pedagógico com IA generativa, ética e LGPD, gamificação, e avaliação/correção assistida por IA. A avaliação final combina 4 critérios: 40% prova/projeto presencial, 20% atividades por módulo, 10% participação nos fóruns, e 30% o projeto aplicado final — exigindo frequência mínima de 75% e nota final ≥ 6,0 para a emissão do certificado de Extensão/Aperfeiçoamento.",
+    "Este curso nasce da experiência em Robótica Educacional, Cultura Maker e desenvolvimento de plataformas gamificadas (como ItaGame e GamificaEdu), reunindo fundamentos teóricos de IA aplicada à educação com prática direta em ferramentas e plataformas digitais. A proposta segue o modelo de oferta híbrida adotado por instituições de referência (como IFCE/UAB), combinando uma etapa presencial concentrada — essencial para práticas orientadas, avaliação presencial e integração entre cursistas — com uma trilha formativa contínua em plataforma digital, respeitando o marco regulatório de EaD vigente e as boas práticas de design instrucional para formação continuada de professores.",
+  metodologiaGeral: {
+    intro: "O curso combina metodologias ativas com gamificação do próprio processo formativo:",
+    itens: [
+      "Metodologias ativas: sala de aula invertida (leitura/vídeo antes, prática depois), aprendizagem baseada em problemas e projetos (PBL)",
+      "Gamificação do próprio curso: pontuação, badges e ranking dos cursistas na plataforma, como vitrine viva das técnicas ensinadas",
+      'Etapa presencial "mão na massa": oficinas práticas de robótica, cultura maker e prototipagem, com uso de IA como copiloto',
+      "Etapa EAD ativa: trilhas em microlearning (vídeos curtos de 8–12 min), estudos de caso, simulados interativos e fóruns de discussão mediados por tutor",
+      "Aprendizagem por projeto: cada cursista desenvolve, ao longo do curso, um projeto aplicado à sua realidade escolar (plano de aula com IA, jogo/desafio gamificado, ou rotina de correção automatizada)",
+      "Mentoria: acompanhamento individual/coletivo via webconferência nas semanas do Projeto Aplicado Final",
+    ],
+  },
+  organizacaoCurricular: {
+    intro: "O curso é organizado em 4 fases, da abertura à certificação:",
+    itens: [
+      "Fase 1 — Abertura na plataforma (última semana de outubro): ambientação no AVA, apresentação do curso, formação de turmas e liberação do Módulo 2 para início em novembro",
+      "Fase 2 — Trilha online (novembro, 72h): Módulos 2 a 5, um por semana",
+      "Fase 3 — Imersão presencial (dezembro, 3 dias): Dia 1 com o Módulo 1 (fundamentos), Dia 2 com o Módulo 6 (robótica e cultura maker), Dia 3 com avaliação presencial e lançamento do projeto aplicado",
+      "Fase 4 — Projeto Aplicado Final e encerramento (dezembro, 24h): desenvolvimento do Módulo 7 com mentoria assíncrona, seguido da apresentação dos projetos e emissão de certificados",
+    ],
+  },
 };
 
 export interface SessaoFormacaoIA {
