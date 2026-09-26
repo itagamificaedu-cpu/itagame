@@ -26,7 +26,7 @@ export const SOBRE_CURSO_FORMACAO_IA = {
   introducao:
     "A Inteligência Artificial (IA) já integra ferramentas de planejamento, correção, personalização do ensino e gamificação utilizadas no cotidiano escolar. No entanto, grande parte dos professores da Educação Básica ainda não teve formação estruturada para compreender, avaliar criticamente e aplicar essas tecnologias em sala de aula.",
   justificativa:
-    "Este curso nasce da experiência em Robótica Educacional, Cultura Maker e desenvolvimento de plataformas gamificadas (como ItaGame e GamificaEdu), reunindo fundamentos teóricos de IA aplicada à educação com prática direta em ferramentas e plataformas digitais. A proposta segue o modelo de oferta híbrida adotado por instituições de referência (como IFCE/UAB), combinando uma etapa presencial concentrada — essencial para práticas orientadas, avaliação presencial e integração entre cursistas — com uma trilha formativa contínua em plataforma digital, respeitando o marco regulatório de EaD vigente e as boas práticas de design instrucional para formação continuada de professores.",
+    "Este curso nasce da experiência em Robótica Educacional, Cultura Maker e desenvolvimento de plataformas gamificadas (como ItaGame e GamificaEdu), reunindo fundamentos teóricos de IA aplicada à educação com prática direta em ferramentas e plataformas digitais. A proposta segue o modelo de oferta híbrida adotado por instituições de referência (como IFCE/UAB), combinando uma etapa presencial concentrada, essencial para práticas orientadas, avaliação presencial e integração entre cursistas, com uma trilha formativa contínua em plataforma digital, respeitando o marco regulatório de EaD vigente e as boas práticas de design instrucional para formação continuada de professores.",
   metodologiaGeral: {
     intro: "O curso combina metodologias ativas com gamificação do próprio processo formativo:",
     itens: [
@@ -41,10 +41,10 @@ export const SOBRE_CURSO_FORMACAO_IA = {
   organizacaoCurricular: {
     intro: "O curso é organizado em 4 fases, da abertura à certificação:",
     itens: [
-      "Fase 1 — Abertura na plataforma (última semana de outubro): ambientação no AVA, apresentação do curso, formação de turmas e liberação do Módulo 2 para início em novembro",
-      "Fase 2 — Trilha online (novembro, 72h): Módulos 2 a 5, um por semana",
-      "Fase 3 — Imersão presencial (dezembro, 3 dias): Dia 1 com o Módulo 1 (fundamentos), Dia 2 com o Módulo 6 (robótica e cultura maker), Dia 3 com avaliação presencial e lançamento do projeto aplicado",
-      "Fase 4 — Projeto Aplicado Final e encerramento (dezembro, 24h): desenvolvimento do Módulo 7 com mentoria assíncrona, seguido da apresentação dos projetos e emissão de certificados",
+      "Fase 1, Abertura na plataforma (última semana de outubro): ambientação no AVA, apresentação do curso, formação de turmas e liberação do Módulo 2 para início em novembro",
+      "Fase 2, Trilha online (novembro, 72h): Módulos 2 a 5, um por semana",
+      "Fase 3, Imersão presencial (dezembro, 3 dias): Dia 1 com o Módulo 1 (fundamentos), Dia 2 com o Módulo 6 (robótica e cultura maker), Dia 3 com avaliação presencial e lançamento do projeto aplicado",
+      "Fase 4, Projeto Aplicado Final e encerramento (dezembro, 24h): desenvolvimento do Módulo 7 com mentoria assíncrona, seguido da apresentação dos projetos e emissão de certificados",
     ],
   },
 };

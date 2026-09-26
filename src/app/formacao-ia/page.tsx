@@ -88,15 +88,15 @@ export default async function FormacaoIALanding() {
         <div className="mt-6 space-y-4">
           <div className="rounded-xl border border-neutral-200 bg-white p-5">
             <p className="text-xs font-bold uppercase tracking-wide text-[#1a3fd4]">Introdução</p>
-            <p className="mt-2 text-sm leading-relaxed text-neutral-600">{SOBRE_CURSO_FORMACAO_IA.introducao}</p>
+            <p className="mt-2 text-justify text-sm leading-relaxed text-neutral-600">{SOBRE_CURSO_FORMACAO_IA.introducao}</p>
           </div>
           <div className="rounded-xl border border-neutral-200 bg-white p-5">
             <p className="text-xs font-bold uppercase tracking-wide text-[#1a3fd4]">Justificativa</p>
-            <p className="mt-2 text-sm leading-relaxed text-neutral-600">{SOBRE_CURSO_FORMACAO_IA.justificativa}</p>
+            <p className="mt-2 text-justify text-sm leading-relaxed text-neutral-600">{SOBRE_CURSO_FORMACAO_IA.justificativa}</p>
           </div>
           <div className="rounded-xl border border-neutral-200 bg-white p-5">
             <p className="text-xs font-bold uppercase tracking-wide text-[#1a3fd4]">Metodologia</p>
-            <p className="mt-2 text-sm leading-relaxed text-neutral-600">
+            <p className="mt-2 text-justify text-sm leading-relaxed text-neutral-600">
               {SOBRE_CURSO_FORMACAO_IA.metodologiaGeral.intro}
             </p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-neutral-600">
@@ -107,7 +107,7 @@ export default async function FormacaoIALanding() {
           </div>
           <div className="rounded-xl border border-neutral-200 bg-white p-5">
             <p className="text-xs font-bold uppercase tracking-wide text-[#1a3fd4]">Organização curricular</p>
-            <p className="mt-2 text-sm leading-relaxed text-neutral-600">
+            <p className="mt-2 text-justify text-sm leading-relaxed text-neutral-600">
               {SOBRE_CURSO_FORMACAO_IA.organizacaoCurricular.intro}
             </p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-neutral-600">
