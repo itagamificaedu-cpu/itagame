@@ -101,7 +101,7 @@ export default async function FormacaoIALanding() {
             </p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-neutral-600">
               {SOBRE_CURSO_FORMACAO_IA.metodologiaGeral.itens.map((item) => (
-                <li key={item}>{item}</li>
+                <li key={item} className="text-justify">{item}</li>
               ))}
             </ul>
           </div>
@@ -112,7 +112,7 @@ export default async function FormacaoIALanding() {
             </p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-neutral-600">
               {SOBRE_CURSO_FORMACAO_IA.organizacaoCurricular.itens.map((item) => (
-                <li key={item}>{item}</li>
+                <li key={item} className="text-justify">{item}</li>
               ))}
             </ul>
           </div>
