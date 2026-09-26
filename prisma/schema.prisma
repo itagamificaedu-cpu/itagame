@@ -843,3 +843,58 @@ model GincanaRodada {
 
   @@map("gincana_rodadas")
 }
+
+// ─── Formação em IA Aplicada à Educação (120h) ─────────────────────────────
+// Curso pago, turma fechada (evento com datas, não trilha sempre-disponível),
+// inscrição pública SEM login/SSO — o professor que se inscreve não precisa
+// ter conta na plataforma. Conteúdo do curso (módulos/sessões) fica hardcoded
+// em src/lib/formacaoIA.ts; aqui só entra o controle de cada matrícula.
+enum StatusMatriculaFormacaoIA {
+  pendente
+  aguardando_pagamento
+  pago
+  cancelado
+  certificado_emitido
+}
+
+enum TempoDocenciaFormacaoIA {
+  menos_1
+  de_1_a_3
+  de_4_a_10
+  mais_10
+}
+
+model MatriculaFormacaoIA {
+  id String @id @default(cuid())
+
+  nomeCompleto          String
+  cpf                   String
+  email                 String
+  telefone              String
+  instituicaoEnsino     String
+  areaDisciplina        String
+  tempoDocencia         TempoDocenciaFormacaoIA
+  declaraAtuacaoDocente Boolean @default(false)
+  autorizaImagem        Boolean @default(false)
+  aceitaTermos          Boolean @default(false)
+
+  status          StatusMatriculaFormacaoIA @default(pendente)
+  codigoMatricula String                    @unique @default(uuid())
+
+  valorPago      Decimal   @default(99.90) @db.Decimal(8, 2)
+  idTransacaoPag String?
+  dataPagamento  DateTime?
+
+  frequenciaPct      Int?
+  notaFinal          Decimal? @db.Decimal(4, 1)
+  projetoFinalTitulo String?
+  observacoesStaff   String?
+
+  certificadoGerado Boolean   @default(false)
+  dataCertificado   DateTime?
+
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  @@map("matriculas_formacao_ia")
+}

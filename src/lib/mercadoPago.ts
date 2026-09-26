@@ -25,6 +25,11 @@ export const PRECO_ADDON_BNCC = 20.0;
 // por partida — não é limitação de bug, é a regra de negócio combinada.
 export const PRECO_KIT_VITALICIO_BNCC = 147.0;
 
+// Formação em IA Aplicada à Educação (120h) — curso pago, turma fechada,
+// inscrição pública sem login. Ver src/lib/formacaoIA.ts pro conteúdo do
+// curso e src/app/actions/formacaoIA.ts pro checkout.
+export const PRECO_FORMACAO_IA = 99.9;
+
 // Liga/desliga a oferta "Combo Pro + bônus" (/oferta/combo-pro). Desativada
 // pra usar como base de uma futura promoção — o código fica pronto, só
 // virar essa chave pra true de novo quando for rodar a próxima.

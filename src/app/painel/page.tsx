@@ -86,6 +86,14 @@ export default async function PaginaPainel() {
                 💼 Leads
               </Link>
             )}
+            {usuario?.papel === "ita_owner" && (
+              <Link
+                href="/painel/admin/formacao-ia"
+                className="hidden rounded-full bg-neutral-900/5 px-3 py-1 text-xs font-bold text-neutral-700 sm:inline-flex"
+              >
+                🎓 Formação IA
+              </Link>
+            )}
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1a3fd4] text-sm font-bold text-white">
               {iniciais}
             </div>

@@ -53,6 +53,21 @@ export async function POST(req: NextRequest) {
     // "<professorId>:vitalicio-bncc"     → Kit Vitalício (pagamento único, sem exigir Pro)
     const [professorId, segundo, terceiro] = pagamento.external_reference.split(":");
 
+    if (professorId === "formacao-ia") {
+      // Matrícula pública (sem login) na Formação em IA Aplicada à Educação —
+      // "segundo" aqui é o id da MatriculaFormacaoIA, não um professorId.
+      await prisma.matriculaFormacaoIA.updateMany({
+        where: { id: segundo, status: { not: "certificado_emitido" } },
+        data: {
+          status: "pago",
+          dataPagamento: new Date(),
+          idTransacaoPag: String(pagamento.id),
+        },
+      });
+
+      return NextResponse.json({ ok: true });
+    }
+
     if (segundo === "vitalicio-bncc") {
       // "Vitalício" na prática: joga bnccComputacaoAte bem pra frente (não
       // existe "sem data" no modelo, e não precisa — o gate só checa
