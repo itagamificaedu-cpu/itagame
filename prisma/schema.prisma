@@ -157,6 +157,8 @@ model Usuario {
   leadsVenda          LeadVenda[]
   gincanas            Gincana[]
   progressoCursoBncc  ProgressoCursoBnccComputacao?
+  resultadosSispaiMatematica    ResultadoSispaiMatematica[]
+  habilidadesSispaiMatematica   HabilidadeSispaiMatematica[]
 
   @@map("usuarios")
 }
@@ -897,4 +899,55 @@ model MatriculaFormacaoIA {
   atualizadoEm DateTime @updatedAt
 
   @@map("matriculas_formacao_ia")
+}
+
+// --- SISPAI (Sistema Permanente de Avaliação de Itapipoca, Lei Municipal
+// nº 059/2023) — avaliação diagnóstica própria da rede municipal, aplicada
+// 2x por ano (Rodada 1 e 2) do 2º ao 9º ano. Diferente da Matriz oficial do
+// SPAECE estadual (ver spaece.ts) — cada aluno aqui já vem com o resultado
+// calculado pela SME (percentual de acerto, nota TRI, nível N1-N8 e padrão
+// de desempenho), então só importamos e exibimos, sem recalcular nada.
+// Dado sensível e específico do CEITEC — nunca compartilhado entre contas,
+// sempre filtrado por professorId.
+enum PadraoDesempenhoSispai {
+  abaixo_do_basico
+  basico
+  adequado
+  avancado
+}
+
+model ResultadoSispaiMatematica {
+  id               String   @id @default(cuid())
+  turma            String
+  nomeAluno        String
+  rodada           Int // 1 = SISPAI I, 2 = SISPAI II
+  percentualAcerto Decimal  @db.Decimal(5, 2)
+  triScore         Decimal? @db.Decimal(6, 2)
+  nivel            String? // N1 a N8 — só disponível quando a rodada trouxe o detalhamento por habilidade
+  padrao           PadraoDesempenhoSispai? // idem
+  criadoEm         DateTime @default(now())
+
+  professorId String
+  professor   Usuario @relation(fields: [professorId], references: [id])
+
+  @@map("resultados_sispai_matematica")
+}
+
+// Mapeamento de Habilidades — Visão da Turma: percentual de acerto do 9º
+// ano inteiro (todas as turmas somadas) em cada habilidade cobrada na
+// prova, organizada nas 5 Trilhas da BNCC de Matemática. Usado pra saber
+// em quais habilidades focar o reforço, não é por aluno individual.
+model HabilidadeSispaiMatematica {
+  id                    String  @id @default(cuid())
+  trilha                String // ex: "Números e Operações"
+  codigoSaeb            String // ex: "9N2.3"
+  codigoBncc            String // ex: "EF09MA05"
+  descricaoHabilidade   String
+  percentualAcertoGeral Decimal @db.Decimal(5, 2)
+  rodada                Int
+
+  professorId String
+  professor   Usuario @relation(fields: [professorId], references: [id])
+
+  @@map("habilidades_sispai_matematica")
 }

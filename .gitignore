@@ -40,3 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# material com dado pessoal real de aluno (nome, nota, prova) — nunca vai
+# pro git, mesmo em repositório privado. Fica só local/VPS.
+/_docs/spaece/
+/scripts/dados-sispai-matematica.json

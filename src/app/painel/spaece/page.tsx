@@ -45,6 +45,15 @@ export default async function PaginaSpaece() {
             descritores reais de Língua Portuguesa e Matemática do 9º ano, gerados com IA em
             minutos e travados no eixo/descritores certos.
           </p>
+
+          {sessao.papel === "ita_owner" && (
+            <Link
+              href="/painel/spaece/resultados-matematica"
+              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-white/15 px-4 py-2 text-sm font-bold backdrop-blur transition hover:bg-white/25"
+            >
+              📉 Resultados SISPAI — Matemática (CEITEC)
+            </Link>
+          )}
         </div>
 
         {DISCIPLINAS_SPAECE.map((disciplina) => (
