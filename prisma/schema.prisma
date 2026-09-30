@@ -159,6 +159,8 @@ model Usuario {
   progressoCursoBncc  ProgressoCursoBnccComputacao?
   resultadosSispaiMatematica    ResultadoSispaiMatematica[]
   habilidadesSispaiMatematica   HabilidadeSispaiMatematica[]
+  diagnosticosBimestraisMatematica DiagnosticoBimestralMatematica[]
+  habilidadesBimestraisMatematica  HabilidadeBimestralMatematica[]
 
   @@map("usuarios")
 }
@@ -950,4 +952,50 @@ model HabilidadeSispaiMatematica {
   professor   Usuario @relation(fields: [professorId], references: [id])
 
   @@map("habilidades_sispai_matematica")
+}
+
+// Diagnóstico Bimestral de Matemática — avaliação da SME aplicada a cada
+// bimestre (diferente do SISPAI, que é só 2x/ano), quebrada nas 8
+// habilidades básicas (4 operações + 4 situações-problema). Fonte:
+// painel "Foco Pedagógico" do dashboard oficial. Cada linha é um ponto de
+// atenção específico de um aluno num bimestre — não recalculamos nada, só
+// importamos o que a SME já classificou como "avançou pouco"/"não avançou".
+enum SituacaoHabilidadeBimestral {
+  avancou_pouco
+  nao_avancou
+}
+
+model DiagnosticoBimestralMatematica {
+  id         String                      @id @default(cuid())
+  ano        Int
+  bimestre   Int // 1 a 4
+  turma      String
+  nomeAluno  String
+  matricula  String
+  habilidade String // ex: "RESOLVER OPERAÇÃO DE SUBTRAÇÃO"
+  situacao   SituacaoHabilidadeBimestral
+  criadoEm   DateTime                    @default(now())
+
+  professorId String
+  professor   Usuario @relation(fields: [professorId], references: [id])
+
+  @@map("diagnosticos_bimestrais_matematica")
+}
+
+// Percentual de acerto do 9º ano inteiro em cada uma das 8 habilidades do
+// Diagnóstico Bimestral — visão agregada por bimestre, pra ver a evolução
+// trimestre a trimestre (diferente da HabilidadeSispaiMatematica, que é por
+// rodada semestral).
+model HabilidadeBimestralMatematica {
+  id                    String  @id @default(cuid())
+  ano                   Int
+  bimestre              Int
+  habilidade            String
+  percentualAcertoGeral Decimal @db.Decimal(5, 2)
+  totalAlunos           Int
+
+  professorId String
+  professor   Usuario @relation(fields: [professorId], references: [id])
+
+  @@map("habilidades_bimestrais_matematica")
 }

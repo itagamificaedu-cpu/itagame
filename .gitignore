@@ -45,3 +45,4 @@ next-env.d.ts
 # pro git, mesmo em repositório privado. Fica só local/VPS.
 /_docs/spaece/
 /scripts/dados-sispai-matematica.json
+/scripts/dados-diagnostico-bimestral-matematica.json

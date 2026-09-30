@@ -31,3 +31,27 @@ export function corPercentualHabilidade(percentual: number): string {
   if (percentual < 100) return "bg-blue-100 text-blue-700";
   return "bg-green-100 text-green-700";
 }
+
+// Diagnóstico Bimestral de Matemática — aplicado a cada bimestre (diferente
+// do SISPAI, que é semestral), quebrado nas 8 habilidades básicas. A SME já
+// classifica cada aluno como "avançou pouco" (fraco) ou "não avançou"
+// (crítico) em cada habilidade que ele não domina.
+export const SITUACAO_BIMESTRAL_LABEL: Record<string, string> = {
+  avancou_pouco: "Avançou pouco",
+  nao_avancou: "Não avançou",
+};
+
+export const SITUACAO_BIMESTRAL_COR: Record<string, string> = {
+  avancou_pouco: "bg-orange-100 text-orange-700",
+  nao_avancou: "bg-red-100 text-red-700",
+};
+
+// Abrevia os nomes longos das 8 habilidades do Diagnóstico Bimestral pra
+// caber em tabela.
+export function abreviarHabilidadeBimestral(habilidade: string): string {
+  return habilidade
+    .replace("RESOLVER OPERAÇÃO DE ", "Operação: ")
+    .replace("RESOLVER SITUAÇÃO-PROBLEMA DE ", "Situação-problema: ")
+    .toLowerCase()
+    .replace(/^./, (c) => c.toUpperCase());
+}
