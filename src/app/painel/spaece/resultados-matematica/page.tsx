@@ -15,7 +15,7 @@ export default async function ResultadosSispaiMatematica() {
     notFound();
   }
 
-  const [resultados, habilidades, diagnosticosBimestrais, habilidadesBimestrais] = await Promise.all([
+  const [resultados, habilidades, diagnosticosBimestrais, habilidadesBimestrais, respostasSimulado] = await Promise.all([
     prisma.resultadoSispaiMatematica.findMany({ where: { professorId: sessao.userId } }),
     prisma.habilidadeSispaiMatematica.findMany({
       where: { professorId: sessao.userId },
@@ -25,6 +25,33 @@ export default async function ResultadosSispaiMatematica() {
     prisma.habilidadeBimestralMatematica.findMany({
       where: { professorId: sessao.userId },
       orderBy: [{ habilidade: "asc" }, { bimestre: "asc" }],
+    }),
+    // Desempenho nos Simulados/Cabo de Guerra SPAECE jogados dentro do
+    // próprio ItaGame (Sala Ao Vivo) — dado NOSSO, não oficial da SME. Só
+    // conta resposta de participante ligado a um Aluno de verdade (turma +
+    // PIN), nunca apelido livre, pra poder agregar por aluno de fato.
+    prisma.respostaParticipante.findMany({
+      where: {
+        participante: {
+          alunoId: { not: null },
+          sala: {
+            atividade: {
+              professorId: sessao.userId,
+              disciplina: "Matemática",
+              tema: { contains: "(SPAECE)" },
+            },
+          },
+        },
+      },
+      select: {
+        correta: true,
+        participante: {
+          select: {
+            alunoId: true,
+            aluno: { select: { nome: true, turma: { select: { nome: true } } } },
+          },
+        },
+      },
     }),
   ]);
 
@@ -126,6 +153,28 @@ export default async function ResultadosSispaiMatematica() {
   const turmasComCriticos = Array.from(new Set(diagnosticosBimestrais.map((d) => d.turma))).sort();
   const bimestreDiagnostico = diagnosticosBimestrais[0]?.bimestre ?? null;
 
+  // Agrega as respostas do Simulado/Cabo de Guerra por aluno (soma de todas
+  // as salas já jogadas) pra virar um percentual de acerto por aluno.
+  type DesempenhoSimuladoAluno = { alunoId: string; nome: string; turma: string; corretas: number; total: number };
+  const desempenhoSimuladoMapa = new Map<string, DesempenhoSimuladoAluno>();
+  for (const r of respostasSimulado) {
+    const alunoId = r.participante.alunoId;
+    if (!alunoId || !r.participante.aluno) continue;
+    const item = desempenhoSimuladoMapa.get(alunoId) ?? {
+      alunoId,
+      nome: r.participante.aluno.nome,
+      turma: r.participante.aluno.turma.nome,
+      corretas: 0,
+      total: 0,
+    };
+    item.total += 1;
+    if (r.correta) item.corretas += 1;
+    desempenhoSimuladoMapa.set(alunoId, item);
+  }
+  const desempenhoSimulados = Array.from(desempenhoSimuladoMapa.values())
+    .map((a) => ({ ...a, percentual: (a.corretas / a.total) * 100 }))
+    .sort((a, b) => a.percentual - b.percentual);
+
   return (
     <main className="min-h-screen bg-neutral-50 px-6 py-10">
       <div className="mx-auto max-w-5xl">
@@ -175,6 +224,7 @@ export default async function ResultadosSispaiMatematica() {
           criticosPorAluno={criticosPorAluno}
           turmasComCriticos={turmasComCriticos}
           bimestreDiagnostico={bimestreDiagnostico}
+          desempenhoSimulados={desempenhoSimulados}
         />
       </div>
     </main>

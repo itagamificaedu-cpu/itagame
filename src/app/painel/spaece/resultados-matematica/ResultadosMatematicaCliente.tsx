@@ -6,6 +6,7 @@ import {
   PADRAO_SISPAI_COR,
   notaBaixaSispai,
   corPercentualHabilidade,
+  classificarPadraoPorPercentual,
   SITUACAO_BIMESTRAL_COR,
   abreviarHabilidadeBimestral,
 } from "@/lib/sispai";
@@ -24,6 +25,14 @@ type HabilidadesPorRodada = { rodada: number; itens: HabilidadeItem[] };
 type EvolucaoBimestral = { habilidade: string; porBimestre: { bimestre: number; percentualAcertoGeral: number }[] };
 type PontoAtencao = { habilidade: string; situacao: string };
 type AlunoCritico = { nome: string; matricula: string; turma: string; pontos: PontoAtencao[]; peso: number };
+type DesempenhoSimuladoAluno = {
+  alunoId: string;
+  nome: string;
+  turma: string;
+  corretas: number;
+  total: number;
+  percentual: number;
+};
 
 const PADRAO_ORDEM = ["abaixo_do_basico", "basico", "adequado", "avancado"] as const;
 const PADRAO_COR_BARRA: Record<string, string> = {
@@ -52,6 +61,7 @@ export function ResultadosMatematicaCliente({
   criticosPorAluno,
   turmasComCriticos,
   bimestreDiagnostico,
+  desempenhoSimulados,
 }: {
   alunos: AlunoCombinado[];
   turmas: string[];
@@ -60,6 +70,7 @@ export function ResultadosMatematicaCliente({
   criticosPorAluno: AlunoCritico[];
   turmasComCriticos: string[];
   bimestreDiagnostico: number | null;
+  desempenhoSimulados: DesempenhoSimuladoAluno[];
 }) {
   const [turmaSelecionada, setTurmaSelecionada] = useState("todas");
 
@@ -159,6 +170,55 @@ export function ResultadosMatematicaCliente({
           )}
         </div>
       </div>
+
+      {desempenhoSimulados.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-lg font-extrabold text-neutral-900">
+            📱 Desempenho nos Simulados SPAECE (ItaGame)
+          </h2>
+          <p className="mt-1 text-xs text-neutral-500">
+            Baseado nas respostas reais dos alunos jogando o Simulado/Cabo de Guerra dentro do ItaGame — é
+            prática interna, calculada aqui pelo percentual de acerto. <strong>Não é a classificação oficial
+            do SISPAI</strong> (essa vem pronta da SME, com TRI de verdade); os selos de nível abaixo são só
+            uma estimativa visual, pra comparar sem confundir com o padrão oficial da tabela mais abaixo.
+          </p>
+          <div className="mt-3 overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-neutral-50 text-xs uppercase text-neutral-500">
+                <tr>
+                  <th className="px-4 py-2">Aluno</th>
+                  <th className="px-4 py-2">Turma</th>
+                  <th className="px-4 py-2 text-right">Acertos</th>
+                  <th className="px-4 py-2 text-right">% de acerto</th>
+                  <th className="px-4 py-2 text-right">Nível estimado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {desempenhoSimulados.map((a) => {
+                  const padrao = classificarPadraoPorPercentual(a.percentual);
+                  return (
+                    <tr key={a.alunoId} className="border-t border-neutral-100">
+                      <td className="px-4 py-2 font-medium text-neutral-800">{a.nome}</td>
+                      <td className="px-4 py-2 text-neutral-600">{a.turma}</td>
+                      <td className="px-4 py-2 text-right text-neutral-600">
+                        {a.corretas}/{a.total}
+                      </td>
+                      <td className="px-4 py-2 text-right font-semibold text-neutral-700">
+                        {a.percentual.toFixed(0)}%
+                      </td>
+                      <td className="px-4 py-2 text-right">
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${PADRAO_SISPAI_COR[padrao]}`}>
+                          {PADRAO_SISPAI_LABEL[padrao]}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {habilidadesPorRodada.some((r) => r.itens.length > 0) && (
         <div className="mt-8 space-y-6">

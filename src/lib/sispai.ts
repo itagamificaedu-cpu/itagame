@@ -25,6 +25,19 @@ export function notaBaixaSispai(padrao: string | null): boolean {
   return padrao === "abaixo_do_basico" || padrao === "basico";
 }
 
+// Classificação ESTIMADA (não oficial) pra uso só nos Simulados/Cabo de
+// Guerra internos do ItaGame — reaproveita os mesmos 4 rótulos/cores do
+// padrão oficial do SISPAI só por familiaridade visual, mas calculada aqui
+// por uma faixa simples de percentual de acerto, nunca pela TRI real. Ver
+// aviso explícito na tela de resultados pra não confundir com o padrão
+// oficial calculado pela SME.
+export function classificarPadraoPorPercentual(percentual: number): string {
+  if (percentual < 25) return "abaixo_do_basico";
+  if (percentual < 50) return "basico";
+  if (percentual < 75) return "adequado";
+  return "avancado";
+}
+
 export function corPercentualHabilidade(percentual: number): string {
   if (percentual === 0) return "bg-red-100 text-red-700";
   if (percentual < 60) return "bg-orange-100 text-orange-700";
