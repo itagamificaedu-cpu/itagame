@@ -87,7 +87,7 @@ function CaixaContagem({ cor, valor, rotulo, detalhe }: { cor: CorCelula; valor:
 // Gráfico de colunas por aluno (0–100%), cada coluna com a cor do nível.
 function GraficoColunasAlunos({ alunos }: { alunos: DesempenhoSimuladoAluno[] }) {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto pt-3">
       <div className="relative flex h-56 min-w-full items-end gap-3 border-b border-l border-neutral-300 pl-9 pr-2">
         {[100, 90, 70, 50].map((marca) => (
           <div
