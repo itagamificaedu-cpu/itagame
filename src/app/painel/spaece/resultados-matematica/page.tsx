@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
-import { VERDE_SPAECE, VERDE_SPAECE_ESCURO } from "@/lib/spaece";
+import { VERDE_SPAECE } from "@/lib/spaece";
 import { ResultadosMatematicaCliente } from "./ResultadosMatematicaCliente";
 
 // Dado sensível e específico do CEITEC (nomes reais de alunos) — só o dono
@@ -176,43 +176,57 @@ export default async function ResultadosSispaiMatematica() {
     .sort((a, b) => a.percentual - b.percentual);
 
   return (
-    <main className="min-h-screen bg-neutral-50 px-6 py-10">
+    <main className="min-h-screen bg-white px-4 py-8 sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <Link href="/painel/spaece" className="text-sm font-semibold" style={{ color: VERDE_SPAECE }}>
+        <Link href="/painel/spaece" className="text-sm font-semibold text-[#0d6efd] hover:underline">
           ← Voltar ao SPAECE 9º ano
         </Link>
 
-        <div
-          className="mt-4 overflow-hidden rounded-2xl p-8 text-white shadow-sm"
-          style={{ backgroundImage: `linear-gradient(to bottom right, ${VERDE_SPAECE}, ${VERDE_SPAECE_ESCURO})` }}
-        >
-          <p className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-bold backdrop-blur">
-            🟩 SISPAI · Sistema Permanente de Avaliação de Itapipoca
+        {/* Cabeçalho no mesmo formato do "Relatório de Desempenho Consolidado" do SISPAI */}
+        <div className="mt-6 border-b-2 border-[#0d6efd] pb-4 text-center">
+          <h1 className="text-2xl font-bold text-[#0d6efd] sm:text-3xl">Relatório de Desempenho Consolidado</h1>
+          <p className="mt-2 text-xs uppercase tracking-widest text-neutral-500">
+            Prefeitura Municipal de Itapipoca - SME - SISPAI
           </p>
-          <h1 className="mt-3 text-2xl font-extrabold sm:text-3xl">Resultados de Matemática — 9º ano</h1>
-          <p className="mt-2 max-w-2xl text-sm text-white/85">
-            Avaliação diagnóstica da SME de Itapipoca (Lei Municipal nº 059/2023), aplicada em duas rodadas.
-            Cada aluno já vem com o percentual de acerto, a nota na escala TRI e o padrão de desempenho
-            calculados pela Secretaria de Educação, então esta tela só organiza e exibe esses dados.
+          <p className="mt-1 text-xs uppercase tracking-widest text-neutral-500">
+            Coordenadoria de Avaliação e Desempenho Acadêmico
           </p>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="rounded-xl border border-neutral-200 bg-white p-4 text-center">
+        <div className="mt-6 rounded-md border border-neutral-200 bg-neutral-50 p-4 text-sm text-neutral-800">
+          <p className="border-b border-neutral-200 pb-2">
+            <strong>Escola:</strong>{" "}
+            <span className="font-bold text-[#0d6efd]">CENTRO EDUCAÇÃO INTEGRAL, INOVAÇÃO E TECNOLOGIA - CEITEC</span>
+          </p>
+          <div className="mt-2 flex flex-wrap gap-x-8 gap-y-1">
+            <p>
+              <strong>Ano / Avaliação:</strong> 2026 | SISPAI I e II
+            </p>
+            <p>
+              <strong>Série:</strong> 9º ANO
+            </p>
+            <p>
+              <strong>Disciplina:</strong> Matemática
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="rounded-md border border-neutral-200 p-3 text-center">
             <p className="text-2xl font-extrabold text-neutral-900">{classificados.length}</p>
-            <p className="text-xs text-neutral-500">alunos classificados</p>
+            <p className="text-xs font-bold uppercase text-neutral-500">Alunos classificados</p>
           </div>
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-center">
-            <p className="text-2xl font-extrabold text-red-700">{notaBaixa.length}</p>
-            <p className="text-xs text-red-700">nota baixa agora (Rodada 2, Básico/Abaixo)</p>
+          <div className="rounded-md p-3 text-center" style={{ backgroundColor: "#ff0000", color: "#ffffff" }}>
+            <p className="text-2xl font-extrabold">{notaBaixa.length}</p>
+            <p className="text-xs font-bold uppercase">Básico ou abaixo</p>
           </div>
-          <div className="rounded-xl border border-neutral-200 bg-white p-4 text-center">
-            <p className="text-2xl font-extrabold text-neutral-900">{mediaRodada1.toFixed(1)}%</p>
-            <p className="text-xs text-neutral-500">média de acerto — Rodada 1</p>
+          <div className="rounded-md border border-neutral-200 p-3 text-center">
+            <p className="text-2xl font-extrabold text-neutral-900">{mediaRodada1.toFixed(1).replace(".", ",")}%</p>
+            <p className="text-xs font-bold uppercase text-neutral-500">Média de acerto — SISPAI I</p>
           </div>
-          <div className="rounded-xl border border-neutral-200 bg-white p-4 text-center">
-            <p className="text-2xl font-extrabold text-neutral-900">{mediaRodada2.toFixed(1)}%</p>
-            <p className="text-xs text-neutral-500">média de acerto — Rodada 2</p>
+          <div className="rounded-md border border-neutral-200 p-3 text-center">
+            <p className="text-2xl font-extrabold text-neutral-900">{mediaRodada2.toFixed(1).replace(".", ",")}%</p>
+            <p className="text-xs font-bold uppercase text-neutral-500">Média de acerto — SISPAI II</p>
           </div>
         </div>
 
