@@ -9,7 +9,8 @@ import { gerarTrilhaComIa, type QuestaoTrilhaGerada } from "@/lib/ia";
 import { EsquemaCriarTrilha, EstadoCriarTrilha } from "@/lib/definicoes";
 import type { EixoBnccComputacao } from "@/lib/bnccComputacao";
 import { modeloBnccPorId } from "@/lib/modelosBnccComputacao";
-import type { EixoSpaece9Ano } from "@/lib/spaece";
+import { eixoSpaecePorChave, type EixoSpaece9Ano } from "@/lib/spaece";
+import { questoesDoEixoMatematica } from "@/lib/bancoQuestoesSpaeceMatematica";
 
 // Ações de professor pra Trilhas Educativas: criar, publicar e excluir. A
 // criação de missão fica em missoes.ts (arquivo separado pra não ficar
@@ -301,6 +302,122 @@ export async function criarTrilhaAPartirDeModelo(input: {
   revalidatePath("/painel/bncc-computacao");
   revalidatePath("/painel/spaece");
   return { ok: true, trilhaId };
+}
+
+function embaralhar<T>(itens: T[]): T[] {
+  const copia = [...itens];
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia;
+}
+
+export type ResultadoCriarConteudoSpaece =
+  | { ok: true; trilhaId: string; simuladoId: string; caboDeGuerraId: string }
+  | { ok: false; erro: string };
+
+// Mesma ideia de criarTrilhaAPartirDeModelo (conteúdo pronto, escrito à mão,
+// sem chamar IA nenhuma), só que pra Matemática do SPAECE: usa o banco de
+// 125 questões originais de bancoQuestoesSpaeceMatematica.ts (escritas
+// seguindo os 25 descritores oficiais do Caderno de Itens, nunca copiadas
+// dele) pra montar de uma vez as 3 atividades do eixo escolhido — Trilha
+// (1 missão por descritor), Simulado (quiz com todas as questões do eixo) e
+// Cabo de Guerra (mesmo banco). Existe porque gerarAtividadeSpaece/
+// gerarTrilhaIa dependem da IA, que fica fora do ar sem crédito na
+// Anthropic — isso aqui funciona sempre, de graça.
+export async function criarConteudoSpaeceMatematicaDoBanco(input: {
+  eixoChave: EixoSpaece9Ano;
+  turmaId: string;
+}): Promise<ResultadoCriarConteudoSpaece> {
+  const sessao = await exigirAssinaturaAtiva();
+
+  const eixo = eixoSpaecePorChave(input.eixoChave);
+  if (!eixo || eixo.disciplina !== "matematica") {
+    return { ok: false, erro: "Esse eixo não é de Matemática." };
+  }
+
+  const turma = await prisma.turma.findUnique({ where: { id: input.turmaId } });
+  if (!turma || turma.professorId !== sessao.userId) {
+    return { ok: false, erro: "Turma não encontrada." };
+  }
+
+  const porDescritor = questoesDoEixoMatematica(input.eixoChave);
+  if (porDescritor.length === 0 || porDescritor.some((d) => d.questoes.length === 0)) {
+    return { ok: false, erro: "O banco de questões desse eixo ainda está incompleto." };
+  }
+
+  const todasQuestoes = porDescritor.flatMap((d) => d.questoes);
+  const codigosDescritores = eixo.descritores.map((d) => d.codigo);
+
+  const montarAtividade = (tipo: "quiz" | "cabo_de_guerra", sufixoTema: string) => ({
+    tipo,
+    disciplina: "Matemática",
+    serie: "9º ano",
+    tema: `${eixo.nome} (SPAECE) — ${sufixoTema}`,
+    conteudoGerado: {
+      titulo: `${sufixoTema} — ${eixo.nome}`,
+      questoes: todasQuestoes.map((questao) => ({
+        enunciado: questao.enunciado,
+        alternativas: embaralhar(questao.alternativas),
+      })),
+    } as Prisma.InputJsonValue,
+    gabarito: todasQuestoes.map((questao) => ({
+      enunciado: questao.enunciado,
+      respostaCorreta: questao.respostaCorreta,
+      explicacao: questao.explicacao ?? null,
+    })) as Prisma.InputJsonValue,
+    competenciasBncc: codigosDescritores,
+    professorId: sessao.userId,
+  });
+
+  const resultado = await prisma.$transaction(async (tx) => {
+    const trilha = await tx.trilha.create({
+      data: {
+        nome: `${eixo.nome} — Banco Oficial SPAECE`,
+        descricao: `Trilha com uma missão por descritor de "${eixo.nome}" — questões originais escritas seguindo a Matriz de Referência do SPAECE (9º ano), uma por descritor oficial.`,
+        tipoEstrutura: "linear",
+        nivel: "9º ano",
+        competenciasBncc: codigosDescritores,
+        eixoSpaece: input.eixoChave,
+        turmaId: input.turmaId,
+        professorId: sessao.userId,
+      },
+    });
+
+    let preRequisitoId: string | undefined;
+    for (const [indice, { descritor, questoes }] of porDescritor.entries()) {
+      const criada = await tx.missao.create({
+        data: {
+          titulo: `${descritor.codigo} — ${descritor.habilidade}`,
+          descricao: `Quiz com 5 questões originais sobre: ${descritor.habilidade}`,
+          xpRecompensa: 20,
+          criadaPorId: sessao.userId,
+          trilhaId: trilha.id,
+          ordem: indice,
+          tipoAtividade: "quiz",
+          preRequisitoId,
+          checkpointTipo: "quiz_automatico",
+          quizPerguntas: questoes.map((questao) => ({
+            enunciado: questao.enunciado,
+            alternativas: embaralhar(questao.alternativas),
+            respostaCorreta: questao.respostaCorreta,
+          })) as Prisma.InputJsonValue,
+        },
+      });
+      preRequisitoId = criada.id;
+    }
+
+    const simulado = await tx.atividade.create({ data: montarAtividade("quiz", "Simulado") });
+    const caboDeGuerra = await tx.atividade.create({ data: montarAtividade("cabo_de_guerra", "Cabo de Guerra") });
+
+    return { trilhaId: trilha.id, simuladoId: simulado.id, caboDeGuerraId: caboDeGuerra.id };
+  });
+
+  revalidatePath("/painel/spaece");
+  revalidatePath("/painel/trilhas");
+  revalidatePath("/painel/atividades");
+  return { ok: true, ...resultado };
 }
 
 export async function excluirTrilha(trilhaId: string) {

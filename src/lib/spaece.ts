@@ -160,13 +160,22 @@ export const DISCIPLINAS_SPAECE: {
             codigo: "D13",
             habilidade: "Reconhecer diferentes representações de um mesmo número racional, em situação-problema.",
           },
+          {
+            codigo: "D15",
+            habilidade:
+              "Resolver problema utilizando a adição ou subtração com números racionais representados na forma fracionária (mesmo denominador ou denominadores diferentes) ou na forma decimal.",
+          },
           { codigo: "D17", habilidade: "Resolver situação problema utilizando porcentagem." },
           {
             codigo: "D18",
             habilidade:
               "Resolver situação problema envolvendo a variação proporcional entre grandezas direta ou inversamente proporcionais.",
           },
+          { codigo: "D19", habilidade: "Resolver problema envolvendo juros simples." },
+          { codigo: "D21", habilidade: "Efetuar cálculos com números irracionais, utilizando suas propriedades." },
+          { codigo: "D24", habilidade: "Fatorar e simplificar expressões algébricas." },
           { codigo: "D25", habilidade: "Resolver situação problema que envolva equações de 1º grau." },
+          { codigo: "D26", habilidade: "Resolver situação problema envolvendo equação do 2º grau." },
           { codigo: "D27", habilidade: "Resolver situação problema envolvendo sistema de equações do 1º grau." },
         ],
       },
@@ -179,6 +188,12 @@ export const DISCIPLINAS_SPAECE: {
             codigo: "D48",
             habilidade:
               "Identificar e classificar figuras planas: quadrado, retângulo, triângulo e círculo, destacando algumas de suas características (número de lados e tipo de ângulos).",
+          },
+          { codigo: "D49", habilidade: "Resolver problemas envolvendo semelhança de figuras planas." },
+          {
+            codigo: "D50",
+            habilidade:
+              "Resolver situação problema aplicando o Teorema de Pitágoras ou as demais relações métricas no triângulo retângulo.",
           },
           {
             codigo: "D51",

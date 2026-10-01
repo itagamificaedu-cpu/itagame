@@ -3,6 +3,7 @@ import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { DISCIPLINAS_SPAECE, VERDE_SPAECE, VERDE_SPAECE_ESCURO } from "@/lib/spaece";
 import { BotaoGerarAtividadeSpaece } from "@/components/spaece/BotaoGerarAtividadeSpaece";
+import { BotaoCriarConteudoSpaeceMatematica } from "@/components/spaece/BotaoCriarConteudoSpaeceMatematica";
 
 // Hub da aba "SPAECE 9º ano" — mesmo padrão da "BNCC Computação": reaproveita
 // o motor de Trilhas já existente, organizado pelos eixos oficiais da
@@ -12,11 +13,18 @@ import { BotaoGerarAtividadeSpaece } from "@/components/spaece/BotaoGerarAtivida
 export default async function PaginaSpaece() {
   const sessao = await exigirAssinaturaAtiva();
 
-  const trilhas = await prisma.trilha.findMany({
-    where: { professorId: sessao.userId, eixoSpaece: { not: null } },
-    include: { turma: true, _count: { select: { missoes: true } } },
-    orderBy: { criadaEm: "desc" },
-  });
+  const [trilhas, turmas] = await Promise.all([
+    prisma.trilha.findMany({
+      where: { professorId: sessao.userId, eixoSpaece: { not: null } },
+      include: { turma: true, _count: { select: { missoes: true } } },
+      orderBy: { criadaEm: "desc" },
+    }),
+    prisma.turma.findMany({
+      where: { professorId: sessao.userId },
+      orderBy: { nome: "asc" },
+      select: { id: true, nome: true },
+    }),
+  ]);
 
   const trilhasPorEixo = new Map(
     DISCIPLINAS_SPAECE.flatMap((d) => d.eixos).map((eixo) => [
@@ -114,6 +122,15 @@ export default async function PaginaSpaece() {
                       cor={VERDE_SPAECE}
                       corEscura={VERDE_SPAECE_ESCURO}
                     />
+
+                    {disciplina.chave === "matematica" && (
+                      <BotaoCriarConteudoSpaeceMatematica
+                        eixoChave={eixo.chave}
+                        turmas={turmas}
+                        cor={VERDE_SPAECE}
+                        corEscura={VERDE_SPAECE_ESCURO}
+                      />
+                    )}
 
                     {trilhasDoEixo.length > 0 && (
                       <ul className="mt-4 space-y-2 border-t border-neutral-100 pt-4">

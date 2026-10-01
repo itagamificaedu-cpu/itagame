@@ -1,0 +1,1307 @@
+{
+  "D07": [
+    {
+      "enunciado": "Uma professora tem 36 lápis e 48 borrachas e quer montar kits idênticos, com a maior quantidade de kits possível, sem sobrar nenhum material. Quantos kits ela consegue montar?",
+      "alternativas": [
+        "6",
+        "8",
+        "12",
+        "24"
+      ],
+      "respostaCorreta": "12",
+      "explicacao": "MDC(36,48) = 12."
+    },
+    {
+      "enunciado": "Três amigas vão à academia: Ana a cada 4 dias, Bia a cada 6 dias e Carla a cada 8 dias. Se as três foram juntas hoje, daqui a quantos dias elas coincidirão de novo?",
+      "alternativas": [
+        "12",
+        "16",
+        "20",
+        "24"
+      ],
+      "respostaCorreta": "24",
+      "explicacao": "MMC(4,6,8) = 24."
+    },
+    {
+      "enunciado": "Um estudante tem duas fitas de 54 cm e 72 cm e quer cortá-las em pedaços iguais, do maior tamanho possível, sem sobras. Qual deve ser o comprimento de cada pedaço?",
+      "alternativas": [
+        "6 cm",
+        "9 cm",
+        "18 cm",
+        "27 cm"
+      ],
+      "respostaCorreta": "18 cm",
+      "explicacao": "MDC(54,72) = 18."
+    },
+    {
+      "enunciado": "Dois faróis piscam: um a cada 15 segundos, outro a cada 20 segundos. Se piscaram juntos às 10h, depois de quantos segundos eles voltarão a piscar juntos?",
+      "alternativas": [
+        "35",
+        "40",
+        "60",
+        "300"
+      ],
+      "respostaCorreta": "60",
+      "explicacao": "MMC(15,20) = 60."
+    },
+    {
+      "enunciado": "Numa gincana, 60 meninos e 84 meninas serão divididos em equipes idênticas (mesmo número de meninos e mesmo número de meninas em cada equipe), formando o maior número possível de equipes. Quantas equipes serão formadas?",
+      "alternativas": [
+        "6",
+        "8",
+        "12",
+        "24"
+      ],
+      "respostaCorreta": "12",
+      "explicacao": "MDC(60,84) = 12."
+    }
+  ],
+  "D08": [
+    {
+      "enunciado": "Numa reta numérica, o ponto A está em -8 e o ponto B está em +12. Entre eles há 4 marcações igualmente espaçadas, dividindo o segmento em 5 partes iguais. Qual valor está na 2ª marcação a partir de A?",
+      "alternativas": [
+        "-4",
+        "0",
+        "4",
+        "8"
+      ],
+      "respostaCorreta": "0"
+    },
+    {
+      "enunciado": "Um termômetro marcava -15°C às 6h da manhã. Às 14h a temperatura havia subido 22°C em relação à medição das 6h. Qual era a temperatura às 14h?",
+      "alternativas": [
+        "-7°C",
+        "7°C",
+        "37°C",
+        "-37°C"
+      ],
+      "respostaCorreta": "7°C"
+    },
+    {
+      "enunciado": "Qual destes números está mais próximo de -5 na reta numérica: -10, -8, -1 ou 2?",
+      "alternativas": [
+        "-10",
+        "-8",
+        "-1",
+        "2"
+      ],
+      "respostaCorreta": "-8"
+    },
+    {
+      "enunciado": "Em um prédio, o térreo corresponde ao 0. O estacionamento fica no andar -2 e o último andar é o +12. Pedro está exatamente no andar que fica na metade do caminho entre o estacionamento e o último andar. Em que andar ele está?",
+      "alternativas": [
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "respostaCorreta": "5"
+    },
+    {
+      "enunciado": "Qual das sequências abaixo coloca os números -7, 4, -12, 0 e -1 em ordem crescente?",
+      "alternativas": [
+        "-12, -7, -1, 0, 4",
+        "-7, -12, -1, 0, 4",
+        "-12, -1, -7, 0, 4",
+        "4, 0, -1, -7, -12"
+      ],
+      "respostaCorreta": "-12, -7, -1, 0, 4"
+    }
+  ],
+  "D10": [
+    {
+      "enunciado": "Uma empresa teve prejuízo de R$ 3.200,00 em janeiro e lucro de R$ 5.750,00 em fevereiro. Qual foi o resultado do bimestre?",
+      "alternativas": [
+        "R$ 2.550,00 de lucro",
+        "R$ 2.550,00 de prejuízo",
+        "R$ 8.950,00 de lucro",
+        "R$ 8.950,00 de prejuízo"
+      ],
+      "respostaCorreta": "R$ 2.550,00 de lucro"
+    },
+    {
+      "enunciado": "A temperatura em uma cidade era de -4°C e caiu mais 7°C durante a madrugada. Qual é a temperatura atual?",
+      "alternativas": [
+        "-11°C",
+        "-3°C",
+        "3°C",
+        "11°C"
+      ],
+      "respostaCorreta": "-11°C"
+    },
+    {
+      "enunciado": "Um submarino está a -180 m de profundidade e sobe 65 m. A que profundidade ele está agora?",
+      "alternativas": [
+        "-245 m",
+        "-115 m",
+        "115 m",
+        "245 m"
+      ],
+      "respostaCorreta": "-115 m"
+    },
+    {
+      "enunciado": "Multiplicando -8 por -6 e somando -15 ao resultado, qual é o valor final?",
+      "alternativas": [
+        "-63",
+        "-33",
+        "33",
+        "63"
+      ],
+      "respostaCorreta": "33"
+    },
+    {
+      "enunciado": "Uma conta bancária tinha saldo de -R$ 450,00. O cliente fez um depósito de R$ 300,00 e depois um saque de R$ 120,00. Qual é o saldo final da conta?",
+      "alternativas": [
+        "-R$ 270,00",
+        "R$ 270,00",
+        "-R$ 630,00",
+        "R$ 630,00"
+      ],
+      "respostaCorreta": "-R$ 270,00"
+    }
+  ],
+  "D11": [
+    {
+      "enunciado": "Entre quais dois números inteiros está localizado o número 7/2?",
+      "alternativas": [
+        "2 e 3",
+        "3 e 4",
+        "4 e 5",
+        "6 e 7"
+      ],
+      "respostaCorreta": "3 e 4"
+    },
+    {
+      "enunciado": "Numa reta numérica, o ponto M representa 0,25 e o ponto N representa 1,25. Qual fração está localizada exatamente na metade do caminho entre M e N?",
+      "alternativas": [
+        "1/2",
+        "3/4",
+        "1",
+        "5/4"
+      ],
+      "respostaCorreta": "3/4"
+    },
+    {
+      "enunciado": "Qual destes números racionais é o maior: -3/4, -0,8, -1/2 ou -0,9?",
+      "alternativas": [
+        "-3/4",
+        "-0,8",
+        "-1/2",
+        "-0,9"
+      ],
+      "respostaCorreta": "-1/2"
+    },
+    {
+      "enunciado": "Em uma régua, o ponto P está na marca 2,4 cm e o ponto Q está na marca 3,6 cm. Qual número decimal representa o ponto exatamente no meio entre P e Q?",
+      "alternativas": [
+        "2,8",
+        "3,0",
+        "3,2",
+        "3,4"
+      ],
+      "respostaCorreta": "3,0"
+    },
+    {
+      "enunciado": "Qual das alternativas coloca os números 0,6; -1/4; 7/10 e -0,1 em ordem crescente?",
+      "alternativas": [
+        "-1/4, -0,1, 0,6, 7/10",
+        "-0,1, -1/4, 0,6, 7/10",
+        "0,6, 7/10, -1/4, -0,1",
+        "7/10, 0,6, -0,1, -1/4"
+      ],
+      "respostaCorreta": "-1/4, -0,1, 0,6, 7/10"
+    }
+  ],
+  "D12": [
+    {
+      "enunciado": "Pedro percorreu 2/3 de um percurso de 9 km na segunda-feira e 1/4 do mesmo percurso na terça-feira. Quantos km ele percorreu nos dois dias juntos?",
+      "alternativas": [
+        "6,75 km",
+        "7,5 km",
+        "8,25 km",
+        "9 km"
+      ],
+      "respostaCorreta": "8,25 km"
+    },
+    {
+      "enunciado": "Numa fazenda, 2/5 da produção de leite do dia é vendida para um laticínio e os 3/5 restantes são usados para fazer queijo. Se a produção total do dia foi de 450 litros, quantos litros foram usados para fazer queijo?",
+      "alternativas": [
+        "180",
+        "225",
+        "270",
+        "300"
+      ],
+      "respostaCorreta": "270"
+    },
+    {
+      "enunciado": "Multiplique 2,5 por 0,4 e some 1,25 ao resultado. Qual é o valor final?",
+      "alternativas": [
+        "1,65",
+        "2,25",
+        "2,65",
+        "3,75"
+      ],
+      "respostaCorreta": "2,25"
+    },
+    {
+      "enunciado": "Um tanque tem capacidade de 1/2 m³. Se nele já há 3/8 m³ de água, quanto falta para enchê-lo completamente?",
+      "alternativas": [
+        "1/8 m³",
+        "1/4 m³",
+        "3/8 m³",
+        "5/8 m³"
+      ],
+      "respostaCorreta": "1/8 m³"
+    },
+    {
+      "enunciado": "Dividindo 7,2 por 0,6, qual é o resultado?",
+      "alternativas": [
+        "1,2",
+        "10",
+        "12",
+        "120"
+      ],
+      "respostaCorreta": "12"
+    }
+  ],
+  "D13": [
+    {
+      "enunciado": "Qual das alternativas representa o mesmo número que 0,75?",
+      "alternativas": [
+        "3/5",
+        "7/5",
+        "3/4",
+        "5/4"
+      ],
+      "respostaCorreta": "3/4"
+    },
+    {
+      "enunciado": "A fração 9/4 é equivalente a qual número misto?",
+      "alternativas": [
+        "1 e 1/4",
+        "2 e 1/4",
+        "2 e 1/2",
+        "4 e 1/9"
+      ],
+      "respostaCorreta": "2 e 1/4"
+    },
+    {
+      "enunciado": "O número decimal 0,125 pode ser escrito como qual fração irredutível?",
+      "alternativas": [
+        "1/8",
+        "1/4",
+        "1/5",
+        "5/8"
+      ],
+      "respostaCorreta": "1/8"
+    },
+    {
+      "enunciado": "Qual destas representações NÃO é equivalente a 50%?",
+      "alternativas": [
+        "1/2",
+        "0,5",
+        "2/4",
+        "5/4"
+      ],
+      "respostaCorreta": "5/4"
+    },
+    {
+      "enunciado": "A dízima periódica 0,333... corresponde a qual fração?",
+      "alternativas": [
+        "1/3",
+        "3/10",
+        "1/30",
+        "3/100"
+      ],
+      "respostaCorreta": "1/3"
+    }
+  ],
+  "D15": [
+    {
+      "enunciado": "Qual é o resultado de 1/4 + 1/4?",
+      "alternativas": [
+        "1/8",
+        "1/2",
+        "2/8",
+        "1"
+      ],
+      "respostaCorreta": "1/2"
+    },
+    {
+      "enunciado": "Qual é o resultado de 2/3 + 1/6?",
+      "alternativas": [
+        "3/9",
+        "1/2",
+        "5/6",
+        "3/6"
+      ],
+      "respostaCorreta": "5/6"
+    },
+    {
+      "enunciado": "Qual é o resultado de 3,45 + 2,8?",
+      "alternativas": [
+        "5,53",
+        "6,25",
+        "6,73",
+        "5,73"
+      ],
+      "respostaCorreta": "6,25"
+    },
+    {
+      "enunciado": "Qual é o resultado de 5/8 - 1/4?",
+      "alternativas": [
+        "4/4",
+        "1/2",
+        "3/8",
+        "4/8"
+      ],
+      "respostaCorreta": "3/8"
+    },
+    {
+      "enunciado": "Qual é o resultado de 7,6 - 3,25?",
+      "alternativas": [
+        "4,35",
+        "4,45",
+        "3,35",
+        "4,75"
+      ],
+      "respostaCorreta": "4,35"
+    }
+  ],
+  "D17": [
+    {
+      "enunciado": "Um produto de R$ 80,00 recebeu um desconto de 15%. Qual é o preço final?",
+      "alternativas": [
+        "R$ 65,00",
+        "R$ 68,00",
+        "R$ 72,00",
+        "R$ 76,00"
+      ],
+      "respostaCorreta": "R$ 68,00"
+    },
+    {
+      "enunciado": "Em uma turma de 40 alunos, 25% faltaram à aula. Quantos alunos estiveram presentes?",
+      "alternativas": [
+        "10",
+        "25",
+        "30",
+        "35"
+      ],
+      "respostaCorreta": "30"
+    },
+    {
+      "enunciado": "Um produto custava R$ 120,00 e teve um aumento de 20%. Qual é o novo preço?",
+      "alternativas": [
+        "R$ 132,00",
+        "R$ 140,00",
+        "R$ 144,00",
+        "R$ 150,00"
+      ],
+      "respostaCorreta": "R$ 144,00"
+    },
+    {
+      "enunciado": "Em um evento com 250 pessoas, 90 são homens. Qual é a porcentagem de mulheres no evento?",
+      "alternativas": [
+        "36%",
+        "48%",
+        "56%",
+        "64%"
+      ],
+      "respostaCorreta": "64%"
+    },
+    {
+      "enunciado": "Um produto de R$ 300,00 recebeu desconto e passou a custar R$ 255,00. Qual foi a porcentagem de desconto aplicada?",
+      "alternativas": [
+        "10%",
+        "15%",
+        "20%",
+        "25%"
+      ],
+      "respostaCorreta": "15%"
+    }
+  ],
+  "D18": [
+    {
+      "enunciado": "Se 4 litros de tinta cobrem 36 m² de parede, quantos litros são necessários para cobrir 63 m² (mesma proporção)?",
+      "alternativas": [
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "respostaCorreta": "7"
+    },
+    {
+      "enunciado": "Seis operários constroem um muro em 15 dias. Trabalhando no mesmo ritmo, quantos dias levariam 9 operários para construir o mesmo muro?",
+      "alternativas": [
+        "8",
+        "9",
+        "10",
+        "12"
+      ],
+      "respostaCorreta": "10"
+    },
+    {
+      "enunciado": "Uma receita para 5 pessoas usa 600 g de carne. Quantos gramas são necessários para preparar a mesma receita para 8 pessoas?",
+      "alternativas": [
+        "800 g",
+        "900 g",
+        "960 g",
+        "1.000 g"
+      ],
+      "respostaCorreta": "960 g"
+    },
+    {
+      "enunciado": "Um reservatório é esvaziado por 3 bombas idênticas em 12 horas. Usando 4 bombas iguais às anteriores, em quantas horas o mesmo reservatório seria esvaziado?",
+      "alternativas": [
+        "8 horas",
+        "9 horas",
+        "10 horas",
+        "16 horas"
+      ],
+      "respostaCorreta": "9 horas"
+    },
+    {
+      "enunciado": "Um carro percorre 240 km com 20 litros de combustível. Mantendo o mesmo consumo, quantos litros serão necessários para percorrer 420 km?",
+      "alternativas": [
+        "30",
+        "32",
+        "35",
+        "40"
+      ],
+      "respostaCorreta": "35"
+    }
+  ],
+  "D19": [
+    {
+      "enunciado": "Um capital de R$ 2.000,00 é aplicado a juros simples de 3% ao mês, durante 4 meses. Qual é o valor dos juros?",
+      "alternativas": [
+        "R$ 60,00",
+        "R$ 120,00",
+        "R$ 180,00",
+        "R$ 240,00"
+      ],
+      "respostaCorreta": "R$ 240,00"
+    },
+    {
+      "enunciado": "Pedro pegou um empréstimo de R$ 1.500,00 a juros simples de 2% ao mês. Após 6 meses, quanto ele deve pagar no total (capital + juros)?",
+      "alternativas": [
+        "R$ 1.620,00",
+        "R$ 1.680,00",
+        "R$ 1.700,00",
+        "R$ 1.740,00"
+      ],
+      "respostaCorreta": "R$ 1.680,00"
+    },
+    {
+      "enunciado": "Um valor de R$ 800,00 rendeu R$ 96,00 de juros simples em 3 meses. Qual foi a taxa de juros mensal aplicada?",
+      "alternativas": [
+        "2%",
+        "3%",
+        "4%",
+        "6%"
+      ],
+      "respostaCorreta": "4%"
+    },
+    {
+      "enunciado": "Qual é o montante (capital + juros simples) de um capital de R$ 3.000,00 aplicado a 1,5% ao mês durante 10 meses?",
+      "alternativas": [
+        "R$ 3.300,00",
+        "R$ 3.375,00",
+        "R$ 3.450,00",
+        "R$ 3.600,00"
+      ],
+      "respostaCorreta": "R$ 3.450,00"
+    },
+    {
+      "enunciado": "Em quantos meses um capital de R$ 1.000,00 aplicado a 5% ao mês (juros simples) rende R$ 250,00 de juros?",
+      "alternativas": [
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "respostaCorreta": "5"
+    }
+  ],
+  "D21": [
+    {
+      "enunciado": "Qual é o valor aproximado de √50?",
+      "alternativas": [
+        "5,0",
+        "6,5",
+        "7,1",
+        "8,0"
+      ],
+      "respostaCorreta": "7,1"
+    },
+    {
+      "enunciado": "Qual é a forma simplificada de √72?",
+      "alternativas": [
+        "6√2",
+        "8√3",
+        "9√2",
+        "12√2"
+      ],
+      "respostaCorreta": "6√2"
+    },
+    {
+      "enunciado": "Qual é o resultado de √18 + √8, na forma simplificada?",
+      "alternativas": [
+        "3√2",
+        "5√2",
+        "26",
+        "√26"
+      ],
+      "respostaCorreta": "5√2"
+    },
+    {
+      "enunciado": "Entre quais números inteiros consecutivos está √40?",
+      "alternativas": [
+        "5 e 6",
+        "6 e 7",
+        "7 e 8",
+        "4 e 5"
+      ],
+      "respostaCorreta": "6 e 7"
+    },
+    {
+      "enunciado": "Qual é o valor de (√5)² - (√3)²?",
+      "alternativas": [
+        "2",
+        "√2",
+        "8",
+        "√8"
+      ],
+      "respostaCorreta": "2"
+    }
+  ],
+  "D24": [
+    {
+      "enunciado": "Qual é a forma fatorada da expressão 6x + 9?",
+      "alternativas": [
+        "3(2x + 3)",
+        "2(3x + 9)",
+        "6(x + 9)",
+        "3(3x + 6)"
+      ],
+      "respostaCorreta": "3(2x + 3)"
+    },
+    {
+      "enunciado": "Simplifique a expressão (4x²)/(2x), sabendo que x ≠ 0.",
+      "alternativas": [
+        "2x",
+        "2x²",
+        "4x",
+        "x/2"
+      ],
+      "respostaCorreta": "2x"
+    },
+    {
+      "enunciado": "Qual é a forma fatorada de x² - 9?",
+      "alternativas": [
+        "(x - 3)(x + 3)",
+        "(x - 9)(x + 1)",
+        "(x - 3)²",
+        "(x + 9)(x - 1)"
+      ],
+      "respostaCorreta": "(x - 3)(x + 3)"
+    },
+    {
+      "enunciado": "Qual é a forma fatorada de 10xy - 15x?",
+      "alternativas": [
+        "5(2xy - 3x)",
+        "5x(2y - 3)",
+        "5y(2x - 3)",
+        "10x(y - 1,5)"
+      ],
+      "respostaCorreta": "5x(2y - 3)"
+    },
+    {
+      "enunciado": "Simplifique a expressão (x² + 2x)/x, sabendo que x ≠ 0.",
+      "alternativas": [
+        "x + 2",
+        "2x",
+        "x²",
+        "2x + 1"
+      ],
+      "respostaCorreta": "x + 2"
+    }
+  ],
+  "D25": [
+    {
+      "enunciado": "A soma de um número com o triplo desse mesmo número é 48. Qual é esse número?",
+      "alternativas": [
+        "10",
+        "12",
+        "16",
+        "24"
+      ],
+      "respostaCorreta": "12"
+    },
+    {
+      "enunciado": "Mariana tem o dobro da idade do seu irmão. Juntas, as duas idades somam 36 anos. Qual é a idade do irmão?",
+      "alternativas": [
+        "10",
+        "12",
+        "18",
+        "24"
+      ],
+      "respostaCorreta": "12"
+    },
+    {
+      "enunciado": "Um número menos 7 é igual a 15. Qual é esse número?",
+      "alternativas": [
+        "8",
+        "15",
+        "22",
+        "28"
+      ],
+      "respostaCorreta": "22"
+    },
+    {
+      "enunciado": "Numa loja, uma calça custa R$ 15,00 a mais que uma camisa. Juntas, as duas peças custam R$ 85,00. Qual é o preço da camisa?",
+      "alternativas": [
+        "R$ 30,00",
+        "R$ 35,00",
+        "R$ 40,00",
+        "R$ 50,00"
+      ],
+      "respostaCorreta": "R$ 35,00"
+    },
+    {
+      "enunciado": "Resolva a equação: 3x + 5 = 2x + 12.",
+      "alternativas": [
+        "5",
+        "7",
+        "9",
+        "17"
+      ],
+      "respostaCorreta": "7"
+    }
+  ],
+  "D26": [
+    {
+      "enunciado": "Resolvendo x² - 9 = 0, quais são as raízes da equação?",
+      "alternativas": [
+        "x = 3 e x = -3",
+        "x = 9 e x = -9",
+        "x = 3 (única raiz)",
+        "x = 0 e x = 9"
+      ],
+      "respostaCorreta": "x = 3 e x = -3"
+    },
+    {
+      "enunciado": "A área de um terreno quadrado é 144 m². Qual é a medida do lado desse terreno?",
+      "alternativas": [
+        "10 m",
+        "12 m",
+        "14 m",
+        "72 m"
+      ],
+      "respostaCorreta": "12 m"
+    },
+    {
+      "enunciado": "Resolva a equação x² - 5x + 6 = 0.",
+      "alternativas": [
+        "x = 1 e x = 6",
+        "x = 2 e x = 3",
+        "x = -2 e x = -3",
+        "x = 5 e x = 6"
+      ],
+      "respostaCorreta": "x = 2 e x = 3"
+    },
+    {
+      "enunciado": "O quadrado de um número, menos 4 vezes esse mesmo número, é igual a 0. Quais são os dois possíveis valores desse número?",
+      "alternativas": [
+        "0 e 4",
+        "2 e 2",
+        "-4 e 0",
+        "4 e 4"
+      ],
+      "respostaCorreta": "0 e 4"
+    },
+    {
+      "enunciado": "Resolva a equação x² = 64.",
+      "alternativas": [
+        "x = 8 (única raiz)",
+        "x = 32",
+        "x = 8 e x = -8",
+        "x = 16"
+      ],
+      "respostaCorreta": "x = 8 e x = -8"
+    }
+  ],
+  "D27": [
+    {
+      "enunciado": "A soma de dois números é 20 e a diferença entre eles é 4. Quais são esses números?",
+      "alternativas": [
+        "12 e 8",
+        "14 e 6",
+        "10 e 10",
+        "16 e 4"
+      ],
+      "respostaCorreta": "12 e 8"
+    },
+    {
+      "enunciado": "Num cinema, o ingresso de adulto custa R$ 20,00 e o de criança custa R$ 10,00. Foram vendidos 50 ingressos ao todo, totalizando R$ 740,00. Quantos ingressos de adulto foram vendidos?",
+      "alternativas": [
+        "20",
+        "22",
+        "24",
+        "26"
+      ],
+      "respostaCorreta": "24"
+    },
+    {
+      "enunciado": "Resolva o sistema de equações: x + y = 15 e 2x - y = 0.",
+      "alternativas": [
+        "x = 5, y = 10",
+        "x = 10, y = 5",
+        "x = 3, y = 12",
+        "x = 7, y = 8"
+      ],
+      "respostaCorreta": "x = 5, y = 10"
+    },
+    {
+      "enunciado": "Dois números têm soma 30. O maior número é o dobro do menor mais 3. Quais são esses números?",
+      "alternativas": [
+        "20 e 10",
+        "21 e 9",
+        "18 e 12",
+        "24 e 6"
+      ],
+      "respostaCorreta": "21 e 9"
+    },
+    {
+      "enunciado": "Em uma lanchonete, 3 sanduíches e 2 sucos custam R$ 38,00, e 1 sanduíche e 2 sucos custam R$ 18,00. Qual é o preço de um sanduíche?",
+      "alternativas": [
+        "R$ 8,00",
+        "R$ 9,00",
+        "R$ 10,00",
+        "R$ 12,00"
+      ],
+      "respostaCorreta": "R$ 10,00"
+    }
+  ],
+  "D48": [
+    {
+      "enunciado": "Uma figura plana tem 4 lados iguais entre si e 4 ângulos retos. Que figura é essa?",
+      "alternativas": [
+        "Retângulo",
+        "Quadrado",
+        "Losango",
+        "Triângulo"
+      ],
+      "respostaCorreta": "Quadrado"
+    },
+    {
+      "enunciado": "Uma figura plana tem 3 lados e a soma de seus ângulos internos é 180°. Que figura é essa?",
+      "alternativas": [
+        "Quadrado",
+        "Círculo",
+        "Triângulo",
+        "Retângulo"
+      ],
+      "respostaCorreta": "Triângulo"
+    },
+    {
+      "enunciado": "Qual figura plana não tem lados nem vértices, sendo formada por todos os pontos equidistantes de um centro?",
+      "alternativas": [
+        "Quadrado",
+        "Círculo",
+        "Triângulo",
+        "Retângulo"
+      ],
+      "respostaCorreta": "Círculo"
+    },
+    {
+      "enunciado": "Uma figura plana tem 4 lados, com os lados opostos iguais e paralelos entre si, e 4 ângulos retos, mas nem todos os lados são iguais. Que figura é essa?",
+      "alternativas": [
+        "Quadrado",
+        "Retângulo",
+        "Triângulo",
+        "Círculo"
+      ],
+      "respostaCorreta": "Retângulo"
+    },
+    {
+      "enunciado": "Um triângulo tem seus três ângulos internos medindo 60° cada um. Que tipo de ângulo esse triângulo possui, em todos os seus vértices?",
+      "alternativas": [
+        "Todos obtusos",
+        "Todos agudos",
+        "Um reto e dois agudos",
+        "Um obtuso e dois agudos"
+      ],
+      "respostaCorreta": "Todos agudos"
+    }
+  ],
+  "D49": [
+    {
+      "enunciado": "Dois triângulos são semelhantes, com razão de semelhança igual a 3. Se o menor tem um lado de 4 cm, qual é a medida do lado correspondente no triângulo maior?",
+      "alternativas": [
+        "7 cm",
+        "8 cm",
+        "12 cm",
+        "16 cm"
+      ],
+      "respostaCorreta": "12 cm"
+    },
+    {
+      "enunciado": "Dois retângulos são semelhantes. O menor tem base 5 cm e altura 3 cm. O maior tem base 15 cm. Qual é a altura do retângulo maior?",
+      "alternativas": [
+        "6 cm",
+        "9 cm",
+        "12 cm",
+        "15 cm"
+      ],
+      "respostaCorreta": "9 cm"
+    },
+    {
+      "enunciado": "A sombra de um poste de 6 m de altura mede 4 m no chão. No mesmo instante, a sombra de uma pessoa mede 1 m. Usando semelhança de triângulos, qual é a altura dessa pessoa?",
+      "alternativas": [
+        "1,2 m",
+        "1,5 m",
+        "1,8 m",
+        "2,0 m"
+      ],
+      "respostaCorreta": "1,5 m"
+    },
+    {
+      "enunciado": "Dois polígonos são semelhantes, com razão de semelhança 2/5 do menor para o maior. Se um lado do polígono maior mede 20 cm, qual é a medida do lado correspondente no menor?",
+      "alternativas": [
+        "6 cm",
+        "8 cm",
+        "10 cm",
+        "12 cm"
+      ],
+      "respostaCorreta": "8 cm"
+    },
+    {
+      "enunciado": "Um mapa está na escala 1:50.000. Uma distância de 3 cm medida no mapa corresponde a quantos metros na realidade?",
+      "alternativas": [
+        "150 m",
+        "500 m",
+        "1.500 m",
+        "15.000 m"
+      ],
+      "respostaCorreta": "1.500 m"
+    }
+  ],
+  "D50": [
+    {
+      "enunciado": "Um triângulo retângulo tem catetos medindo 6 cm e 8 cm. Qual é a medida da hipotenusa?",
+      "alternativas": [
+        "9 cm",
+        "10 cm",
+        "12 cm",
+        "14 cm"
+      ],
+      "respostaCorreta": "10 cm"
+    },
+    {
+      "enunciado": "Uma escada de 13 m está apoiada em uma parede, com a base a 5 m de distância da parede. A que altura da parede a escada alcança?",
+      "alternativas": [
+        "10 m",
+        "11 m",
+        "12 m",
+        "13 m"
+      ],
+      "respostaCorreta": "12 m"
+    },
+    {
+      "enunciado": "Um terreno retangular mede 9 m de largura por 12 m de comprimento. Qual é a medida da diagonal desse terreno?",
+      "alternativas": [
+        "13 m",
+        "15 m",
+        "18 m",
+        "21 m"
+      ],
+      "respostaCorreta": "15 m"
+    },
+    {
+      "enunciado": "Em um triângulo retângulo, a hipotenusa mede 25 cm e um dos catetos mede 15 cm. Qual é a medida do outro cateto?",
+      "alternativas": [
+        "10 cm",
+        "15 cm",
+        "20 cm",
+        "24 cm"
+      ],
+      "respostaCorreta": "20 cm"
+    },
+    {
+      "enunciado": "Dois postes verticais, de 9 m e 3 m de altura, estão com as bases separadas por uma distância de 8 m. Qual é o comprimento do cabo esticado que liga o topo dos dois postes?",
+      "alternativas": [
+        "8 m",
+        "9 m",
+        "10 m",
+        "12 m"
+      ],
+      "respostaCorreta": "10 m"
+    }
+  ],
+  "D51": [
+    {
+      "enunciado": "Qual é a soma dos ângulos internos de um hexágono (polígono de 6 lados)?",
+      "alternativas": [
+        "540°",
+        "630°",
+        "720°",
+        "900°"
+      ],
+      "respostaCorreta": "720°"
+    },
+    {
+      "enunciado": "Quantas diagonais tem um pentágono (polígono de 5 lados)?",
+      "alternativas": [
+        "3",
+        "5",
+        "10",
+        "15"
+      ],
+      "respostaCorreta": "5"
+    },
+    {
+      "enunciado": "Qual é a medida de cada ângulo interno de um hexágono regular?",
+      "alternativas": [
+        "100°",
+        "108°",
+        "120°",
+        "135°"
+      ],
+      "respostaCorreta": "120°"
+    },
+    {
+      "enunciado": "Quantas diagonais tem um octógono (polígono de 8 lados)?",
+      "alternativas": [
+        "16",
+        "20",
+        "24",
+        "28"
+      ],
+      "respostaCorreta": "20"
+    },
+    {
+      "enunciado": "A soma dos ângulos internos de um polígono é 1080°. Quantos lados tem esse polígono?",
+      "alternativas": [
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "respostaCorreta": "8"
+    }
+  ],
+  "D52": [
+    {
+      "enunciado": "A planificação de um cubo é formada por quantos quadrados?",
+      "alternativas": [
+        "4",
+        "5",
+        "6",
+        "8"
+      ],
+      "respostaCorreta": "6"
+    },
+    {
+      "enunciado": "Qual sólido geométrico tem como planificação um retângulo (a superfície lateral enrolada) mais dois círculos nas bases?",
+      "alternativas": [
+        "Cone",
+        "Cilindro",
+        "Esfera",
+        "Prisma"
+      ],
+      "respostaCorreta": "Cilindro"
+    },
+    {
+      "enunciado": "A planificação de uma pirâmide de base quadrada é formada por 1 quadrado e quantos triângulos?",
+      "alternativas": [
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "respostaCorreta": "4"
+    },
+    {
+      "enunciado": "Qual destes sólidos NÃO pode ser planificado em polígonos de faces totalmente planas?",
+      "alternativas": [
+        "Cubo",
+        "Esfera",
+        "Pirâmide",
+        "Prisma"
+      ],
+      "respostaCorreta": "Esfera"
+    },
+    {
+      "enunciado": "A planificação de um prisma de base triangular é formada por 2 triângulos e quantos retângulos?",
+      "alternativas": [
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "respostaCorreta": "3"
+    }
+  ],
+  "D65": [
+    {
+      "enunciado": "Um terreno retangular tem 18 m de comprimento e 12 m de largura. Qual é o seu perímetro?",
+      "alternativas": [
+        "30 m",
+        "54 m",
+        "60 m",
+        "216 m"
+      ],
+      "respostaCorreta": "60 m"
+    },
+    {
+      "enunciado": "Um jardim quadrado tem lado medindo 7,5 m. Qual é o perímetro desse jardim?",
+      "alternativas": [
+        "15 m",
+        "22,5 m",
+        "30 m",
+        "56,25 m"
+      ],
+      "respostaCorreta": "30 m"
+    },
+    {
+      "enunciado": "Um triângulo tem lados medindo 5 cm, 7 cm e 9 cm. Qual é o seu perímetro?",
+      "alternativas": [
+        "16 cm",
+        "21 cm",
+        "24 cm",
+        "35 cm"
+      ],
+      "respostaCorreta": "21 cm"
+    },
+    {
+      "enunciado": "Uma pista de corrida circular tem raio de 14 m. Qual é, aproximadamente, o seu perímetro (use π ≈ 22/7)?",
+      "alternativas": [
+        "44 m",
+        "66 m",
+        "88 m",
+        "176 m"
+      ],
+      "respostaCorreta": "88 m"
+    },
+    {
+      "enunciado": "Um campo retangular tem 40 m de comprimento e perímetro total de 140 m. Qual é a largura desse campo?",
+      "alternativas": [
+        "20 m",
+        "25 m",
+        "30 m",
+        "35 m"
+      ],
+      "respostaCorreta": "30 m"
+    }
+  ],
+  "D67": [
+    {
+      "enunciado": "Uma sala retangular tem 5 m de largura e 6 m de comprimento. Qual é a área dessa sala?",
+      "alternativas": [
+        "11 m²",
+        "22 m²",
+        "30 m²",
+        "60 m²"
+      ],
+      "respostaCorreta": "30 m²"
+    },
+    {
+      "enunciado": "Um terreno triangular tem base de 12 m e altura de 8 m. Qual é a área desse terreno?",
+      "alternativas": [
+        "20 m²",
+        "48 m²",
+        "96 m²",
+        "48 m"
+      ],
+      "respostaCorreta": "48 m²"
+    },
+    {
+      "enunciado": "Uma praça circular tem raio de 7 m. Qual é, aproximadamente, a sua área (use π ≈ 22/7)?",
+      "alternativas": [
+        "44 m²",
+        "98 m²",
+        "154 m²",
+        "308 m²"
+      ],
+      "respostaCorreta": "154 m²"
+    },
+    {
+      "enunciado": "Um painel quadrado tem lado medindo 2,5 m. Qual é a área desse painel?",
+      "alternativas": [
+        "5 m²",
+        "6,25 m²",
+        "10 m²",
+        "12,5 m²"
+      ],
+      "respostaCorreta": "6,25 m²"
+    },
+    {
+      "enunciado": "Um trapézio tem base maior de 10 cm, base menor de 6 cm e altura de 4 cm. Qual é a área desse trapézio?",
+      "alternativas": [
+        "24 cm²",
+        "32 cm²",
+        "40 cm²",
+        "64 cm²"
+      ],
+      "respostaCorreta": "32 cm²"
+    }
+  ],
+  "D69": [
+    {
+      "enunciado": "Uma caixa em formato de cubo tem aresta medindo 4 cm. Qual é o volume dessa caixa?",
+      "alternativas": [
+        "16 cm³",
+        "48 cm³",
+        "64 cm³",
+        "96 cm³"
+      ],
+      "respostaCorreta": "64 cm³"
+    },
+    {
+      "enunciado": "Um aquário retangular tem 50 cm de comprimento, 30 cm de largura e 40 cm de altura. Qual é o volume desse aquário?",
+      "alternativas": [
+        "40.000 cm³",
+        "50.000 cm³",
+        "60.000 cm³",
+        "120.000 cm³"
+      ],
+      "respostaCorreta": "60.000 cm³"
+    },
+    {
+      "enunciado": "Uma caixa d'água cilíndrica tem raio de 1 m e altura de 2 m. Qual é, aproximadamente, o seu volume (use π ≈ 3,14)?",
+      "alternativas": [
+        "3,14 m³",
+        "6,28 m³",
+        "9,42 m³",
+        "12,56 m³"
+      ],
+      "respostaCorreta": "6,28 m³"
+    },
+    {
+      "enunciado": "Um depósito em formato de paralelepípedo retângulo tem volume de 240 m³. Se a base mede 8 m por 6 m, qual é a altura desse depósito?",
+      "alternativas": [
+        "4 m",
+        "5 m",
+        "6 m",
+        "8 m"
+      ],
+      "respostaCorreta": "5 m"
+    },
+    {
+      "enunciado": "Um cubo tem volume de 125 cm³. Qual é a medida da aresta desse cubo?",
+      "alternativas": [
+        "4 cm",
+        "5 cm",
+        "25 cm",
+        "41,6 cm"
+      ],
+      "respostaCorreta": "5 cm"
+    }
+  ],
+  "D75": [
+    {
+      "enunciado": "Uma tabela mostra as vendas de uma loja em 4 dias: segunda-feira 20 unidades, terça-feira 35, quarta-feira 15 e quinta-feira 30. Qual foi o total vendido nesses 4 dias?",
+      "alternativas": [
+        "80",
+        "90",
+        "100",
+        "110"
+      ],
+      "respostaCorreta": "100"
+    },
+    {
+      "enunciado": "Um gráfico de barras mostra o número de alunos aprovados por turma: Turma A com 25, Turma B com 18 e Turma C com 22. Qual turma teve o menor número de aprovados?",
+      "alternativas": [
+        "Turma A",
+        "Turma B",
+        "Turma C",
+        "Todas empataram"
+      ],
+      "respostaCorreta": "Turma B"
+    },
+    {
+      "enunciado": "Uma tabela de temperaturas de um dia mostra: manhã 18°C, tarde 29°C e noite 21°C. Qual foi a diferença entre a temperatura mais alta e a mais baixa do dia?",
+      "alternativas": [
+        "8°C",
+        "9°C",
+        "11°C",
+        "13°C"
+      ],
+      "respostaCorreta": "11°C"
+    },
+    {
+      "enunciado": "Um gráfico mostra a quantidade de livros lidos por 5 alunos no mês: 3, 5, 2, 5 e 5 livros. Qual é o número de livros que mais se repete entre os alunos (a moda)?",
+      "alternativas": [
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "respostaCorreta": "5"
+    },
+    {
+      "enunciado": "Uma tabela mostra o volume de chuva (em mm) em 4 meses: janeiro 120, fevereiro 80, março 150 e abril 50. Em quantos mm o mês de maior chuva superou o mês de menor chuva?",
+      "alternativas": [
+        "70",
+        "90",
+        "100",
+        "120"
+      ],
+      "respostaCorreta": "100"
+    }
+  ],
+  "D77": [
+    {
+      "enunciado": "As notas de um aluno em 4 provas foram 7, 8, 6 e 9. Qual é a média aritmética dessas notas?",
+      "alternativas": [
+        "7,0",
+        "7,5",
+        "8,0",
+        "8,5"
+      ],
+      "respostaCorreta": "7,5"
+    },
+    {
+      "enunciado": "A média de idade de 5 amigos é 14 anos. Se um sexto amigo, de 20 anos, entrar no grupo, qual será a nova média de idade?",
+      "alternativas": [
+        "14 anos",
+        "15 anos",
+        "16 anos",
+        "17 anos"
+      ],
+      "respostaCorreta": "15 anos"
+    },
+    {
+      "enunciado": "Um time de basquete fez 45, 52 e 58 pontos em 3 jogos. Quantos pontos ele precisa fazer no 4º jogo para que a média dos 4 jogos seja exatamente 50?",
+      "alternativas": [
+        "40",
+        "45",
+        "50",
+        "55"
+      ],
+      "respostaCorreta": "45"
+    },
+    {
+      "enunciado": "As alturas de 4 alunos são 1,60 m, 1,55 m, 1,70 m e 1,75 m. Qual é a média dessas alturas?",
+      "alternativas": [
+        "1,60 m",
+        "1,62 m",
+        "1,65 m",
+        "1,70 m"
+      ],
+      "respostaCorreta": "1,65 m"
+    },
+    {
+      "enunciado": "As vendas diárias médias de uma loja foram de R$ 800,00, considerando os 30 dias do mês. Qual foi o total vendido no mês?",
+      "alternativas": [
+        "R$ 8.000,00",
+        "R$ 16.000,00",
+        "R$ 24.000,00",
+        "R$ 30.000,00"
+      ],
+      "respostaCorreta": "R$ 24.000,00"
+    }
+  ]
+}
