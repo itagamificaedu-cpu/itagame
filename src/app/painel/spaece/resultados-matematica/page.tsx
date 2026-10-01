@@ -185,12 +185,7 @@ export default async function ResultadosSispaiMatematica() {
         {/* Cabeçalho no mesmo formato do "Relatório de Desempenho Consolidado" do SISPAI */}
         <div className="mt-6 border-b-2 border-[#0d6efd] pb-4 text-center">
           <h1 className="text-2xl font-bold text-[#0d6efd] sm:text-3xl">Relatório de Desempenho Consolidado</h1>
-          <p className="mt-2 text-xs uppercase tracking-widest text-neutral-500">
-            Prefeitura Municipal de Itapipoca - SME - SISPAI
-          </p>
-          <p className="mt-1 text-xs uppercase tracking-widest text-neutral-500">
-            Coordenadoria de Avaliação e Desempenho Acadêmico
-          </p>
+          <p className="mt-2 text-xs uppercase tracking-widest text-neutral-500">CEITEC</p>
         </div>
 
         <div className="mt-6 rounded-md border border-neutral-200 bg-neutral-50 p-4 text-sm text-neutral-800">
