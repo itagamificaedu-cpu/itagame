@@ -10,9 +10,11 @@
 // Uso: node scripts/importarSispaiMatematica.js
 
 const { PrismaClient } = require("@prisma/client");
+const { PrismaPg } = require("@prisma/adapter-pg");
 const dados = require("./dados-sispai-matematica.json");
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg(process.env.DATABASE_URL);
+const prisma = new PrismaClient({ adapter });
 
 const EMAIL_PROFESSOR = "itagamificaedu@gmail.com";
 

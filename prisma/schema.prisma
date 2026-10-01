@@ -34,6 +34,7 @@ enum TipoAtividade {
   associar_colunas
   apresentacao
   cabo_de_guerra
+  quem_erra_cai
 }
 
 enum StatusSala {
@@ -352,6 +353,12 @@ model ParticipanteSala {
   apelido     String
   pontuacao   Int      @default(0)
   entrouEm    DateTime @default(now())
+
+  // Só usado pelo tipo "quem_erra_cai": vira true na primeira resposta
+  // errada, e a partir daí o aluno fica só assistindo (não responde mais
+  // perguntas, mas continua na sala pra ver o resto do jogo). Ignorado
+  // pelos outros 7 tipos de atividade.
+  eliminado   Boolean  @default(false)
 
   salaId      String
   sala        SalaAoVivo @relation(fields: [salaId], references: [id])

@@ -243,8 +243,12 @@ export async function responder(
 
   const participante = await prisma.participanteSala.findUnique({
     where: { id: sessaoParticipante.participanteId },
-    select: { alunoId: true },
+    select: { alunoId: true, eliminado: true },
   });
+
+  if (sala.atividade.tipo === "quem_erra_cai" && participante?.eliminado) {
+    return { ok: false, mensagem: "Você já caiu nesta partida. Só assistindo até o fim." };
+  }
 
   const gabarito = sala.atividade.gabarito as { respostaCorreta: string }[];
   const respostaCorreta = gabarito[sala.perguntaAtual]?.respostaCorreta;
@@ -266,6 +270,7 @@ export async function responder(
   const pontosGanhos = correta ? 100 - penalidade : 0;
 
   const concedeXp = correta && Boolean(participante?.alunoId);
+  const eliminaAgora = sala.atividade.tipo === "quem_erra_cai" && !correta;
 
   try {
     await prisma.$transaction([
@@ -279,7 +284,10 @@ export async function responder(
       }),
       prisma.participanteSala.update({
         where: { id: sessaoParticipante.participanteId },
-        data: { pontuacao: { increment: pontosGanhos } },
+        data: {
+          pontuacao: { increment: pontosGanhos },
+          ...(eliminaAgora ? { eliminado: true } : {}),
+        },
       }),
       ...(concedeXp
         ? [

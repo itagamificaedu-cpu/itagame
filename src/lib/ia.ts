@@ -14,7 +14,8 @@ export type TipoAtividadeGeravel =
   | "caca_palavras"
   | "associar_colunas"
   | "apresentacao"
-  | "cabo_de_guerra";
+  | "cabo_de_guerra"
+  | "quem_erra_cai";
 
 type QuestaoGerada = {
   enunciado: string;
@@ -81,6 +82,8 @@ const ORIENTACAO_POR_TIPO: Record<TipoAtividadeGeravel, string> = {
     "Cada questão representa um slide: em 'enunciado' escreva o título do slide e em 'alternativas' liste de 3 a 5 tópicos/bullet points do slide (frases curtas). Em 'respostaCorreta' escreva uma breve fala sugerida para o professor apresentar esse slide.",
   cabo_de_guerra:
     "Cada questão deve ser de múltipla escolha, curta e rápida de responder (é um jogo de velocidade entre duas equipes, o aluno precisa decidir na hora): exatamente 4 alternativas curtas (poucas palavras cada) e apenas uma correta, sem enunciados longos ou pegadinhas complexas.",
+  quem_erra_cai:
+    "Cada questão deve ser de múltipla escolha, com exatamente 4 alternativas plausíveis e apenas uma correta — é um jogo de eliminação (quem erra sai da partida), então evite pegadinhas ambíguas ou questões com mais de uma resposta defensável.",
 };
 
 function montarInstrucao(params: {

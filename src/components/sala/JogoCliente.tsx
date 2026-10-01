@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { responder } from "@/app/actions/salas";
 
-type Participante = { id: string; apelido: string; pontuacao: number };
+type Participante = { id: string; apelido: string; pontuacao: number; eliminado: boolean };
 
 type EstadoSala = {
   status: "aberta" | "em_andamento" | "encerrada";
@@ -110,6 +110,18 @@ export function JogoCliente({ codigo }: { codigo: string }) {
         <PontinhosCarregando />
         <p className="text-sm font-medium text-neutral-400">Conectando à sala...</p>
       </main>
+    );
+  }
+
+  if (dados.tipoAtividade === "quem_erra_cai") {
+    return (
+      <JogoQuemErraCai
+        dados={dados}
+        respostaEnviada={respostaEnviada}
+        enviando={enviando}
+        feedback={feedback}
+        onResponder={enviarResposta}
+      />
     );
   }
 
@@ -295,6 +307,157 @@ export function JogoCliente({ codigo }: { codigo: string }) {
                 ))}
           </div>
         )}
+      </div>
+    </main>
+  );
+}
+
+// "Quem Erra Cai" — visual próprio, verde minimalista: cada aluno é um
+// círculo numa plataforma fina. Errar = o círculo cai e apaga; quem
+// sobrevive mais rodadas ganha. Reaproveita a mesma Sala Ao Vivo (mesmo
+// motor de perguntas/SSE/pontuação) dos outros tipos, só muda a casca.
+function JogoQuemErraCai({
+  dados,
+  respostaEnviada,
+  enviando,
+  feedback,
+  onResponder,
+}: {
+  dados: EstadoSala;
+  respostaEnviada: boolean;
+  enviando: boolean;
+  feedback: { correta: boolean; pontosGanhos: number; xpGanho: number } | null;
+  onResponder: (alternativa: string) => void;
+}) {
+  const meu = dados.participantes.find((p) => p.id === dados.meuId) ?? null;
+  const meuEliminado = meu?.eliminado ?? false;
+  const sobreviventes = dados.participantes.filter((p) => !p.eliminado);
+
+  if (dados.status === "encerrada") {
+    const vencedor = dados.participantes[0] ?? null;
+    return (
+      <main className="flex min-h-screen flex-col items-center bg-neutral-50 px-4 py-14">
+        <div className="w-full max-w-sm text-center">
+          <p className="text-sm font-semibold tracking-wide text-neutral-400 uppercase">Quem Erra Cai</p>
+          <span className="mt-4 block text-5xl">🏆</span>
+          <p className="mt-2 text-sm text-neutral-500">
+            {vencedor?.id === dados.meuId ? "Você venceu!" : "Quem sobreviveu mais:"}
+          </p>
+          <p className="mt-1 text-3xl font-extrabold text-neutral-900">{vencedor?.apelido ?? "—"}</p>
+          <p className="mt-1 text-sm text-[#00c264]">{vencedor?.pontuacao ?? 0} rodadas sobrevividas</p>
+
+          <ol className="mt-8 space-y-1.5 text-left">
+            {dados.participantes.map((p, indice) => (
+              <li
+                key={p.id}
+                className={`flex items-center justify-between rounded-xl border px-4 py-2.5 text-sm ${
+                  p.id === dados.meuId ? "border-[#00c264] bg-[#00c264]/10" : "border-neutral-200 bg-white"
+                } ${p.eliminado ? "opacity-50" : ""}`}
+              >
+                <span className="flex items-center gap-2 font-medium text-neutral-800">
+                  <span className={`h-2 w-2 rounded-full ${p.eliminado ? "bg-neutral-300" : "bg-[#00c264]"}`} />
+                  {indice + 1}. {p.apelido}
+                </span>
+                <span className="text-neutral-500">{p.eliminado ? "caiu" : "de pé"}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </main>
+    );
+  }
+
+  if (dados.status === "aberta" || !dados.perguntaAtualConteudo) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center gap-5 bg-neutral-50 px-4 text-center">
+        <p className="text-sm font-semibold tracking-wide text-neutral-400 uppercase">Quem Erra Cai</p>
+        <span className="h-3 w-3 animate-pulse rounded-full bg-[#00c264]" />
+        <div>
+          <p className="text-xl font-extrabold text-neutral-900">Aguardando o professor iniciar</p>
+          <p className="mt-1 text-sm text-neutral-500">Errou, caiu. Fique atento 👀</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (meuEliminado) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center gap-3 bg-neutral-900 px-4 text-center">
+        <span className="text-5xl grayscale">⚪</span>
+        <p className="text-2xl font-extrabold text-white">Você caiu</p>
+        <p className="text-sm text-white/60">
+          {sobreviventes.length} de {dados.participantes.length} ainda de pé
+        </p>
+        <p className="mt-4 text-xs text-white/40">Fique assistindo até o fim da partida</p>
+      </main>
+    );
+  }
+
+  if (respostaEnviada || dados.euJaRespondiPerguntaAtual) {
+    const acertou = feedback?.correta;
+    return (
+      <main
+        className={`flex min-h-screen flex-col items-center justify-center gap-3 px-4 text-center transition-colors ${
+          acertou === false ? "bg-neutral-900" : "bg-neutral-50"
+        }`}
+      >
+        {acertou === false ? (
+          <>
+            <span className="text-5xl">⚪</span>
+            <p className="text-2xl font-extrabold text-white">Você caiu</p>
+          </>
+        ) : (
+          <>
+            <span className="h-3 w-3 rounded-full bg-[#00c264]" />
+            <p className="text-2xl font-extrabold text-neutral-900">Você continua de pé</p>
+          </>
+        )}
+        <p className={`text-sm ${acertou === false ? "text-white/60" : "text-neutral-500"}`}>
+          {sobreviventes.length} de {dados.participantes.length} ainda de pé — aguardando os outros
+        </p>
+      </main>
+    );
+  }
+
+  return (
+    <main className="min-h-screen bg-neutral-50 px-4 py-8">
+      <div className="mx-auto max-w-lg">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-bold tracking-wide text-neutral-400 uppercase">
+            Pergunta {dados.perguntaAtual + 1} de {dados.totalQuestoes}
+          </p>
+          <p className="rounded-full bg-[#00c264]/10 px-3 py-1 text-xs font-bold text-[#00854a]">
+            {sobreviventes.length} de pé
+          </p>
+        </div>
+        <h1 className="mt-4 text-center text-xl font-extrabold text-neutral-900">
+          {dados.perguntaAtualConteudo.enunciado}
+        </h1>
+        <p className="mt-1 text-center text-xs font-semibold text-neutral-400">Errar = cair da partida</p>
+
+        <div className="mt-8 grid grid-cols-1 gap-3">
+          {dados.perguntaAtualConteudo.alternativas.length > 0
+            ? dados.perguntaAtualConteudo.alternativas.map((alternativa, indice) => (
+                <button
+                  key={alternativa}
+                  onClick={() => onResponder(alternativa)}
+                  disabled={enviando}
+                  className="rounded-2xl border-2 border-neutral-200 bg-white px-5 py-4 text-left font-bold text-neutral-800 shadow-sm transition active:scale-[0.98] disabled:opacity-60 hover:border-[#00c264]"
+                >
+                  {String.fromCharCode(65 + indice)}. {alternativa}
+                </button>
+              ))
+            : ["verdadeiro", "falso"].map((opcao) => (
+                <button
+                  key={opcao}
+                  onClick={() => onResponder(opcao)}
+                  disabled={enviando}
+                  className="rounded-2xl border-2 border-neutral-200 bg-white px-5 py-6 text-center text-lg font-extrabold text-neutral-800 shadow-sm transition active:scale-[0.98] disabled:opacity-60 hover:border-[#00c264]"
+                >
+                  {opcao === "verdadeiro" ? "Verdadeiro" : "Falso"}
+                </button>
+              ))}
+        </div>
       </div>
     </main>
   );

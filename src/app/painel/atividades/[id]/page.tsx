@@ -14,11 +14,12 @@ type ConteudoBase = { titulo: string; questoes: Questao[] };
 type ConteudoAssociarColunas = ConteudoBase & { colunaB: string[] };
 type ConteudoCacaPalavras = ConteudoBase & { tamanho: number; grade: string[][] };
 
-// Quiz, V/F, completar frase e associar colunas dá pra jogar pergunta a
-// pergunta numa Sala Ao Vivo (a diferença é só como a resposta é conferida —
-// ver responder() em actions/salas.ts). Caça-palavras (grade única, não é
-// sequência de perguntas), apresentação (não tem certo/errado) e cabo de
-// guerra (tem o próprio jogo dedicado, com times/individual) ficam de fora.
+// Quiz, V/F, completar frase, associar colunas e quem-erra-cai dá pra jogar
+// pergunta a pergunta numa Sala Ao Vivo (a diferença é só como a resposta é
+// conferida e, no quem-erra-cai, que errar elimina o aluno — ver responder()
+// em actions/salas.ts). Caça-palavras (grade única, não é sequência de
+// perguntas), apresentação (não tem certo/errado) e cabo de guerra (tem o
+// próprio jogo dedicado, com times/individual) ficam de fora.
 const TIPOS_SEM_SALA_AO_VIVO = new Set(["caca_palavras", "apresentacao", "cabo_de_guerra"]);
 
 export default async function PaginaDetalheAtividade({
@@ -136,7 +137,8 @@ export default async function PaginaDetalheAtividade({
           {(atividade.tipo === "quiz" ||
             atividade.tipo === "verdadeiro_falso" ||
             atividade.tipo === "completar_frase" ||
-            atividade.tipo === "cabo_de_guerra") && (
+            atividade.tipo === "cabo_de_guerra" ||
+            atividade.tipo === "quem_erra_cai") && (
             <BlocoQuestoes conteudo={conteudo} gabarito={gabarito} tipo={atividade.tipo} />
           )}
         </div>

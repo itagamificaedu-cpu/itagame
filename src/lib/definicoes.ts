@@ -66,6 +66,7 @@ export const EsquemaGeracaoAtividade = z.object({
       "associar_colunas",
       "apresentacao",
       "cabo_de_guerra",
+      "quem_erra_cai",
     ],
     { error: "Escolha um tipo de atividade." }
   ),

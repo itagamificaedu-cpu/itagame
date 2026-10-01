@@ -40,7 +40,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ codigo:
           where: { codigo },
           include: {
             atividade: true,
-            participantes: { orderBy: { pontuacao: "desc" } },
+            participantes: { orderBy: [{ eliminado: "asc" }, { pontuacao: "desc" }] },
           },
         });
 
@@ -93,6 +93,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ codigo:
             id: p.id,
             apelido: p.apelido,
             pontuacao: p.pontuacao,
+            eliminado: p.eliminado,
           })),
           meuId: meuParticipante?.id ?? null,
           minhaPontuacao: meuParticipante?.pontuacao ?? null,

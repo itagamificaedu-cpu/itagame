@@ -13,6 +13,7 @@ const ROTULO_QUANTIDADE: Record<string, string> = {
   associar_colunas: "Quantidade de pares",
   apresentacao: "Quantidade de slides",
   cabo_de_guerra: "Quantidade de perguntas",
+  quem_erra_cai: "Quantidade de perguntas",
 };
 
 export default function PaginaNovaAtividade() {
@@ -77,6 +78,7 @@ export default function PaginaNovaAtividade() {
               <option value="associar_colunas">Associar colunas</option>
               <option value="apresentacao">Apresentação</option>
               <option value="cabo_de_guerra">🪢 Cabo de Guerra (times)</option>
+              <option value="quem_erra_cai">⚪ Quem Erra Cai (eliminação)</option>
             </select>
             {estado?.erros?.tipo && <p className="mt-1 text-xs text-red-600">{estado.erros.tipo[0]}</p>}
           </div>

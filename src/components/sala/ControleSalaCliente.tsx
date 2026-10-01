@@ -5,10 +5,11 @@ import Link from "next/link";
 import { avancarPergunta, encerrarSala } from "@/app/actions/salas";
 import { QrCodeEntrada } from "@/components/comum/QrCodeEntrada";
 
-type Participante = { id: string; apelido: string; pontuacao: number };
+type Participante = { id: string; apelido: string; pontuacao: number; eliminado: boolean };
 
 type EstadoSala = {
   status: "aberta" | "em_andamento" | "encerrada";
+  tipoAtividade: string;
   perguntaAtual: number;
   totalQuestoes: number;
   titulo: string;
@@ -92,6 +93,8 @@ export function ControleSalaCliente({ codigo }: { codigo: string }) {
               {dados.respostasAtual} de {dados.participantes.length} já responderam
             </p>
 
+            {dados.tipoAtividade === "quem_erra_cai" && <ArenaQuemErraCai participantes={dados.participantes} />}
+
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => iniciarTransicao(() => avancarPergunta(codigo))}
@@ -131,5 +134,35 @@ export function ControleSalaCliente({ codigo }: { codigo: string }) {
         )}
       </div>
     </main>
+  );
+}
+
+// Projeção pro telão: cada aluno é um círculo numa "plataforma" fina —
+// verde e de pé enquanto acerta, cinza e caído assim que erra uma vez.
+// Visual verde minimalista, sem mascote nem neon — só o essencial pra dar
+// tensão.
+function ArenaQuemErraCai({ participantes }: { participantes: Participante[] }) {
+  const sobreviventes = participantes.filter((p) => !p.eliminado).length;
+  return (
+    <div className="mt-6 rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
+      <p className="text-xs font-bold tracking-wide text-neutral-400 uppercase">
+        {sobreviventes} de {participantes.length} de pé
+      </p>
+      <div className="mt-3 flex flex-wrap gap-3">
+        {participantes.map((p) => (
+          <div key={p.id} className="flex w-16 flex-col items-center gap-1.5">
+            <div
+              className={`flex h-10 w-10 items-center justify-center rounded-full text-xs font-extrabold text-white transition-all duration-500 ${
+                p.eliminado ? "translate-y-3 bg-neutral-300 opacity-50" : "bg-[#00c264]"
+              }`}
+            >
+              {p.apelido.slice(0, 2).toUpperCase()}
+            </div>
+            <div className={`h-0.5 w-10 rounded-full ${p.eliminado ? "bg-neutral-200" : "bg-[#00c264]/40"}`} />
+            <p className="w-full truncate text-center text-[11px] text-neutral-500">{p.apelido}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
