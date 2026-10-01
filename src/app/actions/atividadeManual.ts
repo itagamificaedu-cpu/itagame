@@ -13,7 +13,7 @@ import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 // "conteudoGerado"/"gabarito"), então funciona igual em tudo depois:
 // sala ao vivo, exportar Word/PDF/PowerPoint etc.
 
-export type TipoAtividadeManual = "quiz" | "verdadeiro_falso" | "completar_frase";
+export type TipoAtividadeManual = "quiz" | "verdadeiro_falso" | "completar_frase" | "quem_erra_cai";
 
 export type QuestaoManual = {
   enunciado: string;
@@ -53,7 +53,7 @@ export async function criarAtividadeManual(input: {
       return { ok: false, erro: `Escreva o texto da pergunta ${numero}.` };
     }
 
-    if (input.tipo === "quiz") {
+    if (input.tipo === "quiz" || input.tipo === "quem_erra_cai") {
       const alternativas = questao.alternativas.map((a) => a.trim()).filter(Boolean);
       if (alternativas.length < 2) {
         return { ok: false, erro: `A pergunta ${numero} precisa de pelo menos 2 alternativas preenchidas.` };
@@ -75,7 +75,9 @@ export async function criarAtividadeManual(input: {
   const questoesLimpas = input.questoes.map((questao) => ({
     enunciado: questao.enunciado.trim(),
     alternativas:
-      input.tipo === "quiz" ? questao.alternativas.map((a) => a.trim()).filter(Boolean) : [],
+      input.tipo === "quiz" || input.tipo === "quem_erra_cai"
+        ? questao.alternativas.map((a) => a.trim()).filter(Boolean)
+        : [],
   }));
 
   const gabarito = input.questoes.map((questao) => ({

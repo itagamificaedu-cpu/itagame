@@ -65,7 +65,7 @@ export function CriadorManualCliente() {
     setErro(null);
 
     const payload = questoes.map((questao) => {
-      if (tipo === "quiz") {
+      if (tipo === "quiz" || tipo === "quem_erra_cai") {
         const alternativas = questao.alternativas.filter((a) => a.trim());
         const respostaCorreta =
           questao.corretaIndice !== null ? questao.alternativas[questao.corretaIndice] ?? "" : "";
@@ -101,6 +101,7 @@ export function CriadorManualCliente() {
           <option value="quiz">Quiz (múltipla escolha)</option>
           <option value="verdadeiro_falso">Verdadeiro ou falso</option>
           <option value="completar_frase">Completar frase</option>
+          <option value="quem_erra_cai">⚪ Quem Erra Cai (eliminação)</option>
         </select>
       </div>
 
@@ -170,7 +171,7 @@ export function CriadorManualCliente() {
               className="mt-2 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-[#1a3fd4] focus:outline-none focus:ring-1 focus:ring-[#1a3fd4]"
             />
 
-            {tipo === "quiz" && (
+            {(tipo === "quiz" || tipo === "quem_erra_cai") && (
               <div className="mt-3 space-y-2">
                 <p className="text-xs font-semibold text-neutral-500 uppercase">
                   Alternativas — marque a correta
