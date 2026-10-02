@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import * as XLSX from "xlsx";
 import { prisma } from "@/lib/prisma";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
+import { chaveDeNome, extrairNomesDaLista } from "@/lib/listaAlunos";
 import {
   EsquemaCriarTurma,
   EstadoCriarTurma,
@@ -161,6 +162,40 @@ export async function importarAlunosXls(
 
   revalidatePath(`/painel/turmas/${turmaId}`);
   return { ok: true, quantidade: nomes.length };
+}
+
+export type ResultadoColarAlunos =
+  | { ok: true; adicionados: number; jaExistiam: number }
+  | { ok: false; erro: string };
+
+// Cadastro em lote colando a lista direto da tela (Word, Excel, WhatsApp),
+// sem precisar montar arquivo .xlsx. Liberado só para a conta dona (ita_owner),
+// por pedido do Genezio. Não duplica quem já está na turma.
+export async function colarListaDeAlunos(turmaId: string, texto: string): Promise<ResultadoColarAlunos> {
+  const sessao = await exigirAssinaturaAtiva();
+  if (sessao.papel !== "ita_owner") {
+    return { ok: false, erro: "Recurso disponível só para o administrador." };
+  }
+  await verificarDonoTurma(turmaId, sessao.userId);
+
+  const nomes = extrairNomesDaLista(texto);
+  if (nomes.length === 0) {
+    return { ok: false, erro: "Não encontrei nenhum nome na lista colada." };
+  }
+  if (nomes.length > MAXIMO_LINHAS_XLS) {
+    return { ok: false, erro: `Muitos nomes (máximo ${MAXIMO_LINHAS_XLS} por vez).` };
+  }
+
+  const existentes = await prisma.aluno.findMany({ where: { turmaId }, select: { nome: true } });
+  const jaTem = new Set(existentes.map((a) => chaveDeNome(a.nome)));
+  const novos = nomes.filter((nome) => !jaTem.has(chaveDeNome(nome)));
+
+  if (novos.length > 0) {
+    await prisma.aluno.createMany({ data: novos.map((nome) => ({ nome, turmaId })) });
+  }
+
+  revalidatePath(`/painel/turmas/${turmaId}`);
+  return { ok: true, adicionados: novos.length, jaExistiam: nomes.length - novos.length };
 }
 
 export async function removerAluno(turmaId: string, alunoId: string) {

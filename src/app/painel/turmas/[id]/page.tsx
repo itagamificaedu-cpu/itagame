@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { excluirTurma, removerAluno } from "@/app/actions/turmas";
 import FormularioAdicionarAluno from "./FormularioAdicionarAluno";
 import FormularioImportarAlunosXls from "./FormularioImportarAlunosXls";
+import FormularioColarAlunos from "./FormularioColarAlunos";
 import GerarPinCliente from "./GerarPinCliente";
 import CopiarLinkTrilhaCliente from "./CopiarLinkTrilhaCliente";
 
@@ -108,6 +109,21 @@ export default async function PaginaDetalheTurma({
           <div className="mt-3">
             <FormularioAdicionarAluno turmaId={turma.id} />
           </div>
+
+          {sessao.papel === "ita_owner" && (
+            <>
+              <p className="mt-5 border-t border-neutral-100 pt-4 font-bold text-neutral-900">
+                📋 Colar lista de nomes
+              </p>
+              <p className="mt-1 text-xs text-neutral-500">
+                Copie os nomes do Word ou da planilha e cole aqui, sem precisar montar arquivo. Quem já está na turma não
+                é repetido.
+              </p>
+              <div className="mt-3">
+                <FormularioColarAlunos turmaId={turma.id} />
+              </div>
+            </>
+          )}
 
           <p className="mt-5 border-t border-neutral-100 pt-4 font-bold text-neutral-900">
             Ou importar vários de uma vez
