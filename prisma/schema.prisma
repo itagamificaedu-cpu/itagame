@@ -208,6 +208,9 @@ model Aluno {
   // usa, junto com o código da turma, pra entrar em /entrar-trilha sem
   // precisar de e-mail. Nulo até o professor gerar o primeiro PIN.
   pinHash   String?
+  // PIN em texto pra o professor rever a qualquer hora (só 4 dígitos, vale pra todas
+  // as atividades do aluno). Nulo em quem recebeu PIN antes dessa coluna existir.
+  pinTexto  String?
   criadoEm  DateTime @default(now())
 
   // Bloqueio de força bruta no PIN: mesmo esquema do login do professor —

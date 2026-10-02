@@ -7,10 +7,12 @@ export default function GerarPinCliente({
   turmaId,
   alunoId,
   temPin,
+  pinAtual,
 }: {
   turmaId: string;
   alunoId: string;
   temPin: boolean;
+  pinAtual: string | null;
 }) {
   const [pin, setPin] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
@@ -28,22 +30,27 @@ export default function GerarPinCliente({
     });
   }
 
+  // PIN que aparece sempre: o recém-gerado ou o que ficou guardado.
+  const pinMostrado = pin ?? pinAtual;
+
   return (
     <div className="flex items-center gap-2">
-      {pin ? (
+      {pinMostrado && (
         <span className="rounded-md bg-[#00c264]/10 px-2 py-1 text-xs font-bold text-[#00854a]">
-          PIN: {pin}
+          PIN: {pinMostrado}
         </span>
-      ) : (
-        <button
-          type="button"
-          onClick={gerar}
-          disabled={pendente}
-          className="text-xs font-semibold text-[#1a3fd4] hover:underline disabled:opacity-60"
-        >
-          {pendente ? "Gerando..." : temPin ? "Gerar novo PIN" : "Gerar PIN"}
-        </button>
       )}
+      {!pinMostrado && temPin && (
+        <span className="text-xs text-neutral-400">PIN antigo (não dá para rever)</span>
+      )}
+      <button
+        type="button"
+        onClick={gerar}
+        disabled={pendente}
+        className="text-xs font-semibold text-[#1a3fd4] hover:underline disabled:opacity-60"
+      >
+        {pendente ? "Gerando..." : pinMostrado || temPin ? "Trocar PIN" : "Gerar PIN"}
+      </button>
       {erro && <span className="text-xs text-red-600">{erro}</span>}
     </div>
   );

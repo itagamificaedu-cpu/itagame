@@ -81,8 +81,34 @@ export async function gerarPinAluno(turmaId: string, alunoId: string): Promise<R
   const pin = gerarPin();
   const pinHash = await bcrypt.hash(pin, 10);
 
-  await prisma.aluno.update({ where: { id: alunoId }, data: { pinHash } });
+  await prisma.aluno.update({ where: { id: alunoId }, data: { pinHash, pinTexto: pin, tentativasPinFalhas: 0, pinBloqueadoAte: null } });
 
   revalidatePath(`/painel/turmas/${turmaId}`);
   return { ok: true, pin };
+}
+
+// Gera o PIN de todos os alunos da turma que ainda não têm um. Quem já tem PIN
+// não é mexido (o aluno já pode estar usando). O PIN do aluno é um só e vale
+// pra todas as atividades: trilhas, salas ao vivo e cabo de guerra.
+export type ResultadoGerarPinsTurma = { ok: true; gerados: number } | { ok: false; erro: string };
+
+export async function gerarPinsDaTurma(turmaId: string): Promise<ResultadoGerarPinsTurma> {
+  const sessao = await exigirAssinaturaAtiva();
+
+  const turma = await prisma.turma.findUnique({ where: { id: turmaId } });
+  if (!turma || turma.professorId !== sessao.userId) {
+    return { ok: false, erro: "Turma não encontrada." };
+  }
+
+  const semPin = await prisma.aluno.findMany({ where: { turmaId, pinHash: null }, select: { id: true } });
+  for (const aluno of semPin) {
+    const pin = gerarPin();
+    await prisma.aluno.update({
+      where: { id: aluno.id },
+      data: { pinHash: await bcrypt.hash(pin, 10), pinTexto: pin },
+    });
+  }
+
+  revalidatePath(`/painel/turmas/${turmaId}`);
+  return { ok: true, gerados: semPin.length };
 }

@@ -7,6 +7,7 @@ import FormularioAdicionarAluno from "./FormularioAdicionarAluno";
 import FormularioImportarAlunosXls from "./FormularioImportarAlunosXls";
 import FormularioColarAlunos from "./FormularioColarAlunos";
 import GerarPinCliente from "./GerarPinCliente";
+import GerarPinsTurmaCliente from "./GerarPinsTurmaCliente";
 import CopiarLinkTrilhaCliente from "./CopiarLinkTrilhaCliente";
 
 export default async function PaginaDetalheTurma({
@@ -126,6 +127,7 @@ export default async function PaginaDetalheTurma({
 
         <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
           <p className="font-bold text-neutral-900">Lista de alunos</p>
+          <GerarPinsTurmaCliente turmaId={turma.id} semPin={turma.alunos.filter((a) => a.pinHash === null).length} />
 
           {turma.alunos.length === 0 ? (
             <p className="mt-4 text-sm text-neutral-500">Nenhum aluno cadastrado ainda.</p>
@@ -152,6 +154,7 @@ export default async function PaginaDetalheTurma({
                       turmaId={turma.id}
                       alunoId={aluno.id}
                       temPin={aluno.pinHash !== null}
+                      pinAtual={aluno.pinTexto}
                     />
                     <form action={removerAluno.bind(null, turma.id, aluno.id)}>
                       <button
