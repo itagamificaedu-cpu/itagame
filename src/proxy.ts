@@ -24,6 +24,7 @@ const AREAS: Record<string, { inicio: string; permitidas: RegExp[] }> = {
 };
 
 export async function proxy(request: NextRequest) {
+  console.log("[proxy] chamado", request.nextUrl.pathname, Boolean(request.cookies.get("itagame_sessao")));
   const cookie = request.cookies.get("itagame_sessao")?.value;
   if (!cookie) return NextResponse.next();
 
@@ -37,6 +38,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  console.log("[proxy] restrito =", restrito);
   const area = restrito ? AREAS[restrito] : undefined;
   if (!area) return NextResponse.next();
 
