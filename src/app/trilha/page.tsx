@@ -20,6 +20,24 @@ export default async function PaginaTrilhaAluno() {
 
   const xpTotal = xpTransacoes.reduce((soma, t) => soma + t.quantidade, 0);
 
+  // Aluno que entrou na turma DEPOIS da trilha ser publicada não ganhou o
+  // progresso inicial (ver publicarTrilha) — cria aqui o que faltar, com a
+  // mesma regra: livre ou sem pré-requisito = disponível, resto bloqueada.
+  // skipDuplicates não mexe em nada que o aluno já tenha feito.
+  await prisma.progressoAluno.createMany({
+    data: trilhas.flatMap((trilha) =>
+      trilha.missoes.map((missao) => ({
+        alunoId: aluno.id,
+        missaoId: missao.id,
+        status:
+          trilha.tipoEstrutura === "livre" || !missao.preRequisitoId
+            ? ("disponivel" as const)
+            : ("bloqueada" as const),
+      }))
+    ),
+    skipDuplicates: true,
+  });
+
   const progressos = await prisma.progressoAluno.findMany({
     where: { alunoId: aluno.id, missao: { trilhaId: { in: trilhas.map((t) => t.id) } } },
   });
