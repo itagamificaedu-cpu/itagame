@@ -145,6 +145,15 @@ model Usuario {
   escolaId     String?
   escola       Escola?      @relation(fields: [escolaId], references: [id])
 
+  // Professor colaborador: conta própria (login e senha dele), mas trabalha
+  // com os dados da conta principal (turmas, trilhas, simulados) e só
+  // enxerga a área liberada em acessoRestrito — hoje só "spaece_9ano"
+  // (professores de Matemática do CEITEC na aba SPAECE 9º ano).
+  contaPrincipalId String?
+  contaPrincipal   Usuario?  @relation("Colaboradores", fields: [contaPrincipalId], references: [id])
+  colaboradores    Usuario[] @relation("Colaboradores")
+  acessoRestrito   String?
+
   turmasComoProfessor Turma[]        @relation("ProfessorTurmas")
   matriculas          Matricula[]
   atividadesCriadas   Atividade[]

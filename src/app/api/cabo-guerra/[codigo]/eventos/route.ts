@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { descriptografar } from "@/lib/sessao";
+import { idDonoDaSessao } from "@/lib/acessoDados";
 import { obterSessaoParticipanteCaboGuerra } from "@/lib/caboGuerraSessao";
 import { prisma } from "@/lib/prisma";
 import { avancarSeNecessario } from "@/lib/caboGuerraTick";
@@ -19,7 +20,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ codigo:
   const sessaoProfessor = await descriptografar(cookieSessao);
   const sessaoParticipante = await obterSessaoParticipanteCaboGuerra(codigo);
 
-  const ehDono = sessaoProfessor?.userId === salaInicial.professorId;
+  const ehDono = (await idDonoDaSessao(sessaoProfessor?.userId)) === salaInicial.professorId;
   if (!ehDono && !sessaoParticipante) {
     return new Response("Não autorizado", { status: 401 });
   }

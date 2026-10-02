@@ -11,6 +11,10 @@ export type DadosSessao = {
   userId: string;
   papel: "ita_owner" | "escola_admin" | "professor" | "aluno";
   sessaoId: string;
+  // Área única liberada pra professor colaborador (ver Usuario.acessoRestrito)
+  // — vai no cookie pra o proxy.ts conseguir barrar as outras páginas sem
+  // consultar o banco a cada requisição.
+  restrito?: string;
 };
 
 export async function criptografar(dados: DadosSessao) {
@@ -43,9 +47,17 @@ export async function descriptografar(sessao: string | undefined = "") {
  */
 export async function criarSessao(dados: { userId: string; papel: DadosSessao["papel"] }) {
   const sessaoId = crypto.randomUUID();
-  await prisma.usuario.update({ where: { id: dados.userId }, data: { sessaoAtual: sessaoId } });
+  const usuario = await prisma.usuario.update({
+    where: { id: dados.userId },
+    data: { sessaoAtual: sessaoId },
+    select: { acessoRestrito: true },
+  });
 
-  const sessao = await criptografar({ ...dados, sessaoId });
+  const sessao = await criptografar({
+    ...dados,
+    sessaoId,
+    ...(usuario.acessoRestrito ? { restrito: usuario.acessoRestrito } : {}),
+  });
   const expiraEm = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const cookieStore = await cookies();
 

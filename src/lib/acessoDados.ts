@@ -16,7 +16,7 @@ export const verificarSessao = cache(async () => {
 
   const usuario = await prisma.usuario.findUnique({
     where: { id: sessao.userId },
-    select: { sessaoAtual: true },
+    select: { sessaoAtual: true, contaPrincipalId: true, acessoRestrito: true },
   });
 
   // A conta foi acessada em outro aparelho depois desse login — o carimbo
@@ -33,8 +33,34 @@ export const verificarSessao = cache(async () => {
     .update({ where: { id: sessao.userId }, data: { ultimoAcessoEm: new Date() } })
     .catch(() => {});
 
-  return { autenticado: true, userId: sessao.userId, papel: sessao.papel };
+  // Professor colaborador: o login é dele, mas tudo que a plataforma lê e
+  // grava (turmas, trilhas, simulados, salas) é da conta principal — por
+  // isso userId vira o da conta principal. A trava de quais páginas ele
+  // abre fica no proxy.ts.
+  if (usuario.contaPrincipalId) {
+    return {
+      autenticado: true,
+      userId: usuario.contaPrincipalId,
+      papel: sessao.papel,
+      colaborador: { id: sessao.userId, acessoRestrito: usuario.acessoRestrito },
+    };
+  }
+
+  return { autenticado: true, userId: sessao.userId, papel: sessao.papel, colaborador: null };
 });
+
+// Dono do conteúdo pra quem chega só com o cookie (rotas de API que não
+// passam por verificarSessao): o próprio usuário, ou a conta principal se
+// for professor colaborador.
+export async function idDonoDaSessao(userIdDoCookie: string | undefined): Promise<string | null> {
+  if (!userIdDoCookie) return null;
+  const usuario = await prisma.usuario.findUnique({
+    where: { id: userIdDoCookie },
+    select: { contaPrincipalId: true },
+  });
+  if (!usuario) return null;
+  return usuario.contaPrincipalId ?? userIdDoCookie;
+}
 
 // Exige sessão válida E assinatura Pro ativa. Usar em toda página/ação que
 // seja uma funcionalidade de verdade da plataforma (gerar atividade, sala ao
@@ -48,7 +74,8 @@ export const verificarSessao = cache(async () => {
 export const exigirAssinaturaAtiva = cache(async () => {
   const sessao = await verificarSessao();
 
-  if (sessao.papel === "ita_owner") {
+  // Colaborador usa a conta principal (que é a do dono da plataforma).
+  if (sessao.papel === "ita_owner" || sessao.colaborador) {
     return sessao;
   }
 

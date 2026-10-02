@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
+import { sair } from "@/app/actions/autenticacao";
 import { prisma } from "@/lib/prisma";
 import { DISCIPLINAS_SPAECE, VERDE_SPAECE, VERDE_SPAECE_ESCURO } from "@/lib/spaece";
 import { BotaoGerarAtividadeSpaece } from "@/components/spaece/BotaoGerarAtividadeSpaece";
@@ -13,7 +14,10 @@ import { BotaoCriarConteudoSpaeceMatematica } from "@/components/spaece/BotaoCri
 export default async function PaginaSpaece() {
   const sessao = await exigirAssinaturaAtiva();
 
-  const [trilhas, turmas] = await Promise.all([
+  const ehDono = sessao.papel === "ita_owner" && !sessao.colaborador;
+  const veRelatorio = sessao.papel === "ita_owner" || Boolean(sessao.colaborador);
+
+  const [trilhas, turmas, atividades] = await Promise.all([
     prisma.trilha.findMany({
       where: { professorId: sessao.userId, eixoSpaece: { not: null } },
       include: { turma: true, _count: { select: { missoes: true } } },
@@ -23,6 +27,14 @@ export default async function PaginaSpaece() {
       where: { professorId: sessao.userId },
       orderBy: { nome: "asc" },
       select: { id: true, nome: true },
+    }),
+    // Simulados e Cabos de Guerra prontos — atalho pra abrir e iniciar a
+    // sala ao vivo direto daqui (o professor colaborador não tem a lista
+    // geral de atividades).
+    prisma.atividade.findMany({
+      where: { professorId: sessao.userId, tema: { contains: "(SPAECE)" } },
+      orderBy: { criadaEm: "desc" },
+      select: { id: true, tipo: true, tema: true, disciplina: true },
     }),
   ]);
 
@@ -36,9 +48,18 @@ export default async function PaginaSpaece() {
   return (
     <main className="min-h-screen bg-neutral-50 px-6 py-10">
       <div className="mx-auto max-w-5xl">
-        <Link href="/painel" className="text-sm font-semibold" style={{ color: VERDE_SPAECE }}>
-          ← Voltar ao painel
-        </Link>
+        {sessao.colaborador ? (
+          // Colaborador só tem esta aba — no lugar do "voltar", o botão de sair.
+          <form action={sair} className="flex justify-end">
+            <button type="submit" className="rounded-lg border border-neutral-300 px-3 py-1.5 text-sm font-semibold text-neutral-600 hover:bg-neutral-100">
+              Sair
+            </button>
+          </form>
+        ) : (
+          <Link href="/painel" className="text-sm font-semibold" style={{ color: VERDE_SPAECE }}>
+            ← Voltar ao painel
+          </Link>
+        )}
 
         <div
           className="mt-4 overflow-hidden rounded-2xl p-8 text-white shadow-sm"
@@ -54,15 +75,48 @@ export default async function PaginaSpaece() {
             minutos e travados no eixo/descritores certos.
           </p>
 
-          {sessao.papel === "ita_owner" && (
-            <Link
-              href="/painel/spaece/resultados-matematica"
-              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-white/15 px-4 py-2 text-sm font-bold backdrop-blur transition hover:bg-white/25"
-            >
-              📉 Resultados SISPAI — Matemática (CEITEC)
-            </Link>
-          )}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {veRelatorio && (
+              <Link
+                href="/painel/spaece/resultados-matematica"
+                className="inline-flex items-center gap-2 rounded-lg bg-white/15 px-4 py-2 text-sm font-bold backdrop-blur transition hover:bg-white/25"
+              >
+                📉 Resultados SISPAI — Matemática (CEITEC)
+              </Link>
+            )}
+            {ehDono && (
+              <Link
+                href="/painel/spaece/professores"
+                className="inline-flex items-center gap-2 rounded-lg bg-white/15 px-4 py-2 text-sm font-bold backdrop-blur transition hover:bg-white/25"
+              >
+                👩‍🏫 Professores de Matemática
+              </Link>
+            )}
+          </div>
         </div>
+
+        {atividades.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-lg font-extrabold text-neutral-900">🎮 Simulados e Cabos de Guerra prontos</h2>
+            <p className="mt-1 text-xs text-neutral-500">Abra um deles e clique em “Iniciar sala ao vivo” escolhendo a turma.</p>
+            <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+              {atividades.map((atividade) => (
+                <li key={atividade.id}>
+                  <Link
+                    href={`/painel/atividades/${atividade.id}`}
+                    className="flex items-center justify-between gap-2 rounded-xl border bg-white px-4 py-2.5 text-sm transition hover:bg-neutral-50"
+                    style={{ borderColor: `${VERDE_SPAECE}33` }}
+                  >
+                    <span className="min-w-0 truncate font-semibold text-neutral-800">
+                      {atividade.tipo === "cabo_de_guerra" ? "🪢" : "📝"} {atividade.tema.replace(" (SPAECE)", "")}
+                    </span>
+                    <span className="shrink-0 text-xs text-neutral-400">{atividade.disciplina}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {DISCIPLINAS_SPAECE.map((disciplina) => (
           <div key={disciplina.chave} className="mt-8">

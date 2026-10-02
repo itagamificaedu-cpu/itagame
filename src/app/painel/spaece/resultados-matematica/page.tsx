@@ -12,10 +12,10 @@ import { ResultadosMatematicaCliente } from "./ResultadosMatematicaCliente";
 const INICIO_RELATORIO = new Date("2026-10-02T08:00:00-03:00");
 
 // Dado sensível do CEITEC (nomes reais de alunos) — só o dono da plataforma
-// vê por enquanto (ver feedback_teste_admin na memória).
+// e os professores colaboradores da aba SPAECE dele.
 export default async function ResultadosSispaiMatematica() {
   const sessao = await exigirAssinaturaAtiva();
-  if (sessao.papel !== "ita_owner") {
+  if (sessao.papel !== "ita_owner" && !sessao.colaborador) {
     notFound();
   }
 
