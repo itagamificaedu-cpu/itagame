@@ -5,7 +5,6 @@ import { jwtVerify } from "jose";
 // abre as páginas da área liberada; qualquer outra página do painel volta
 // pra tela inicial da área. Lê só o cookie (o carimbo "restrito" é gravado
 // no login, ver criarSessao), sem consultar o banco a cada requisição.
-const chave = new TextEncoder().encode(process.env.SESSION_SECRET);
 
 const AREAS: Record<string, { inicio: string; permitidas: RegExp[] }> = {
   // Aba SPAECE 9º ano + o que ela precisa pra funcionar: abrir trilha,
@@ -30,9 +29,11 @@ export async function proxy(request: NextRequest) {
 
   let restrito: string | undefined;
   try {
+    const chave = new TextEncoder().encode(process.env.SESSION_SECRET);
     const { payload } = await jwtVerify(cookie, chave, { algorithms: ["HS256"] });
     restrito = typeof payload.restrito === "string" ? payload.restrito : undefined;
-  } catch {
+  } catch (erro) {
+    console.error("[proxy] falha ao ler a sessão:", erro);
     return NextResponse.next();
   }
 
