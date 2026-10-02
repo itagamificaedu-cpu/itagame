@@ -3,7 +3,6 @@ import { descriptografar } from "@/lib/sessao";
 import { cookies } from "next/headers";
 
 const rotasProtegidas = ["/painel"];
-const rotasSomentePublicas = ["/login", "/cadastro"];
 
 // Trava de área do professor colaborador (Usuario.acessoRestrito): ele só
 // abre as páginas da área liberada; qualquer outra página do painel volta
@@ -29,7 +28,6 @@ const AREAS: Record<string, { inicio: string; permitidas: RegExp[] }> = {
 export default async function proxy(req: NextRequest) {
   const caminho = req.nextUrl.pathname;
   const ehRotaProtegida = rotasProtegidas.some((rota) => caminho.startsWith(rota));
-  const ehRotaSomentePublica = rotasSomentePublicas.includes(caminho);
 
   const cookie = (await cookies()).get("itagame_sessao")?.value;
   const sessao = await descriptografar(cookie);
@@ -44,10 +42,6 @@ export default async function proxy(req: NextRequest) {
     if (!area.permitidas.some((regra) => regra.test(limpo))) {
       return NextResponse.redirect(new URL(area.inicio, req.nextUrl));
     }
-  }
-
-  if (ehRotaSomentePublica && sessao?.userId) {
-    return NextResponse.redirect(new URL("/painel", req.nextUrl));
   }
 
   return NextResponse.next();
