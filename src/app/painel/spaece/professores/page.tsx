@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { verificarSessao } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
+import { LIMITE_APARELHOS } from "@/lib/sessao";
 import { VERDE_SPAECE } from "@/lib/spaece";
 import { ProfessoresSpaeceCliente } from "./ProfessoresSpaeceCliente";
 
@@ -16,8 +17,9 @@ export default async function PaginaProfessoresSpaece() {
 
   const conta = await prisma.usuario.findFirst({
     where: { contaPrincipalId: sessao.userId, acessoRestrito: "spaece_9ano" },
-    select: { email: true, ultimoAcessoEm: true },
+    select: { id: true, email: true, ultimoAcessoEm: true },
   });
+  const aparelhos = conta ? await prisma.sessaoColaborador.count({ where: { usuarioId: conta.id } }) : 0;
 
   return (
     <main className="min-h-screen bg-neutral-50 px-6 py-10">
@@ -33,6 +35,8 @@ export default async function PaginaProfessoresSpaece() {
 
         <ProfessoresSpaeceCliente
           loginAtual={conta?.email ?? null}
+          aparelhos={aparelhos}
+          limiteAparelhos={LIMITE_APARELHOS}
           ultimoAcesso={
             conta?.ultimoAcessoEm
               ? conta.ultimoAcessoEm.toLocaleString("pt-BR", { timeZone: "America/Fortaleza", dateStyle: "short", timeStyle: "short" })

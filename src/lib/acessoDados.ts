@@ -25,7 +25,24 @@ export const verificarSessao = cache(async () => {
   // aqui (cookies() só aceita escrita em Server Action/Route Handler, não
   // em Server Component) — sem problema, o cookie velho fica inofensivo:
   // essa mesma checagem barra ele de novo até a pessoa logar de verdade.
-  if (!usuario || usuario.sessaoAtual !== sessao.sessaoId) {
+  if (!usuario) {
+    redirect("/login?erro=outro-acesso");
+  }
+
+  if (usuario.acessoRestrito) {
+    // Login compartilhado: vale enquanto o aparelho (sessaoId) ainda estiver
+    // na lista de aparelhos conectados. Passou do limite ou trocou a senha,
+    // ele sai da lista e cai aqui.
+    const aparelho = await prisma.sessaoColaborador.findUnique({ where: { id: sessao.sessaoId } });
+    if (!aparelho || aparelho.usuarioId !== sessao.userId) {
+      redirect("/login?erro=outro-acesso");
+    }
+    if (Date.now() - aparelho.ultimoUsoEm.getTime() > 60000) {
+      prisma.sessaoColaborador
+        .update({ where: { id: aparelho.id }, data: { ultimoUsoEm: new Date() } })
+        .catch(() => {});
+    }
+  } else if (usuario.sessaoAtual !== sessao.sessaoId) {
     redirect("/login?erro=outro-acesso");
   }
 

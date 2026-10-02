@@ -1,10 +1,20 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { removerLoginCompartilhado, salvarLoginCompartilhado } from "@/app/actions/colaboradores";
+import { desconectarTodosOsAparelhos, removerLoginCompartilhado, salvarLoginCompartilhado } from "@/app/actions/colaboradores";
 import { VERDE_SPAECE } from "@/lib/spaece";
 
-export function ProfessoresSpaeceCliente({ loginAtual, ultimoAcesso }: { loginAtual: string | null; ultimoAcesso: string | null }) {
+export function ProfessoresSpaeceCliente({
+  loginAtual,
+  ultimoAcesso,
+  aparelhos,
+  limiteAparelhos,
+}: {
+  loginAtual: string | null;
+  ultimoAcesso: string | null;
+  aparelhos: number;
+  limiteAparelhos: number;
+}) {
   const [email, setEmail] = useState(loginAtual ?? "");
   const [senha, setSenha] = useState("");
   const [mensagem, setMensagem] = useState<{ ok: boolean; texto: string } | null>(null);
@@ -24,6 +34,13 @@ export function ProfessoresSpaeceCliente({ loginAtual, ultimoAcesso }: { loginAt
     });
   }
 
+  function desconectar() {
+    iniciar(async () => {
+      await desconectarTodosOsAparelhos();
+      setMensagem({ ok: true, texto: "Todos os aparelhos foram desconectados. Quem quiser usar precisa entrar de novo." });
+    });
+  }
+
   function remover() {
     iniciar(async () => {
       await removerLoginCompartilhado();
@@ -40,6 +57,22 @@ export function ProfessoresSpaeceCliente({ loginAtual, ultimoAcesso }: { loginAt
           <p className="text-neutral-500">Login atual</p>
           <p className="mt-0.5 text-lg font-bold text-neutral-900">{loginAtual}</p>
           <p className="mt-1 text-xs text-neutral-500">{ultimoAcesso ? `Último acesso: ${ultimoAcesso}` : "Ninguém entrou ainda."}</p>
+          <p className="mt-2 text-sm text-neutral-700">
+            Aparelhos conectados: <strong>{aparelhos}</strong> de {limiteAparelhos}
+          </p>
+          <p className="mt-0.5 text-xs text-neutral-500">
+            Se alguém de fora entrar e passar do limite, o aparelho usado há mais tempo é desconectado sozinho.
+          </p>
+          {aparelhos > 0 && (
+            <button
+              type="button"
+              onClick={desconectar}
+              disabled={pendente}
+              className="mt-2 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+            >
+              Desconectar todos os aparelhos
+            </button>
+          )}
         </div>
       )}
 

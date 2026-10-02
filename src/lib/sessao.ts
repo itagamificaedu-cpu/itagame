@@ -7,6 +7,10 @@ import { prisma } from "@/lib/prisma";
 const chaveSecreta = process.env.SESSION_SECRET;
 const chaveCodificada = new TextEncoder().encode(chaveSecreta);
 
+// Quantos aparelhos podem ficar logados ao mesmo tempo no login compartilhado
+// dos professores (4 professores, celular + computador/lousa, com folga).
+export const LIMITE_APARELHOS = 6;
+
 export type DadosSessao = {
   userId: string;
   papel: "ita_owner" | "escola_admin" | "professor" | "aluno";
@@ -52,11 +56,24 @@ export async function criarSessao(dados: { userId: string; papel: DadosSessao["p
   });
 
   // Exceção: o login compartilhado dos professores (acessoRestrito) é usado
-  // por várias pessoas ao mesmo tempo, de propósito — reaproveita o carimbo
-  // atual em vez de trocar, pra um login não derrubar o outro. O dono
-  // derruba todos de uma vez ao trocar a senha (zera sessaoAtual).
-  const sessaoId =
-    existente?.acessoRestrito && existente.sessaoAtual ? existente.sessaoAtual : crypto.randomUUID();
+  // por várias pessoas ao mesmo tempo, de propósito, mas até um limite de
+  // aparelhos (LIMITE_APARELHOS). O dono derruba todos de uma vez ao trocar
+  // a senha.
+  let sessaoId: string = crypto.randomUUID();
+  if (existente?.acessoRestrito) {
+    // Cada aparelho ganha a sua linha; passou do limite, sai o mais antigo.
+    const aparelho = await prisma.sessaoColaborador.create({ data: { usuarioId: dados.userId } });
+    sessaoId = aparelho.id;
+    const todos = await prisma.sessaoColaborador.findMany({
+      where: { usuarioId: dados.userId },
+      orderBy: { ultimoUsoEm: "desc" },
+      select: { id: true },
+    });
+    const excedentes = todos.slice(LIMITE_APARELHOS).map((a) => a.id);
+    if (excedentes.length > 0) {
+      await prisma.sessaoColaborador.deleteMany({ where: { id: { in: excedentes } } });
+    }
+  }
   const usuario = await prisma.usuario.update({
     where: { id: dados.userId },
     data: { sessaoAtual: sessaoId },

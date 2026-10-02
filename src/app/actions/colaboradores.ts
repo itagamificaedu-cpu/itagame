@@ -52,6 +52,7 @@ export async function salvarLoginCompartilhado(input: { email: string; senha: st
       where: { id: atual.id },
       data: { email, senhaHash, sessaoAtual: null, tentativasLoginFalhas: 0, loginBloqueadoAte: null },
     });
+    await prisma.sessaoColaborador.deleteMany({ where: { usuarioId: atual.id } });
   } else {
     await prisma.usuario.create({
       data: {
@@ -74,6 +75,16 @@ export async function removerLoginCompartilhado(): Promise<ResultadoLogin> {
   // Tudo que os professores fizeram ficou gravado na conta principal, então
   // apagar este login não perde nenhum dado — e derruba o acesso na hora.
   await prisma.usuario.deleteMany({ where: { contaPrincipalId: sessao.userId, acessoRestrito: AREA_SPAECE } });
+  revalidatePath("/painel/spaece/professores");
+  return { ok: true };
+}
+
+// Desconecta todos os aparelhos do login compartilhado sem trocar a senha.
+export async function desconectarTodosOsAparelhos(): Promise<ResultadoLogin> {
+  const sessao = await exigirDono();
+  await prisma.sessaoColaborador.deleteMany({
+    where: { usuario: { contaPrincipalId: sessao.userId, acessoRestrito: AREA_SPAECE } },
+  });
   revalidatePath("/painel/spaece/professores");
   return { ok: true };
 }

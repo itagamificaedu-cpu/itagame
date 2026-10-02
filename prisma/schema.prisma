@@ -153,6 +153,7 @@ model Usuario {
   contaPrincipal   Usuario?  @relation("Colaboradores", fields: [contaPrincipalId], references: [id])
   colaboradores    Usuario[] @relation("Colaboradores")
   acessoRestrito   String?
+  sessoesColaborador SessaoColaborador[]
 
   turmasComoProfessor Turma[]        @relation("ProfessorTurmas")
   matriculas          Matricula[]
@@ -173,6 +174,20 @@ model Usuario {
   habilidadesBimestraisMatematica  HabilidadeBimestralMatematica[]
 
   @@map("usuarios")
+}
+
+// Aparelhos conectados no login compartilhado dos professores. Cada login cria
+// uma linha; passando do limite (LIMITE_APARELHOS em sessao.ts) o aparelho
+// usado há mais tempo é desconectado. Trocar a senha apaga todas.
+model SessaoColaborador {
+  id          String   @id @default(cuid())
+  usuarioId   String
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  criadaEm    DateTime @default(now())
+  ultimoUsoEm DateTime @default(now())
+
+  @@index([usuarioId])
+  @@map("sessoes_colaborador")
 }
 
 model Turma {
