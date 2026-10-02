@@ -89,7 +89,7 @@ export default async function PaginaSpaece() {
                 href="/painel/spaece/professores"
                 className="inline-flex items-center gap-2 rounded-lg bg-white/15 px-4 py-2 text-sm font-bold backdrop-blur transition hover:bg-white/25"
               >
-                👩‍🏫 Professores de Matemática
+                🔑 Login dos Professores de Matemática
               </Link>
             )}
           </div>

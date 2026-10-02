@@ -65,7 +65,11 @@ export async function entrar(_estado: EstadoFormulario, formData: FormData): Pro
   const { email, senha } = camposValidados.data;
   const proximo = destinoSeguro(formData.get("proximo"));
 
-  const usuario = await prisma.usuario.findUnique({ where: { email } });
+  // Fallback em minúsculas: o login compartilhado dos professores é salvo
+  // assim, e no celular o teclado costuma pôr a primeira letra maiúscula.
+  const usuario =
+    (await prisma.usuario.findUnique({ where: { email } })) ??
+    (await prisma.usuario.findUnique({ where: { email: email.toLowerCase() } }));
   if (!usuario) {
     return { mensagem: "E-mail ou senha incorretos." };
   }

@@ -46,7 +46,17 @@ export async function descriptografar(sessao: string | undefined = "") {
  * conta ao mesmo tempo.
  */
 export async function criarSessao(dados: { userId: string; papel: DadosSessao["papel"] }) {
-  const sessaoId = crypto.randomUUID();
+  const existente = await prisma.usuario.findUnique({
+    where: { id: dados.userId },
+    select: { acessoRestrito: true, sessaoAtual: true },
+  });
+
+  // Exceção: o login compartilhado dos professores (acessoRestrito) é usado
+  // por várias pessoas ao mesmo tempo, de propósito — reaproveita o carimbo
+  // atual em vez de trocar, pra um login não derrubar o outro. O dono
+  // derruba todos de uma vez ao trocar a senha (zera sessaoAtual).
+  const sessaoId =
+    existente?.acessoRestrito && existente.sessaoAtual ? existente.sessaoAtual : crypto.randomUUID();
   const usuario = await prisma.usuario.update({
     where: { id: dados.userId },
     data: { sessaoAtual: sessaoId },
