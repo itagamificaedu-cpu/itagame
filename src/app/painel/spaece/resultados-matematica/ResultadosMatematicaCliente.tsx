@@ -2,49 +2,34 @@
 
 import { useMemo, useState, type ReactNode } from "react";
 import {
-  PADRAO_SISPAI_LABEL,
-  PADRAO_SISPAI_CELULA,
   SEMAFORO_ORDEM,
   SEMAFORO_LABEL,
   SEMAFORO_FAIXA,
   SEMAFORO_CELULA,
   nivelSemaforo,
-  SITUACAO_BIMESTRAL_CELULA,
-  SITUACAO_BIMESTRAL_LABEL,
-  abreviarHabilidadeBimestral,
   type CorCelula,
 } from "@/lib/sispai";
 
 // Visual copiado do "Relatório de Desempenho Consolidado" do portal SISPAI
-// (Prefeitura de Itapipoca): tabela com cabeçalho preto, nome do aluno em
-// azul e a célula do nível pintada inteira — vermelho, laranja, verde-claro,
-// verde-escuro.
+// (cabeçalho preto, nome do aluno em azul, célula do nível pintada inteira),
+// mas com o desempenho real dos alunos no ItaGame — não é a classificação
+// oficial da SME.
 
-type Rodada = { pct: number; tri: number | null; nivel: string | null; padrao: string | null };
-type AlunoCombinado = { turma: string; nome: string; r1: Rodada | null; r2: Rodada | null };
-type HabilidadeItem = {
-  id: string;
-  trilha: string;
-  codigoSaeb: string;
-  codigoBncc: string;
-  descricaoHabilidade: string;
-  percentualAcertoGeral: number;
-};
-type HabilidadesPorRodada = { rodada: number; itens: HabilidadeItem[] };
-type EvolucaoBimestral = { habilidade: string; porBimestre: { bimestre: number; percentualAcertoGeral: number }[] };
-type PontoAtencao = { habilidade: string; situacao: string };
-type AlunoCritico = { nome: string; matricula: string; turma: string; pontos: PontoAtencao[]; peso: number };
-type DesempenhoSimuladoAluno = {
+type AlunoRelatorio = {
   alunoId: string;
   nome: string;
   turma: string;
   corretas: number;
   total: number;
-  percentual: number;
+  percentual: number | null;
+  missoesConcluidas: number;
+  missoesTotal: number;
+  xp: number;
 };
+type AvaliacaoRelatorio = { tema: string; turma: string; alunos: number; corretas: number; total: number };
 
 const AZUL_SISPAI = "#0d6efd";
-const PADRAO_ORDEM = ["abaixo_do_basico", "basico", "adequado", "avancado"] as const;
+const SEM_DADOS: CorCelula = { fundo: "#e9ecef", texto: "#6c757d" };
 
 function TituloSecao({ children, descricao }: { children: ReactNode; descricao?: ReactNode }) {
   return (
@@ -66,11 +51,35 @@ function CelulaCor({ cor, children, className = "" }: { cor: CorCelula; children
   );
 }
 
+function CelulaNivel({ percentual }: { percentual: number | null }) {
+  if (percentual === null) {
+    return (
+      <CelulaCor cor={SEM_DADOS} className="w-32">
+        Não fez
+      </CelulaCor>
+    );
+  }
+  const nivel = nivelSemaforo(percentual);
+  return (
+    <CelulaCor cor={SEMAFORO_CELULA[nivel]} className="w-32">
+      {SEMAFORO_LABEL[nivel]}
+    </CelulaCor>
+  );
+}
+
 const ALINHAMENTO = { left: "text-left", center: "text-center", right: "text-right" } as const;
 
 function Th({ children, alinhar = "left" }: { children: ReactNode; alinhar?: keyof typeof ALINHAMENTO }) {
   return (
     <th className={`px-3 py-2 text-xs font-bold uppercase text-white ${ALINHAMENTO[alinhar]}`}>{children}</th>
+  );
+}
+
+function Td({ children, alinhar = "center", forte = false }: { children: ReactNode; alinhar?: keyof typeof ALINHAMENTO; forte?: boolean }) {
+  return (
+    <td className={`border border-neutral-200 px-3 py-2 text-xs ${ALINHAMENTO[alinhar]} ${forte ? "font-bold text-neutral-900" : "text-neutral-700"}`}>
+      {children}
+    </td>
   );
 }
 
@@ -84,8 +93,21 @@ function CaixaContagem({ cor, valor, rotulo, detalhe }: { cor: CorCelula; valor:
   );
 }
 
+function CaixaNumero({ valor, rotulo }: { valor: ReactNode; rotulo: string }) {
+  return (
+    <div className="rounded-md border border-neutral-200 bg-white p-3 text-center">
+      <p className="text-2xl font-extrabold" style={{ color: AZUL_SISPAI }}>
+        {valor}
+      </p>
+      <p className="text-xs font-bold uppercase text-neutral-600">{rotulo}</p>
+    </div>
+  );
+}
+
+const pct = (valor: number) => `${valor.toFixed(1).replace(".", ",")}%`;
+
 // Gráfico de colunas por aluno (0–100%), cada coluna com a cor do nível.
-function GraficoColunasAlunos({ alunos }: { alunos: DesempenhoSimuladoAluno[] }) {
+function GraficoColunasAlunos({ alunos }: { alunos: (AlunoRelatorio & { percentual: number })[] }) {
   return (
     <div className="overflow-x-auto pt-3">
       <div className="relative flex h-56 min-w-full items-end gap-3 border-b border-l border-neutral-300 pl-9 pr-2">
@@ -98,19 +120,16 @@ function GraficoColunasAlunos({ alunos }: { alunos: DesempenhoSimuladoAluno[] })
             <span className="absolute -left-9 -translate-y-1/2 text-[10px] text-neutral-400">{marca}%</span>
           </div>
         ))}
-        {alunos.map((a) => {
-          const cor = SEMAFORO_CELULA[nivelSemaforo(a.percentual)];
-          return (
-            <div key={a.alunoId} className="flex h-full w-10 shrink-0 flex-col items-center justify-end">
-              <span className="mb-1 text-[10px] font-bold text-neutral-800">{a.percentual.toFixed(0)}%</span>
-              <div
-                className="w-full rounded-t border border-black/10"
-                style={{ height: `${Math.max(2, a.percentual)}%`, backgroundColor: cor.fundo }}
-                title={`${a.nome}: ${a.percentual.toFixed(0)}%`}
-              />
-            </div>
-          );
-        })}
+        {alunos.map((a) => (
+          <div key={a.alunoId} className="flex h-full w-10 shrink-0 flex-col items-center justify-end">
+            <span className="mb-1 text-[10px] font-bold text-neutral-800">{a.percentual.toFixed(0)}%</span>
+            <div
+              className="w-full rounded-t border border-black/10"
+              style={{ height: `${Math.max(2, a.percentual)}%`, backgroundColor: SEMAFORO_CELULA[nivelSemaforo(a.percentual)].fundo }}
+              title={`${a.nome}: ${a.percentual.toFixed(0)}%`}
+            />
+          </div>
+        ))}
       </div>
       <div className="flex gap-3 pl-9 pr-2 pt-1">
         {alunos.map((a) => (
@@ -124,75 +143,69 @@ function GraficoColunasAlunos({ alunos }: { alunos: DesempenhoSimuladoAluno[] })
 }
 
 export function ResultadosMatematicaCliente({
-  alunos,
   turmas,
-  habilidadesPorRodada,
-  evolucaoBimestral,
-  criticosPorAluno,
-  turmasComCriticos,
-  bimestreDiagnostico,
-  desempenhoSimulados,
+  alunos,
+  avaliacoes,
 }: {
-  alunos: AlunoCombinado[];
   turmas: string[];
-  habilidadesPorRodada: HabilidadesPorRodada[];
-  evolucaoBimestral: EvolucaoBimestral[];
-  criticosPorAluno: AlunoCritico[];
-  turmasComCriticos: string[];
-  bimestreDiagnostico: number | null;
-  desempenhoSimulados: DesempenhoSimuladoAluno[];
+  alunos: AlunoRelatorio[];
+  avaliacoes: AvaliacaoRelatorio[];
 }) {
   const [turmaSelecionada, setTurmaSelecionada] = useState("todas");
+  const naTurma = <T extends { turma: string }>(lista: T[]) =>
+    turmaSelecionada === "todas" ? lista : lista.filter((i) => i.turma === turmaSelecionada);
 
-  const atual = (a: AlunoCombinado) => a.r2 ?? a.r1;
-
-  // Mesma ordem do relatório do SISPAI: TRI mais alta primeiro.
+  // Quem já fez vem primeiro, do maior acerto pro menor; quem não fez, por nome.
   const alunosFiltrados = useMemo(
     () =>
-      (turmaSelecionada === "todas" ? alunos : alunos.filter((a) => a.turma === turmaSelecionada))
+      naTurma(alunos)
         .slice()
-        .sort((a, b) => (atual(b)?.tri ?? -1) - (atual(a)?.tri ?? -1)),
+        .sort((a, b) => (b.percentual ?? -1) - (a.percentual ?? -1) || a.nome.localeCompare(b.nome)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [alunos, turmaSelecionada]
   );
+  const quemFez = alunosFiltrados.filter((a): a is AlunoRelatorio & { percentual: number } => a.percentual !== null);
 
-  // As turmas do ItaGame têm nome tipo "9º Ano A" e as do SISPAI só "A" —
-  // casa pelo final do nome pra o mesmo filtro valer nas duas fontes.
-  const simuladosFiltrados = useMemo(
+  const resumo = useMemo(() => {
+    const contagem: Record<string, number> = { vermelho: 0, amarelo: 0, verde: 0, verde_escuro: 0 };
+    for (const a of quemFez) contagem[nivelSemaforo(a.percentual)]++;
+    const corretas = quemFez.reduce((s, a) => s + a.corretas, 0);
+    const total = quemFez.reduce((s, a) => s + a.total, 0);
+    const missoes = alunosFiltrados.reduce((s, a) => s + a.missoesConcluidas, 0);
+    return { contagem, media: total > 0 ? (corretas / total) * 100 : null, missoes };
+  }, [quemFez, alunosFiltrados]);
+
+  const porTurma = useMemo(
     () =>
-      (turmaSelecionada === "todas"
-        ? desempenhoSimulados
-        : desempenhoSimulados.filter((a) => a.turma === turmaSelecionada || a.turma.endsWith(` ${turmaSelecionada}`))
-      )
-        .slice()
-        .sort((a, b) => b.percentual - a.percentual),
-    [desempenhoSimulados, turmaSelecionada]
+      turmas.map((turma) => {
+        const daTurma = alunos.filter((a) => a.turma === turma);
+        const fizeram = daTurma.filter((a) => a.percentual !== null);
+        const corretas = fizeram.reduce((s, a) => s + a.corretas, 0);
+        const total = fizeram.reduce((s, a) => s + a.total, 0);
+        return {
+          turma,
+          alunos: daTurma.length,
+          fizeram: fizeram.length,
+          media: total > 0 ? (corretas / total) * 100 : null,
+          missoes: daTurma.reduce((s, a) => s + a.missoesConcluidas, 0),
+        };
+      }),
+    [turmas, alunos]
   );
 
-  const distribuicaoPadrao = useMemo(() => {
-    const contagem: Record<string, number> = { abaixo_do_basico: 0, basico: 0, adequado: 0, avancado: 0 };
-    let total = 0;
-    for (const a of alunosFiltrados) {
-      const padrao = atual(a)?.padrao;
-      if (padrao && padrao in contagem) {
-        contagem[padrao]++;
-        total++;
-      }
+  // Junta a mesma avaliação de turmas diferentes quando o filtro é "todas".
+  const avaliacoesFiltradas = useMemo(() => {
+    const mapa = new Map<string, { tema: string; alunos: number; corretas: number; total: number }>();
+    for (const a of naTurma(avaliacoes)) {
+      const item = mapa.get(a.tema) ?? { tema: a.tema, alunos: 0, corretas: 0, total: 0 };
+      item.alunos += a.alunos;
+      item.corretas += a.corretas;
+      item.total += a.total;
+      mapa.set(a.tema, item);
     }
-    return { contagem, total };
-  }, [alunosFiltrados]);
-
-  const resumoSimulados = useMemo(() => {
-    const contagem: Record<string, number> = { vermelho: 0, amarelo: 0, verde: 0, verde_escuro: 0 };
-    for (const a of simuladosFiltrados) contagem[nivelSemaforo(a.percentual)]++;
-    const media =
-      simuladosFiltrados.length > 0
-        ? simuladosFiltrados.reduce((s, a) => s + a.percentual, 0) / simuladosFiltrados.length
-        : 0;
-    return { contagem, media };
-  }, [simuladosFiltrados]);
-
-  const turmasCriticosVisiveis =
-    turmaSelecionada === "todas" ? turmasComCriticos : turmasComCriticos.filter((t) => t === turmaSelecionada);
+    return Array.from(mapa.values());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [avaliacoes, turmaSelecionada]);
 
   return (
     <>
@@ -209,7 +222,7 @@ export function ResultadosMatematicaCliente({
           <option value="todas">9º ANO | Todas</option>
           {turmas.map((t) => (
             <option key={t} value={t}>
-              9º ANO | Turma {t}
+              {t.toUpperCase()}
             </option>
           ))}
         </select>
@@ -220,221 +233,59 @@ export function ResultadosMatematicaCliente({
         )}
       </div>
 
-      {/* Resumo oficial por padrão */}
+      {/* Resumo */}
       <section className="mt-8">
-        <TituloSecao descricao="Classificação oficial da SME — Rodada 2 (ou Rodada 1 quando a 2 ainda não tem detalhe).">
-          Resumo por Padrão — SISPAI
+        <TituloSecao descricao="Percentual de acerto nos Simulados e Cabos de Guerra SPAECE jogados na Sala Ao Vivo.">
+          Resumo por Nível
         </TituloSecao>
-        {distribuicaoPadrao.total === 0 ? (
-          <p className="text-sm text-neutral-400">Sem alunos classificados nesse filtro.</p>
-        ) : (
-          <>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {PADRAO_ORDEM.map((padrao) => (
-                <CaixaContagem
-                  key={padrao}
-                  cor={PADRAO_SISPAI_CELULA[padrao]}
-                  valor={distribuicaoPadrao.contagem[padrao]}
-                  rotulo={PADRAO_SISPAI_LABEL[padrao]}
-                  detalhe={`${((distribuicaoPadrao.contagem[padrao] / distribuicaoPadrao.total) * 100).toFixed(0)}% dos alunos`}
-                />
-              ))}
-            </div>
-            <div className="mt-3 flex h-4 w-full overflow-hidden rounded border border-neutral-300">
-              {PADRAO_ORDEM.map((padrao) => {
-                const qtd = distribuicaoPadrao.contagem[padrao];
-                if (qtd === 0) return null;
-                return (
-                  <div
-                    key={padrao}
-                    style={{ width: `${(qtd / distribuicaoPadrao.total) * 100}%`, backgroundColor: PADRAO_SISPAI_CELULA[padrao].fundo }}
-                    title={`${PADRAO_SISPAI_LABEL[padrao]}: ${qtd} aluno(s)`}
-                  />
-                );
-              })}
-            </div>
-          </>
-        )}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <CaixaNumero valor={alunosFiltrados.length} rotulo="Alunos" />
+          <CaixaNumero valor={quemFez.length} rotulo="Já fizeram" />
+          <CaixaNumero valor={resumo.media === null ? "—" : pct(resumo.media)} rotulo="Média de acerto" />
+          <CaixaNumero valor={resumo.missoes} rotulo="Missões concluídas" />
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {SEMAFORO_ORDEM.map((nivel) => (
+            <CaixaContagem
+              key={nivel}
+              cor={SEMAFORO_CELULA[nivel]}
+              valor={resumo.contagem[nivel]}
+              rotulo={SEMAFORO_LABEL[nivel]}
+              detalhe={SEMAFORO_FAIXA[nivel]}
+            />
+          ))}
+        </div>
       </section>
 
-      {/* Simulados do ItaGame — dado interno */}
-      <section className="mt-10">
-        <TituloSecao
-          descricao={
-            <>
-              Respostas reais dos alunos no Simulado/Cabo de Guerra jogados no ItaGame. É prática interna, calculada
-              pelo percentual de acerto — <strong>não é a classificação oficial do SISPAI</strong>.
-            </>
-          }
-        >
-          Simulados SPAECE no ItaGame
-        </TituloSecao>
-
-        {simuladosFiltrados.length === 0 ? (
-          <p className="rounded-md border border-neutral-200 bg-neutral-50 p-6 text-center text-sm text-neutral-400">
-            Nenhum aluno dessa turma jogou um Simulado ainda.
-          </p>
-        ) : (
-          <>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-              <div className="rounded-md border border-neutral-200 bg-white p-3 text-center">
-                <p className="text-2xl font-extrabold" style={{ color: AZUL_SISPAI }}>
-                  {resumoSimulados.media.toFixed(0)}%
-                </p>
-                <p className="text-xs font-bold uppercase text-neutral-600">Média de acerto</p>
-              </div>
-              {SEMAFORO_ORDEM.map((nivel) => (
-                <CaixaContagem
-                  key={nivel}
-                  cor={SEMAFORO_CELULA[nivel]}
-                  valor={resumoSimulados.contagem[nivel]}
-                  rotulo={SEMAFORO_LABEL[nivel]}
-                  detalhe={SEMAFORO_FAIXA[nivel]}
-                />
-              ))}
-            </div>
-
-            <div className="mt-4 rounded-md border border-neutral-200 bg-white p-4">
-              <p className="mb-3 text-sm font-bold text-neutral-700">Acerto por aluno</p>
-              <GraficoColunasAlunos alunos={simuladosFiltrados} />
-            </div>
-
-            <div className="mt-4 overflow-x-auto">
-              <table className="w-full border-collapse border border-neutral-200 bg-white text-sm">
-                <thead className="bg-[#212529]">
-                  <tr>
-                    <Th alinhar="center">#</Th>
-                    <Th>Aluno</Th>
-                    <Th alinhar="center">Turma</Th>
-                    <Th alinhar="center">Acertos</Th>
-                    <Th alinhar="center">Erros</Th>
-                    <Th alinhar="center">Acerto</Th>
-                    <Th alinhar="center">Nível</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {simuladosFiltrados.map((a, i) => {
-                    const nivel = nivelSemaforo(a.percentual);
-                    return (
-                      <tr key={a.alunoId}>
-                        <td className="border border-neutral-200 px-3 py-2 text-center text-xs text-neutral-500">{i + 1}</td>
-                        <td className="border border-neutral-200 px-3 py-2 text-xs font-bold uppercase" style={{ color: AZUL_SISPAI }}>
-                          {a.nome}
-                        </td>
-                        <td className="border border-neutral-200 px-3 py-2 text-center text-xs text-neutral-600">{a.turma}</td>
-                        <td className="border border-neutral-200 px-3 py-2 text-center text-xs font-bold text-neutral-800">{a.corretas}</td>
-                        <td className="border border-neutral-200 px-3 py-2 text-center text-xs font-bold text-neutral-800">
-                          {a.total - a.corretas}
-                        </td>
-                        <td className="border border-neutral-200 px-3 py-2 text-center text-xs font-bold text-neutral-900">
-                          {a.percentual.toFixed(2).replace(".", ",")}%
-                        </td>
-                        <CelulaCor cor={SEMAFORO_CELULA[nivel]} className="w-32">
-                          {SEMAFORO_LABEL[nivel]}
-                        </CelulaCor>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
-      </section>
-
-      {/* Habilidades */}
-      {habilidadesPorRodada.some((r) => r.itens.length > 0) && (
-        <section className="mt-10 space-y-6">
-          <TituloSecao descricao="Percentual de acerto do 9º ano inteiro em cada habilidade. Vermelho = prioridade de reforço.">
-            Desempenho por Habilidade
-          </TituloSecao>
-          {habilidadesPorRodada.map(
-            ({ rodada, itens }) =>
-              itens.length > 0 && (
-                <div key={rodada}>
-                  <p className="mb-2 text-sm font-bold text-neutral-700">SISPAI {rodada === 1 ? "I" : "II"}</p>
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse border border-neutral-200 bg-white text-sm">
-                      <thead className="bg-[#212529]">
-                        <tr>
-                          <Th alinhar="center">Trilha</Th>
-                          <Th>Descrição / Habilidade</Th>
-                          <Th alinhar="center">Acerto</Th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {itens.map((h, i) => {
-                          const pct = Number(h.percentualAcertoGeral);
-                          const nivel = nivelSemaforo(pct);
-                          return (
-                            <tr key={h.id} className={i % 2 === 0 ? "bg-neutral-50" : "bg-white"}>
-                              <td className="w-28 border border-neutral-200 px-3 py-2 text-center text-xs font-bold text-neutral-800">
-                                {h.trilha}
-                              </td>
-                              <td className="border border-neutral-200 px-3 py-2 text-xs text-neutral-800">
-                                <span className="font-bold" style={{ color: AZUL_SISPAI }}>
-                                  (SAEB) {h.codigoSaeb}
-                                </span>{" "}
-                                <span className="font-semibold">{h.descricaoHabilidade}</span>
-                                {h.codigoBncc && (
-                                  <span className="mt-0.5 block text-[11px] font-bold" style={{ color: AZUL_SISPAI }}>
-                                    {h.codigoBncc}
-                                  </span>
-                                )}
-                              </td>
-                              <CelulaCor cor={SEMAFORO_CELULA[nivel]} className="w-24 text-sm">
-                                {nivel === "vermelho" ? "⊗ " : ""}
-                                {pct.toFixed(0)}%
-                              </CelulaCor>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )
-          )}
-        </section>
-      )}
-
-      {/* Diagnóstico Bimestral */}
-      {evolucaoBimestral.length > 0 && (
+      {/* Por turma */}
+      {turmaSelecionada === "todas" && (
         <section className="mt-10">
-          <TituloSecao descricao="Aplicado a cada bimestre nas 8 habilidades básicas de operações e situações-problema.">
-            Diagnóstico Bimestral — evolução
-          </TituloSecao>
+          <TituloSecao>Desempenho por Turma</TituloSecao>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse border border-neutral-200 bg-white text-sm">
               <thead className="bg-[#212529]">
                 <tr>
-                  <Th>Habilidade</Th>
-                  <Th alinhar="center">1º Bimestre</Th>
-                  <Th alinhar="center">2º Bimestre</Th>
+                  <Th>Turma</Th>
+                  <Th alinhar="center">Alunos</Th>
+                  <Th alinhar="center">Já fizeram</Th>
+                  <Th alinhar="center">Missões concluídas</Th>
+                  <Th alinhar="center">Acerto</Th>
+                  <Th alinhar="center">Nível</Th>
                 </tr>
               </thead>
               <tbody>
-                {evolucaoBimestral.map(({ habilidade, porBimestre }, i) => (
-                  <tr key={habilidade} className={i % 2 === 0 ? "bg-neutral-50" : "bg-white"}>
-                    <td className="border border-neutral-200 px-3 py-2 text-xs font-semibold text-neutral-800">
-                      {abreviarHabilidadeBimestral(habilidade)}
+                {porTurma.map((t) => (
+                  <tr key={t.turma}>
+                    <td className="border border-neutral-200 px-3 py-2 text-xs font-bold uppercase">
+                      <button onClick={() => setTurmaSelecionada(t.turma)} className="uppercase hover:underline" style={{ color: AZUL_SISPAI }}>
+                        {t.turma}
+                      </button>
                     </td>
-                    {[1, 2].map((bimestre) => {
-                      const item = porBimestre.find((b) => b.bimestre === bimestre);
-                      if (!item) {
-                        return (
-                          <td key={bimestre} className="w-32 border border-neutral-200 px-3 py-2 text-center text-xs text-neutral-400">
-                            —
-                          </td>
-                        );
-                      }
-                      const pct = Number(item.percentualAcertoGeral);
-                      return (
-                        <CelulaCor key={bimestre} cor={SEMAFORO_CELULA[nivelSemaforo(pct)]} className="w-32">
-                          {pct.toFixed(0)}%
-                        </CelulaCor>
-                      );
-                    })}
+                    <Td>{t.alunos}</Td>
+                    <Td>{t.fizeram}</Td>
+                    <Td>{t.missoes}</Td>
+                    <Td forte>{t.media === null ? "—" : pct(t.media)}</Td>
+                    <CelulaNivel percentual={t.media} />
                   </tr>
                 ))}
               </tbody>
@@ -443,70 +294,57 @@ export function ResultadosMatematicaCliente({
         </section>
       )}
 
-      {/* Foco Pedagógico */}
-      {turmasCriticosVisiveis.length > 0 && (
-        <section className="mt-10 space-y-6">
-          <TituloSecao
-            descricao={`Alunos que a SME identificou como estagnados no ${bimestreDiagnostico ? `${bimestreDiagnostico}º ` : ""}bimestre. Vermelho = não avançou, laranja = avançou pouco.`}
-          >
-            Foco Pedagógico
-          </TituloSecao>
-          {turmasCriticosVisiveis.map((turma) => {
-            const daTurma = criticosPorAluno.filter((a) => a.turma === turma).sort((a, b) => b.peso - a.peso);
-            return (
-              <div key={turma}>
-                <p className="mb-2 text-sm font-bold text-neutral-700">
-                  Turma {turma} <span className="font-normal text-neutral-400">({daTurma.length} alunos)</span>
-                </p>
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse border border-neutral-200 bg-white text-sm">
-                    <thead className="bg-[#212529]">
-                      <tr>
-                        <Th alinhar="center">#</Th>
-                        <Th>Aluno</Th>
-                        <Th>Pontos de atenção</Th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {daTurma.map((a, i) => (
-                        <tr key={a.matricula}>
-                          <td className="border border-neutral-200 px-3 py-2 text-center text-xs text-neutral-500">{i + 1}</td>
-                          <td className="whitespace-nowrap border border-neutral-200 px-3 py-2 text-xs font-bold uppercase" style={{ color: AZUL_SISPAI }}>
-                            {a.nome}
-                          </td>
-                          <td className="border border-neutral-200 px-3 py-2">
-                            <div className="flex flex-wrap gap-1.5">
-                              {a.pontos.map((p, j) => {
-                                const cor = SITUACAO_BIMESTRAL_CELULA[p.situacao];
-                                return (
-                                  <span
-                                    key={j}
-                                    className="rounded px-2 py-0.5 text-[11px] font-bold"
-                                    style={{ backgroundColor: cor.fundo, color: cor.texto }}
-                                    title={SITUACAO_BIMESTRAL_LABEL[p.situacao]}
-                                  >
-                                    {abreviarHabilidadeBimestral(p.habilidade)}
-                                  </span>
-                                );
-                              })}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            );
-          })}
-        </section>
-      )}
-
-      {/* Relação de Estudantes — igual ao relatório oficial */}
+      {/* Por avaliação */}
       <section className="mt-10">
-        <TituloSecao descricao="Ordenado pela TRI mais recente, do maior para o menor — mesma ordem do relatório oficial do SISPAI.">
-          Relação de Estudantes — SISPAI
+        <TituloSecao>Desempenho por Avaliação</TituloSecao>
+        {avaliacoesFiltradas.length === 0 ? (
+          <p className="rounded-md border border-neutral-200 bg-neutral-50 p-6 text-center text-sm text-neutral-400">
+            Nenhum Simulado ou Cabo de Guerra SPAECE jogado ainda nesse filtro.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse border border-neutral-200 bg-white text-sm">
+              <thead className="bg-[#212529]">
+                <tr>
+                  <Th>Avaliação</Th>
+                  <Th alinhar="center">Alunos</Th>
+                  <Th alinhar="center">Acerto</Th>
+                  <Th alinhar="center">Nível</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {avaliacoesFiltradas.map((a) => {
+                  const media = (a.corretas / a.total) * 100;
+                  return (
+                    <tr key={a.tema}>
+                      <Td alinhar="left" forte>
+                        {a.tema.replace(" (SPAECE)", "")}
+                      </Td>
+                      <Td>{a.alunos}</Td>
+                      <Td forte>{pct(media)}</Td>
+                      <CelulaNivel percentual={media} />
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      {/* Por aluno */}
+      <section className="mt-10">
+        <TituloSecao descricao="Ordenado pelo maior acerto. Quem ainda não jogou aparece no fim como “Não fez”.">
+          Relação de Estudantes
         </TituloSecao>
+
+        {quemFez.length > 0 && (
+          <div className="mb-4 rounded-md border border-neutral-200 bg-white p-4">
+            <p className="mb-3 text-sm font-bold text-neutral-700">Acerto por aluno</p>
+            <GraficoColunasAlunos alunos={quemFez} />
+          </div>
+        )}
+
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-neutral-200 bg-white text-sm">
             <thead className="bg-[#212529]">
@@ -514,51 +352,30 @@ export function ResultadosMatematicaCliente({
                 <Th alinhar="center">#</Th>
                 <Th>Aluno</Th>
                 <Th alinhar="center">Turma</Th>
-                <Th alinhar="center">Acerto R1</Th>
-                <Th alinhar="center">Padrão R1</Th>
-                <Th alinhar="center">Acerto R2</Th>
-                <Th alinhar="center">TRI</Th>
+                <Th alinhar="center">Acertos</Th>
+                <Th alinhar="center">Erros</Th>
+                <Th alinhar="center">Acerto</Th>
+                <Th alinhar="center">Missões</Th>
                 <Th alinhar="center">Nível</Th>
-                <Th alinhar="center">Padrão</Th>
               </tr>
             </thead>
             <tbody>
-              {alunosFiltrados.map((a, i) => {
-                const padraoAtual = atual(a)?.padrao;
-                return (
-                  <tr key={`${a.turma}-${a.nome}`}>
-                    <td className="border border-neutral-200 px-3 py-2 text-center text-xs text-neutral-500">{i + 1}</td>
-                    <td className="border border-neutral-200 px-3 py-2 text-xs font-bold uppercase" style={{ color: AZUL_SISPAI }}>
-                      {a.nome}
-                    </td>
-                    <td className="border border-neutral-200 px-3 py-2 text-center text-xs text-neutral-700">{a.turma}</td>
-                    <td className="border border-neutral-200 px-3 py-2 text-center text-xs font-bold text-neutral-900">
-                      {a.r1 ? `${a.r1.pct.toFixed(2).replace(".", ",")}%` : "—"}
-                    </td>
-                    {a.r1?.padrao ? (
-                      <CelulaCor cor={PADRAO_SISPAI_CELULA[a.r1.padrao]} className="w-36">
-                        {PADRAO_SISPAI_LABEL[a.r1.padrao]}
-                      </CelulaCor>
-                    ) : (
-                      <td className="border border-neutral-200 px-3 py-2 text-center text-xs text-neutral-400">—</td>
-                    )}
-                    <td className="border border-neutral-200 px-3 py-2 text-center text-xs font-bold text-neutral-900">
-                      {a.r2 ? `${a.r2.pct.toFixed(2).replace(".", ",")}%` : "—"}
-                    </td>
-                    <td className="border border-neutral-200 px-3 py-2 text-center text-xs text-neutral-700">
-                      {atual(a)?.tri != null ? Number(atual(a)?.tri).toFixed(2).replace(".", ",") : "—"}
-                    </td>
-                    <td className="border border-neutral-200 px-3 py-2 text-center text-xs text-neutral-700">{atual(a)?.nivel ?? "—"}</td>
-                    {padraoAtual ? (
-                      <CelulaCor cor={PADRAO_SISPAI_CELULA[padraoAtual]} className="w-36">
-                        {PADRAO_SISPAI_LABEL[padraoAtual]}
-                      </CelulaCor>
-                    ) : (
-                      <td className="border border-neutral-200 px-3 py-2 text-center text-xs text-neutral-400">—</td>
-                    )}
-                  </tr>
-                );
-              })}
+              {alunosFiltrados.map((a, i) => (
+                <tr key={a.alunoId}>
+                  <Td>{i + 1}</Td>
+                  <td className="border border-neutral-200 px-3 py-2 text-xs font-bold uppercase" style={{ color: AZUL_SISPAI }}>
+                    {a.nome}
+                  </td>
+                  <Td>{a.turma}</Td>
+                  <Td forte>{a.total > 0 ? a.corretas : "—"}</Td>
+                  <Td forte>{a.total > 0 ? a.total - a.corretas : "—"}</Td>
+                  <Td forte>{a.percentual === null ? "—" : pct(a.percentual)}</Td>
+                  <Td>
+                    {a.missoesConcluidas}/{a.missoesTotal}
+                  </Td>
+                  <CelulaNivel percentual={a.percentual} />
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
