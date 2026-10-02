@@ -69,8 +69,39 @@ export async function excluirTurma(turmaId: string) {
   const sessao = await exigirAssinaturaAtiva();
   await verificarDonoTurma(turmaId, sessao.userId);
 
-  await prisma.aluno.deleteMany({ where: { turmaId } });
-  await prisma.turma.delete({ where: { id: turmaId } });
+  // Apaga a turma com tudo que depende dela (alunos, progresso nas trilhas,
+  // XP, loja, prontuário, gincana etc.). As salas ao vivo e de cabo de guerra
+  // só perdem o vínculo com a turma (o banco zera o turmaId sozinho).
+  await prisma.$transaction(async (tx) => {
+    const alunos = await tx.aluno.findMany({ where: { turmaId }, select: { id: true } });
+    const alunoIds = alunos.map((a) => a.id);
+    const trilhas = await tx.trilha.findMany({ where: { turmaId }, select: { id: true } });
+    const trilhaIds = trilhas.map((t) => t.id);
+    const itens = await tx.itemLoja.findMany({ where: { turmaId }, select: { id: true } });
+    const itemIds = itens.map((i) => i.id);
+    const casos = await tx.casoClinicoProntuario.findMany({ where: { turmaId }, select: { id: true } });
+    const casoIds = casos.map((c) => c.id);
+    const aplicacoes = await tx.aplicacaoAtividade.findMany({ where: { turmaId }, select: { id: true } });
+    const aplicacaoIds = aplicacoes.map((a) => a.id);
+
+    await tx.xpTransacao.deleteMany({ where: { alunoId: { in: alunoIds } } });
+    await tx.badgeConcedida.deleteMany({ where: { alunoId: { in: alunoIds } } });
+    await tx.resgateLoja.deleteMany({ where: { OR: [{ alunoId: { in: alunoIds } }, { itemId: { in: itemIds } }] } });
+    await tx.registroProntuario.deleteMany({ where: { OR: [{ alunoId: { in: alunoIds } }, { casoId: { in: casoIds } }] } });
+    await tx.progressoAluno.deleteMany({
+      where: { OR: [{ alunoId: { in: alunoIds } }, { missao: { trilhaId: { in: trilhaIds } } }] },
+    });
+    await tx.missao.deleteMany({ where: { trilhaId: { in: trilhaIds } } });
+    await tx.trilha.deleteMany({ where: { id: { in: trilhaIds } } });
+    await tx.itemLoja.deleteMany({ where: { id: { in: itemIds } } });
+    await tx.casoClinicoProntuario.deleteMany({ where: { id: { in: casoIds } } });
+    await tx.respostaAluno.deleteMany({ where: { aplicacaoId: { in: aplicacaoIds } } });
+    await tx.aplicacaoAtividade.deleteMany({ where: { id: { in: aplicacaoIds } } });
+    await tx.gincanaTime.deleteMany({ where: { turmaId } });
+    await tx.matricula.deleteMany({ where: { turmaId } });
+    await tx.aluno.deleteMany({ where: { turmaId } });
+    await tx.turma.delete({ where: { id: turmaId } }, { timeout: 60000 });
+  });
 
   revalidatePath("/painel/turmas");
   redirect("/painel/turmas");
