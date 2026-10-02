@@ -100,8 +100,8 @@ export async function excluirTurma(turmaId: string) {
     await tx.gincanaTime.deleteMany({ where: { turmaId } });
     await tx.matricula.deleteMany({ where: { turmaId } });
     await tx.aluno.deleteMany({ where: { turmaId } });
-    await tx.turma.delete({ where: { id: turmaId } }, { timeout: 60000 });
-  });
+    await tx.turma.delete({ where: { id: turmaId } });
+  }, { timeout: 60000 });
 
   revalidatePath("/painel/turmas");
   redirect("/painel/turmas");
