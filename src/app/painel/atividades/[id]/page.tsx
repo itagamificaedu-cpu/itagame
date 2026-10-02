@@ -7,7 +7,7 @@ import { SeletorTurmaSala } from "@/components/comum/SeletorTurmaSala";
 import { IniciarCaboGuerraPersonalizadoCliente } from "@/components/caboGuerraOnline/IniciarCaboGuerraPersonalizadoCliente";
 import { BlocoCacaPalavrasCliente } from "./BlocoCacaPalavrasCliente";
 
-type Questao = { enunciado: string; alternativas: string[] };
+type Questao = { enunciado: string; alternativas: string[]; imagem?: string };
 type ItemGabarito = { enunciado: string; respostaCorreta: string; explicacao: string | null };
 
 type ConteudoBase = { titulo: string; questoes: Questao[] };
@@ -165,6 +165,15 @@ function BlocoQuestoes({
             <p className="font-semibold text-neutral-900">
               {indice + 1}. {questao.enunciado}
             </p>
+
+            {questao.imagem && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={questao.imagem}
+                alt={`Figura da questão ${indice + 1}`}
+                className="mt-3 block max-h-96 w-auto max-w-full rounded-lg border border-neutral-200"
+              />
+            )}
 
             {questao.alternativas.length > 0 && (
               <ul className="mt-3 space-y-2">

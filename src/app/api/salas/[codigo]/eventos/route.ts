@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-type Questao = { enunciado: string; alternativas: string[] };
+type Questao = { enunciado: string; alternativas: string[]; imagem?: string };
 
 export async function GET(_req: Request, { params }: { params: Promise<{ codigo: string }> }) {
   const { codigo } = await params;

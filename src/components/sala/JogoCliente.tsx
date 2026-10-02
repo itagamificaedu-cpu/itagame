@@ -11,7 +11,9 @@ type EstadoSala = {
   perguntaAtual: number;
   totalQuestoes: number;
   titulo: string;
-  perguntaAtualConteudo: { enunciado: string; alternativas: string[] } | null;
+  // `imagem` é opcional: só questões tiradas de prova com figura (ex.:
+  // Simulado SISPAI) trazem o caminho da imagem recortada.
+  perguntaAtualConteudo: { enunciado: string; alternativas: string[]; imagem?: string } | null;
   participantes: Participante[];
   meuId: string | null;
   minhaPontuacao: number | null;
@@ -248,6 +250,7 @@ export function JogoCliente({ codigo }: { codigo: string }) {
         <h1 className="mt-3 text-center text-xl font-extrabold text-neutral-900">
           {dados.perguntaAtualConteudo.enunciado}
         </h1>
+        <FiguraQuestao imagem={dados.perguntaAtualConteudo.imagem} />
 
         {dados.perguntaAtualConteudo.alternativas.length === 0 &&
         (dados.tipoAtividade === "completar_frase" || dados.tipoAtividade === "associar_colunas") ? (
@@ -309,6 +312,18 @@ export function JogoCliente({ codigo }: { codigo: string }) {
         )}
       </div>
     </main>
+  );
+}
+
+// Figura da questão (gráfico, mapa, planificação...) — fundo branco e
+// clicável pra abrir em tamanho real no celular.
+function FiguraQuestao({ imagem }: { imagem?: string }) {
+  if (!imagem) return null;
+  return (
+    <a href={imagem} target="_blank" rel="noreferrer" className="mt-4 block rounded-2xl border border-neutral-200 bg-white p-3">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={imagem} alt="Figura da questão" className="mx-auto block max-h-[55vh] w-auto max-w-full" />
+    </a>
   );
 }
 
@@ -434,6 +449,7 @@ function JogoQuemErraCai({
           {dados.perguntaAtualConteudo.enunciado}
         </h1>
         <p className="mt-1 text-center text-xs font-semibold text-neutral-400">Errar = cair da partida</p>
+        <FiguraQuestao imagem={dados.perguntaAtualConteudo.imagem} />
 
         <div className="mt-8 grid grid-cols-1 gap-3">
           {dados.perguntaAtualConteudo.alternativas.length > 0

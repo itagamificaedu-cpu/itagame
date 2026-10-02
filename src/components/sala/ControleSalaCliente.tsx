@@ -13,7 +13,7 @@ type EstadoSala = {
   perguntaAtual: number;
   totalQuestoes: number;
   titulo: string;
-  perguntaAtualConteudo: { enunciado: string; alternativas: string[] } | null;
+  perguntaAtualConteudo: { enunciado: string; alternativas: string[]; imagem?: string } | null;
   participantes: Participante[];
   respostasAtual: number;
 };
@@ -89,6 +89,14 @@ export function ControleSalaCliente({ codigo }: { codigo: string }) {
             <p className="mt-2 text-lg font-bold text-neutral-900">
               {dados.perguntaAtualConteudo.enunciado}
             </p>
+            {dados.perguntaAtualConteudo.imagem && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={dados.perguntaAtualConteudo.imagem}
+                alt="Figura da questão"
+                className="mt-4 block max-h-[60vh] w-auto max-w-full rounded-lg border border-neutral-200"
+              />
+            )}
             <p className="mt-4 text-sm text-neutral-500">
               {dados.respostasAtual} de {dados.participantes.length} já responderam
             </p>
