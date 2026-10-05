@@ -5,6 +5,8 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { entregarMissao, responderQuizMissao, type QuestaoQuizMissao, type PontoMapaMissao } from "@/app/actions/missoes";
 import { MapaInterativoMissaoCliente } from "@/components/trilhas/MapaInterativoMissaoCliente";
+import { celebrarConquista, celebrarMissaoConcluida } from "@/lib/celebracao";
+import { PopupBadge } from "@/components/trilhas/PopupBadge";
 
 type Props = {
   progressoId: string;
@@ -38,15 +40,19 @@ export function MissaoAlunoCliente({
   >(null);
   const [erro, setErro] = useState<string | null>(null);
   const [pendente, iniciarTransicao] = useTransition();
+  const [badgeNovo, setBadgeNovo] = useState<{ nome: string; icone: string } | null>(null);
   const router = useRouter();
 
   if (status === "concluida") {
     return (
-      <div className="rounded-2xl border border-[#00c264]/30 bg-[#00c264]/10 p-6 text-center">
-        <p className="text-3xl">✅</p>
-        <p className="mt-2 font-bold text-[#00854a]">Missão concluída!</p>
-        <p className="mt-1 text-sm text-[#00854a]">Você ganhou {xpGanho} XP.</p>
-      </div>
+      <>
+        {badgeNovo && <PopupBadge badge={badgeNovo} onFechar={() => setBadgeNovo(null)} />}
+        <div className="rounded-2xl border border-[#00c264]/30 bg-[#00c264]/10 p-6 text-center">
+          <p className="text-3xl">✅</p>
+          <p className="mt-2 font-bold text-[#00854a]">Missão concluída!</p>
+          <p className="mt-1 text-sm text-[#00854a]">Você ganhou {xpGanho} XP.</p>
+        </div>
+      </>
     );
   }
 
@@ -86,6 +92,12 @@ export function MissaoAlunoCliente({
         }
         setResultadoQuiz(resultado);
         if (resultado.aprovado) {
+          if (resultado.badgeConcedido) {
+            setBadgeNovo(resultado.badgeConcedido);
+            celebrarConquista();
+          } else {
+            celebrarMissaoConcluida();
+          }
           router.refresh();
         }
       });
@@ -93,6 +105,7 @@ export function MissaoAlunoCliente({
 
     return (
       <div className="space-y-4">
+        {badgeNovo && <PopupBadge badge={badgeNovo} onFechar={() => setBadgeNovo(null)} />}
         {feedbackProfessor && !resultadoQuiz && (
           <p className="rounded-lg bg-neutral-100 px-4 py-3 text-sm text-neutral-600">
             {feedbackProfessor}
@@ -127,6 +140,11 @@ export function MissaoAlunoCliente({
         {resultadoQuiz && !resultadoQuiz.aprovado && (
           <p className="text-sm font-semibold text-red-600">
             Você acertou {resultadoQuiz.acertos}/{resultadoQuiz.total}. Tente de novo!
+          </p>
+        )}
+        {resultadoQuiz && resultadoQuiz.aprovado && (
+          <p className="text-sm font-bold text-[#00854a]">
+            🎉 Acertou {resultadoQuiz.acertos}/{resultadoQuiz.total}! Missão concluída.
           </p>
         )}
         {erro && <p className="text-sm text-red-600">{erro}</p>}

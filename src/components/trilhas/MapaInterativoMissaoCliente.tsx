@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { responderMapaMissao, type PontoMapaMissao } from "@/app/actions/missoes";
+import { celebrarConquista, celebrarMissaoConcluida, tocarSom } from "@/lib/celebracao";
+import { PopupBadge } from "@/components/trilhas/PopupBadge";
 
 // Jogo do mapa interativo: mostra um nome por vez ("Clique no ponto: X") e o
 // aluno clica na bolinha certa em cima da imagem — não precisa acertar o
@@ -41,6 +43,7 @@ export function MapaInterativoMissaoCliente({ progressoId, imagemUrl, pontos, xp
   const [enviando, setEnviando] = useState(false);
   const [resultado, setResultado] = useState<{ aprovado: boolean; acertos: number; total: number } | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [badgeNovo, setBadgeNovo] = useState<{ nome: string; icone: string } | null>(null);
   const travado = useRef(false);
   const router = useRouter();
 
@@ -59,7 +62,10 @@ export function MapaInterativoMissaoCliente({ progressoId, imagemUrl, pontos, xp
     travado.current = true;
     setFeedback({ id: ponto.id, certo });
     setRespondidos((r) => ({ ...r, [ponto.id]: certo ? "certo" : "errado" }));
-    if (certo) setAcertos((a) => a + 1);
+    if (certo) {
+      setAcertos((a) => a + 1);
+      tocarSom("select");
+    }
 
     setTimeout(() => {
       setFeedback(null);
@@ -79,6 +85,12 @@ export function MapaInterativoMissaoCliente({ progressoId, imagemUrl, pontos, xp
     }
     setResultado(resposta);
     if (resposta.aprovado) {
+      if (resposta.badgeConcedido) {
+        setBadgeNovo(resposta.badgeConcedido);
+        celebrarConquista();
+      } else {
+        celebrarMissaoConcluida();
+      }
       router.refresh();
     }
   }
@@ -102,6 +114,7 @@ export function MapaInterativoMissaoCliente({ progressoId, imagemUrl, pontos, xp
 
   return (
     <div>
+      {badgeNovo && <PopupBadge badge={badgeNovo} onFechar={() => setBadgeNovo(null)} />}
       <div className="mb-2 flex items-center justify-between font-mono text-xs font-bold">
         <span className="text-[#1a3fd4]">⏱ {formatarTempo(segundos)}</span>
         <span className="text-[#00854a]">

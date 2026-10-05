@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { iniciarPartidaCaboGuerra, encerrarSalaCaboGuerra } from "@/app/actions/caboGuerraOnline";
 import { NOMES_NIVEL, type Nivel } from "@/lib/caboGuerraPerguntas";
 import { QrCodeEntrada } from "@/components/comum/QrCodeEntrada";
+import { celebrarConquista } from "@/lib/celebracao";
 
 type Participante = { id: string; apelido: string; pontuacao: number };
 
@@ -38,6 +39,17 @@ export function ControleCaboGuerraOnlineCliente({ codigo }: { codigo: string }) 
     origem.onmessage = (evento) => setDados(JSON.parse(evento.data));
     return () => origem.close();
   }, [codigo]);
+
+  // Comemoração só uma vez quando a partida termina (a tela de fim de jogo
+  // recebe várias atualizações pelo SSE enquanto fica aberta na projeção).
+  const jaComemorou = useRef(false);
+  useEffect(() => {
+    if (dados?.status === "encerrada" && !jaComemorou.current) {
+      jaComemorou.current = true;
+      celebrarConquista();
+    }
+    if (dados?.status !== "encerrada") jaComemorou.current = false;
+  }, [dados?.status]);
 
   if (!dados) {
     return (

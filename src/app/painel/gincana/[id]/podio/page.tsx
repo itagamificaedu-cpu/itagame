@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { obterEstadoGincana } from "@/app/actions/gincana";
+import { CelebracaoAoMontar } from "@/components/ui/CelebracaoAoMontar";
 
 const CORES_PODIO = [
   { medalha: "🥇", altura: "h-56", cor: "bg-[#FFD600]", texto: "text-[#1a1a2e]" },
@@ -26,6 +27,7 @@ export default async function PaginaPodioGincana({ params }: { params: Promise<{
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-gradient-to-b from-[#1a3fd4] to-[#0e2694] px-6 py-12 text-white">
+      <CelebracaoAoMontar intensidade="grande" />
       <div className="w-full max-w-3xl">
         <Link href={`/painel/gincana/${id}`} className="text-sm font-semibold text-white/70">
           ← Voltar pro painel da gincana

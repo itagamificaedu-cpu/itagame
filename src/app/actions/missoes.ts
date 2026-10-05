@@ -310,16 +310,23 @@ async function verificarConquistaSpaece(alunoId: string, trilhaId: string | null
   });
 }
 
-async function concluirMissao(progressoId: string) {
+type BadgeConcedido = { nome: string; icone: string } | null;
+
+async function concluirMissao(progressoId: string): Promise<BadgeConcedido> {
   const progresso = await prisma.progressoAluno.findUnique({
     where: { id: progressoId },
     include: { missao: true },
   });
-  if (!progresso) return;
+  if (!progresso) return null;
 
   // Se a missão dá badge, cria a concessão (idempotente, via skipDuplicates)
   // dentro da mesma transação das outras duas operações.
   const badgeId = progresso.missao.badgeId;
+  let badgeConcedido: BadgeConcedido = null;
+  if (badgeId) {
+    const badge = await prisma.badge.findUnique({ where: { id: badgeId } });
+    if (badge) badgeConcedido = { nome: badge.nome, icone: badge.icone || "🏅" };
+  }
 
   await prisma.$transaction(async (tx) => {
     await tx.progressoAluno.update({
@@ -365,6 +372,8 @@ async function concluirMissao(progressoId: string) {
 
   await verificarConquistaBnccComputacao(progresso.alunoId, progresso.missao.trilhaId);
   await verificarConquistaSpaece(progresso.alunoId, progresso.missao.trilhaId);
+
+  return badgeConcedido;
 }
 
 async function buscarProgressoDoAluno(progressoId: string) {
@@ -411,7 +420,7 @@ export async function entregarMissao(
 }
 
 export type ResultadoQuizMissao =
-  | { ok: true; aprovado: boolean; acertos: number; total: number }
+  | { ok: true; aprovado: boolean; acertos: number; total: number; badgeConcedido: BadgeConcedido }
   | { ok: false; erro: string };
 
 export async function responderQuizMissao(
@@ -440,8 +449,9 @@ export async function responderQuizMissao(
   const notaMinima = progresso.missao.notaMinima ?? 60;
   const aprovado = percentual >= notaMinima;
 
+  let badgeConcedido: BadgeConcedido = null;
   if (aprovado) {
-    await concluirMissao(progressoId);
+    badgeConcedido = await concluirMissao(progressoId);
   } else {
     await prisma.progressoAluno.update({
       where: { id: progressoId },
@@ -450,11 +460,11 @@ export async function responderQuizMissao(
   }
 
   revalidatePath(`/trilha/${progresso.missao.trilhaId}`);
-  return { ok: true, aprovado, acertos, total: perguntas.length };
+  return { ok: true, aprovado, acertos, total: perguntas.length, badgeConcedido };
 }
 
 export type ResultadoMapaMissao =
-  | { ok: true; aprovado: boolean; acertos: number; total: number }
+  | { ok: true; aprovado: boolean; acertos: number; total: number; badgeConcedido: BadgeConcedido }
   | { ok: false; erro: string };
 
 // Mesmo padrão de responderQuizMissao: o jogo do mapa roda inteiro no
@@ -492,8 +502,9 @@ export async function responderMapaMissao(
   const notaMinima = progresso.missao.notaMinima ?? 60;
   const aprovado = percentual >= notaMinima;
 
+  let badgeConcedido: BadgeConcedido = null;
   if (aprovado) {
-    await concluirMissao(progressoId);
+    badgeConcedido = await concluirMissao(progressoId);
   } else {
     await prisma.progressoAluno.update({
       where: { id: progressoId },
@@ -502,7 +513,7 @@ export async function responderMapaMissao(
   }
 
   revalidatePath(`/trilha/${progresso.missao.trilhaId}`);
-  return { ok: true, aprovado, acertos, total };
+  return { ok: true, aprovado, acertos, total, badgeConcedido };
 }
 
 export async function avaliarMissao(
