@@ -13,7 +13,14 @@ const INICIO_RELATORIO = new Date("2026-10-02T08:00:00-03:00");
 
 // Dado sensível do CEITEC (nomes reais de alunos) — só o dono da plataforma
 // e os professores colaboradores da aba SPAECE dele.
-export default async function ResultadosSispaiMatematica() {
+export default async function ResultadosSispaiMatematica({
+  searchParams,
+}: {
+  searchParams: Promise<{ disciplina?: string }>;
+}) {
+  const { disciplina: disciplinaParam } = await searchParams;
+  const ehPortugues = disciplinaParam === "portugues";
+  const nomeDisciplina = ehPortugues ? "Língua Portuguesa" : "Matemática";
   const sessao = await exigirAssinaturaAtiva();
   if (sessao.papel !== "ita_owner" && !sessao.colaborador) {
     notFound();
@@ -34,7 +41,7 @@ export default async function ResultadosSispaiMatematica() {
           sala: {
             atividade: {
               professorId: sessao.userId,
-              disciplina: "Matemática",
+              disciplina: nomeDisciplina,
               tema: { contains: "(SPAECE)" },
             },
           },
@@ -138,6 +145,21 @@ export default async function ResultadosSispaiMatematica() {
           <p className="mt-2 text-xs uppercase tracking-widest text-neutral-500">CEITEC</p>
         </div>
 
+        <div className="mt-4 flex justify-center gap-2 text-sm font-semibold">
+          <Link
+            href="/painel/spaece/resultados-matematica"
+            className={`rounded-full px-4 py-1.5 ${!ehPortugues ? "bg-[#0d6efd] text-white" : "border border-neutral-300 text-neutral-700"}`}
+          >
+            Matemática
+          </Link>
+          <Link
+            href="/painel/spaece/resultados-matematica?disciplina=portugues"
+            className={`rounded-full px-4 py-1.5 ${ehPortugues ? "bg-[#0d6efd] text-white" : "border border-neutral-300 text-neutral-700"}`}
+          >
+            Língua Portuguesa
+          </Link>
+        </div>
+
         <div className="mt-6 rounded-md border border-neutral-200 bg-neutral-50 p-4 text-sm text-neutral-800">
           <p className="border-b border-neutral-200 pb-2">
             <strong>Escola:</strong>{" "}
@@ -151,7 +173,7 @@ export default async function ResultadosSispaiMatematica() {
               <strong>Série:</strong> 9º ANO
             </p>
             <p>
-              <strong>Disciplina:</strong> Matemática
+              <strong>Disciplina:</strong> {nomeDisciplina}
             </p>
             <p>
               <strong>Desde:</strong> {INICIO_RELATORIO.toLocaleDateString("pt-BR", { timeZone: "America/Fortaleza" })}
