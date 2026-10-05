@@ -22,7 +22,7 @@ const { PrismaPg } = require("@prisma/adapter-pg");
 
 const prisma = new PrismaClient({ adapter: new PrismaPg(process.env.DATABASE_URL) });
 const cliente = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const MODELO = "claude-opus-5-5";
+const MODELO = "claude-sonnet-5"; // mesmo modelo do restante do app (aceita tool_choice forçado)
 
 const EMAIL_PROFESSOR = "itagamificaedu@gmail.com";
 const TEMA = "Simulado Língua Portuguesa 9º ano (SPAECE) — 26 questões, D01 a D23";
