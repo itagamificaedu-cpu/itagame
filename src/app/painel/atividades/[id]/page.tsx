@@ -1,3 +1,4 @@
+import { rotuloAlternativa } from "@/lib/alternativas";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
@@ -177,7 +178,7 @@ function BlocoQuestoes({
 
             {questao.alternativas.length > 0 && (
               <ul className="mt-3 space-y-2">
-                {questao.alternativas.map((alternativa) => (
+                {questao.alternativas.map((alternativa, indiceAlt) => (
                   <li
                     key={alternativa}
                     className={`rounded-lg border px-3 py-2 text-sm ${
@@ -186,7 +187,7 @@ function BlocoQuestoes({
                         : "border-neutral-200 text-neutral-600"
                     }`}
                   >
-                    {alternativa}
+                    {rotuloAlternativa(alternativa, indiceAlt)}
                   </li>
                 ))}
               </ul>

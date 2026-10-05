@@ -1,5 +1,6 @@
 "use client";
 
+import { rotuloAlternativa } from "@/lib/alternativas";
 import { useEffect, useState } from "react";
 import { responder } from "@/app/actions/salas";
 
@@ -292,7 +293,7 @@ export function JogoCliente({ codigo }: { codigo: string }) {
                     className={`flex items-center gap-3 rounded-2xl px-5 py-5 text-left font-bold text-white shadow-sm transition active:scale-[0.98] disabled:opacity-60 ${FORMAS[indice % 4].cor}`}
                   >
                     <Forma indice={indice} />
-                    {alternativa}
+                    {rotuloAlternativa(alternativa, indice)}
                   </button>
                 ))
               : ["verdadeiro", "falso"].map((opcao, indice) => (
@@ -460,7 +461,7 @@ function JogoQuemErraCai({
                   disabled={enviando}
                   className="rounded-2xl border-2 border-neutral-200 bg-white px-5 py-4 text-left font-bold text-neutral-800 shadow-sm transition active:scale-[0.98] disabled:opacity-60 hover:border-[#00c264]"
                 >
-                  {String.fromCharCode(65 + indice)}. {alternativa}
+                  {rotuloAlternativa(alternativa, indice)}
                 </button>
               ))
             : ["verdadeiro", "falso"].map((opcao) => (

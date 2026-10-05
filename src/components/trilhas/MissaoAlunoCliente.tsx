@@ -1,5 +1,6 @@
 "use client";
 
+import { rotuloAlternativa } from "@/lib/alternativas";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { entregarMissao, responderQuizMissao, type QuestaoQuizMissao, type PontoMapaMissao } from "@/app/actions/missoes";
@@ -103,7 +104,7 @@ export function MissaoAlunoCliente({
               {indice + 1}. {pergunta.enunciado}
             </p>
             <div className="mt-3 space-y-2">
-              {pergunta.alternativas.map((alt) => (
+              {pergunta.alternativas.map((alt, indiceAlt) => (
                 <button
                   key={alt}
                   type="button"
@@ -116,7 +117,7 @@ export function MissaoAlunoCliente({
                       : "border-neutral-200 text-neutral-700 hover:border-neutral-300"
                   }`}
                 >
-                  {alt}
+                  {rotuloAlternativa(alt, indiceAlt)}
                 </button>
               ))}
             </div>

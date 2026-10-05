@@ -1,5 +1,6 @@
 "use client";
 
+import { rotuloAlternativa } from "@/lib/alternativas";
 import { useEffect, useRef, useState } from "react";
 import { responderCaboGuerra } from "@/app/actions/caboGuerraOnline";
 import { NOMES_NIVEL, type Nivel } from "@/lib/caboGuerraPerguntas";
@@ -216,7 +217,7 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
                           : "bg-white/15 hover:bg-white/25"
                     }`}
                   >
-                    {opcao}
+                    {rotuloAlternativa(opcao, indice)}
                   </button>
                 );
               })}
