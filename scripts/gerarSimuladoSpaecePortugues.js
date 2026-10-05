@@ -128,6 +128,21 @@ async function gerarGrupo(grupo) {
   return questoes;
 }
 
+// A IA às vezes devolve um item fora do formato (ex.: 2 alternativas erradas
+// em vez de 3). Nesse caso gera o grupo de novo, até 4 vezes.
+async function gerarGrupoComTentativas(grupo) {
+  let ultimoErro;
+  for (let tentativa = 1; tentativa <= 4; tentativa++) {
+    try {
+      return await gerarGrupo(grupo);
+    } catch (e) {
+      ultimoErro = e;
+      console.warn(`Tentativa ${tentativa} do grupo "${grupo.nome}" falhou: ${e.message}`);
+    }
+  }
+  throw ultimoErro;
+}
+
 function embaralhar(lista) {
   const c = [...lista];
   for (let i = c.length - 1; i > 0; i--) {
@@ -141,7 +156,7 @@ async function main() {
   const professor = await prisma.usuario.findUnique({ where: { email: EMAIL_PROFESSOR } });
   if (!professor) throw new Error(`Professor ${EMAIL_PROFESSOR} não encontrado.`);
 
-  const resultados = await Promise.all(GRUPOS.map(gerarGrupo));
+  const resultados = await Promise.all(GRUPOS.map(gerarGrupoComTentativas));
   const todas = resultados.flat();
   if (todas.length !== 26) throw new Error(`Esperava 26 questões, vieram ${todas.length}.`);
 
