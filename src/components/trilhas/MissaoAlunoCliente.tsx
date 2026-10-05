@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { entregarMissao, responderQuizMissao, type QuestaoQuizMissao, type PontoMapaMissao } from "@/app/actions/missoes";
 import { MapaInterativoMissaoCliente } from "@/components/trilhas/MapaInterativoMissaoCliente";
-import { celebrarConquista, celebrarMissaoConcluida } from "@/lib/celebracao";
+import { celebrarConquista, celebrarMissaoConcluida, tocarSom } from "@/lib/celebracao";
 import { PopupBadge } from "@/components/trilhas/PopupBadge";
 
 type Props = {
@@ -99,6 +99,8 @@ export function MissaoAlunoCliente({
             celebrarMissaoConcluida();
           }
           router.refresh();
+        } else {
+          tocarSom("erro");
         }
       });
     }

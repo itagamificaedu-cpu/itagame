@@ -3,6 +3,7 @@
 import { rotuloAlternativa } from "@/lib/alternativas";
 import { useEffect, useState } from "react";
 import { responder } from "@/app/actions/salas";
+import { tocarSom } from "@/lib/celebracao";
 
 type Participante = { id: string; apelido: string; pontuacao: number; eliminado: boolean };
 
@@ -104,6 +105,7 @@ export function JogoCliente({ codigo }: { codigo: string }) {
     if (resultado.ok) {
       setRespostaEnviada(true);
       setFeedback({ correta: resultado.correta, pontosGanhos: resultado.pontosGanhos, xpGanho: resultado.xpGanho });
+      tocarSom(resultado.correta ? "select" : "erro");
     }
   }
 

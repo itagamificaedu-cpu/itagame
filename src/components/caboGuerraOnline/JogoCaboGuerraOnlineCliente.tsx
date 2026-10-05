@@ -3,6 +3,7 @@
 import { rotuloAlternativa } from "@/lib/alternativas";
 import { useEffect, useRef, useState } from "react";
 import { responderCaboGuerra } from "@/app/actions/caboGuerraOnline";
+import { tocarSom } from "@/lib/celebracao";
 import { NOMES_NIVEL, type Nivel } from "@/lib/caboGuerraPerguntas";
 
 type Participante = { id: string; apelido: string; pontuacao: number };
@@ -88,7 +89,9 @@ export function JogoCaboGuerraOnlineCliente({ codigo }: { codigo: string }) {
     const resultado = await responderCaboGuerra(codigo, valor);
     enviandoRef.current = false;
     if (resultado.ok) {
-      setStatus(resultado.correta && !resultado.tarde ? "correta" : "errada");
+      const acertou = resultado.correta && !resultado.tarde;
+      setStatus(acertou ? "correta" : "errada");
+      tocarSom(acertou ? "select" : "erro");
       if (!resultado.correta || resultado.tarde) {
         setTimeout(() => {
           setStatus(null);

@@ -4,7 +4,7 @@
 // Os arquivos ficam em /public/materiais/audio (nomes sem espaço, cópias
 // dos originais, pra não precisar de encodeURI no <audio>/new Audio()).
 
-export type NomeSom = "fanfare" | "confirm" | "fruit-collect" | "select" | "lose";
+export type NomeSom = "fanfare" | "confirm" | "fruit-collect" | "select" | "lose" | "erro";
 
 const ARQUIVO_SOM: Record<NomeSom, string> = {
   fanfare: "/materiais/audio/fanfare.ogg",
@@ -12,6 +12,9 @@ const ARQUIVO_SOM: Record<NomeSom, string> = {
   "fruit-collect": "/materiais/audio/fruit-collect.wav",
   select: "/materiais/audio/select.wav",
   lose: "/materiais/audio/lose.wav",
+  // Som curto de resposta errada — mais suave que "lose" (que é pra quando
+  // perde a partida/missão toda, não só uma pergunta).
+  erro: "/materiais/audio/erro.wav",
 };
 
 // Cache simples pra não recriar o objeto Audio a cada clique.

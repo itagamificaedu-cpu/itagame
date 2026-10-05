@@ -65,6 +65,8 @@ export function MapaInterativoMissaoCliente({ progressoId, imagemUrl, pontos, xp
     if (certo) {
       setAcertos((a) => a + 1);
       tocarSom("select");
+    } else {
+      tocarSom("erro");
     }
 
     setTimeout(() => {
