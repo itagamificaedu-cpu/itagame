@@ -22,6 +22,15 @@ const prisma = new PrismaClient({ adapter });
 const EMAIL_PROFESSOR = "itagamificaedu@gmail.com";
 const FIGURAS = "/materiais/ceitec-simulados";
 
+// Toda alternativa aparece com a letra na frente ("A) ...", "B) ..."), como na
+// prova impressa. Alternativas que são só a figura ("(A)") viram "A)".
+function comLetras(alternativas) {
+  return alternativas.map((texto, i) => {
+    const letra = String.fromCharCode(65 + i);
+    return /^\([A-D]\)$/.test(texto) ? `${letra})` : `${letra}) ${texto}`;
+  });
+}
+
 const CEITEC = [
   {
     n: 1, d: "D1", img: "ceitec_q01.png",
@@ -336,13 +345,13 @@ async function main() {
         titulo: sim.titulo,
         questoes: sim.questoes.map((q) => ({
           enunciado: enunciadoDe(q),
-          alternativas: q.alt,
+          alternativas: comLetras(q.alt),
           ...(q.img ? { imagem: `${FIGURAS}/${q.img}` } : {}),
         })),
       },
       gabarito: sim.questoes.map((q) => ({
         enunciado: enunciadoDe(q),
-        respostaCorreta: q.alt[q.certa],
+        respostaCorreta: comLetras(q.alt)[q.certa],
         explicacao: q.exp,
       })),
       competenciasBncc: [],

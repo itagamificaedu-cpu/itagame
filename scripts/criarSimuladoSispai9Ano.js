@@ -24,6 +24,15 @@ const TEMA = "SISPAI 2025.2 — 9º ano (SPAECE) — Simulado";
 const FIGURAS = "/materiais/sispai-2025-2-9ano";
 const ABCD = ["(A)", "(B)", "(C)", "(D)"];
 
+// Toda alternativa aparece com a letra na frente ("A) ...", "B) ..."), como na
+// prova impressa. Alternativas que são só a figura ("(A)") viram "A)".
+function comLetras(alternativas) {
+  return alternativas.map((texto, i) => {
+    const letra = String.fromCharCode(65 + i);
+    return /^\([A-D]\)$/.test(texto) ? `${letra})` : `${letra}) ${texto}`;
+  });
+}
+
 const QUESTOES = [
   {
     numero: 27,
@@ -253,13 +262,13 @@ async function main() {
       titulo: "Simulado SISPAI 2025.2 — Matemática 9º ano",
       questoes: QUESTOES.map((q) => ({
         enunciado: `Questão ${q.numero} — ${q.enunciado}`,
-        alternativas: q.alternativas,
+        alternativas: comLetras(q.alternativas),
         ...(q.imagem ? { imagem: `${FIGURAS}/${q.imagem}` } : {}),
       })),
     },
     gabarito: QUESTOES.map((q) => ({
       enunciado: `Questão ${q.numero} — ${q.enunciado}`,
-      respostaCorreta: q.respostaCorreta,
+      respostaCorreta: comLetras(q.alternativas)[q.alternativas.indexOf(q.respostaCorreta)],
       explicacao: q.explicacao,
     })),
     competenciasBncc: [],
