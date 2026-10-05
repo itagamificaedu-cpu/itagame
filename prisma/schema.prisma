@@ -154,6 +154,7 @@ model Usuario {
   colaboradores    Usuario[] @relation("Colaboradores")
   acessoRestrito   String?
   sessoesColaborador SessaoColaborador[]
+  provasCronometradas ProvaCronometrada[]
 
   turmasComoProfessor Turma[]        @relation("ProfessorTurmas")
   matriculas          Matricula[]
@@ -190,6 +191,63 @@ model SessaoColaborador {
   @@map("sessoes_colaborador")
 }
 
+enum StatusProva {
+  aguardando
+  em_andamento
+  pausada
+  encerrada
+}
+
+// Prova cronometrada (simulado do SPAECE no formato da prova de verdade): um
+// relógio só pra turma toda, o aluno navega livre pelas questões e marca o
+// cartão-resposta, e a prova se entrega sozinha quando o tempo acaba.
+// As questões e o gabarito são copiados das atividades na hora de criar
+// (blocos), então editar a atividade depois não muda uma prova já criada.
+// blocos = [{ nome, atividadeId, disciplina, questoes: [{enunciado, alternativas, imagem?}], gabarito: [respostaCorreta] }]
+// O tempo é sempre calculado no servidor (iniciadaEm, pausas e minutos extras).
+model ProvaCronometrada {
+  id               String      @id @default(cuid())
+  codigo           String      @unique
+  titulo           String
+  duracaoMin       Int         @default(150)
+  status           StatusProva @default(aguardando)
+  blocos           Json
+  iniciadaEm       DateTime?
+  pausadoEm        DateTime?
+  segundosPausados Int         @default(0)
+  segundosExtras   Int         @default(0)
+  encerradaEm      DateTime?
+  // Preenchido uma única vez, quando as respostas viram resultado no relatório.
+  resultadosGravadosEm DateTime?
+  criadaEm         DateTime    @default(now())
+
+  professorId String
+  professor   Usuario  @relation(fields: [professorId], references: [id])
+  turmaId     String
+  turma       Turma    @relation(fields: [turmaId], references: [id])
+
+  participantes ParticipanteProva[]
+
+  @@map("provas_cronometradas")
+}
+
+model ParticipanteProva {
+  id            String   @id @default(cuid())
+  // respostas = { "bloco:indice": "texto da alternativa escolhida" }
+  respostas     Json     @default("{}")
+  entrouEm      DateTime @default(now())
+  ultimoSinalEm DateTime @default(now())
+  entregueEm    DateTime?
+
+  provaId String
+  prova   ProvaCronometrada @relation(fields: [provaId], references: [id])
+  alunoId String
+  aluno   Aluno             @relation(fields: [alunoId], references: [id])
+
+  @@unique([provaId, alunoId])
+  @@map("participantes_prova")
+}
+
 model Turma {
   id           String   @id @default(cuid())
   nome         String
@@ -212,6 +270,7 @@ model Turma {
   salasCaboGuerra SalaCaboGuerra[]
   salasAoVivo     SalaAoVivo[]
   gincanaTimes    GincanaTime[]
+  provasCronometradas ProvaCronometrada[]
 
   @@map("turmas")
 }
@@ -243,6 +302,7 @@ model Aluno {
   registrosProntuario RegistroProntuario[]
   participacoesCaboGuerra ParticipanteCaboGuerra[]
   participacoesSala       ParticipanteSala[]
+  participacoesProva      ParticipanteProva[]
 
   @@map("alunos")
 }

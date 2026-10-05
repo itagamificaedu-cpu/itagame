@@ -84,6 +84,8 @@ export async function excluirTurma(turmaId: string) {
     const aplicacoes = await tx.aplicacaoAtividade.findMany({ where: { turmaId }, select: { id: true } });
     const aplicacaoIds = aplicacoes.map((a) => a.id);
 
+    await tx.participanteProva.deleteMany({ where: { alunoId: { in: alunoIds } } });
+    await tx.provaCronometrada.deleteMany({ where: { turmaId } });
     await tx.xpTransacao.deleteMany({ where: { alunoId: { in: alunoIds } } });
     await tx.badgeConcedida.deleteMany({ where: { alunoId: { in: alunoIds } } });
     await tx.resgateLoja.deleteMany({ where: { OR: [{ alunoId: { in: alunoIds } }, { itemId: { in: itemIds } }] } });

@@ -163,7 +163,7 @@ function BlocoQuestoes({
         const item = gabarito[indice];
         return (
           <li key={indice} className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <p className="font-semibold text-neutral-900">
+            <p className="whitespace-pre-line font-semibold text-neutral-900">
               {indice + 1}. {questao.enunciado}
             </p>
 

@@ -84,6 +84,13 @@ export default async function PaginaSpaece() {
                 📉 Resultados SISPAI — Matemática (CEITEC)
               </Link>
             )}
+            <Link
+              href="/painel/spaece/prova"
+              className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-extrabold transition hover:bg-white/90"
+              style={{ color: VERDE_SPAECE_ESCURO }}
+            >
+              ⏱️ Prova Cronometrada (simulado de 2h30)
+            </Link>
             {ehDono && (
               <Link
                 href="/painel/spaece/professores"

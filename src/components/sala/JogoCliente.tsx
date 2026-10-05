@@ -250,7 +250,7 @@ export function JogoCliente({ codigo }: { codigo: string }) {
         <p className="mt-3 text-center text-xs font-bold tracking-wide text-neutral-400 uppercase">
           Pergunta {dados.perguntaAtual + 1} de {dados.totalQuestoes}
         </p>
-        <h1 className="mt-3 text-center text-xl font-extrabold text-neutral-900">
+        <h1 className="mt-3 whitespace-pre-line text-center text-xl font-extrabold text-neutral-900">
           {dados.perguntaAtualConteudo.enunciado}
         </h1>
         <FiguraQuestao imagem={dados.perguntaAtualConteudo.imagem} />
@@ -448,7 +448,7 @@ function JogoQuemErraCai({
             {sobreviventes.length} de pé
           </p>
         </div>
-        <h1 className="mt-4 text-center text-xl font-extrabold text-neutral-900">
+        <h1 className="mt-4 whitespace-pre-line text-center text-xl font-extrabold text-neutral-900">
           {dados.perguntaAtualConteudo.enunciado}
         </h1>
         <p className="mt-1 text-center text-xs font-semibold text-neutral-400">Errar = cair da partida</p>

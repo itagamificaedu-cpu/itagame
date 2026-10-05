@@ -86,7 +86,7 @@ export function ControleSalaCliente({ codigo }: { codigo: string }) {
             <p className="text-sm text-neutral-500">
               Pergunta {dados.perguntaAtual + 1} de {dados.totalQuestoes}
             </p>
-            <p className="mt-2 text-lg font-bold text-neutral-900">
+            <p className="mt-2 whitespace-pre-line text-lg font-bold text-neutral-900">
               {dados.perguntaAtualConteudo.enunciado}
             </p>
             {dados.perguntaAtualConteudo.imagem && (

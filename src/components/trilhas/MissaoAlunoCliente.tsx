@@ -115,7 +115,7 @@ export function MissaoAlunoCliente({
         )}
         {(quizPerguntas ?? []).map((pergunta, indice) => (
           <div key={indice} className="rounded-xl border border-neutral-200 bg-white p-5">
-            <p className="font-semibold text-neutral-900">
+            <p className="whitespace-pre-line font-semibold text-neutral-900">
               {indice + 1}. {pergunta.enunciado}
             </p>
             <div className="mt-3 space-y-2">
