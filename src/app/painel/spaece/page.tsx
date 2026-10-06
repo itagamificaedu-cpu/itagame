@@ -91,6 +91,12 @@ export default async function PaginaSpaece() {
             >
               ⏱️ Prova Cronometrada (simulado de 2h30)
             </Link>
+            <Link
+              href="/painel/turmas"
+              className="inline-flex items-center gap-2 rounded-lg bg-white/15 px-4 py-2 text-sm font-bold backdrop-blur transition hover:bg-white/25"
+            >
+              🏫 Minhas turmas e alunos
+            </Link>
             {ehDono && (
               <Link
                 href="/painel/spaece/professores"

@@ -6,7 +6,7 @@ export default async function PaginaTurmas() {
   const sessao = await exigirAssinaturaAtiva();
 
   const turmas = await prisma.turma.findMany({
-    where: { professorId: sessao.userId },
+    where: { professorId: sessao.userId, ...(sessao.colaborador ? { acessoAlunosBloqueado: false } : {}) },
     orderBy: { criadaEm: "desc" },
     include: { _count: { select: { alunos: true } } },
   });

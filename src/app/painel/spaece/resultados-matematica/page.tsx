@@ -28,7 +28,9 @@ export default async function ResultadosSispaiMatematica({
 
   const [turmas, respostas, progressos, missoesPorTrilha] = await Promise.all([
     prisma.turma.findMany({
-      where: { professorId: sessao.userId, nome: { startsWith: "9º Ano" }, ...(sessao.colaborador ? { acessoAlunosBloqueado: false } : {}) },
+      where: sessao.colaborador
+        ? { professorId: sessao.userId, acessoAlunosBloqueado: false }
+        : { professorId: sessao.userId, nome: { startsWith: "9º Ano" } },
       orderBy: { nome: "asc" },
       select: { id: true, nome: true, alunos: { select: { id: true, nome: true }, orderBy: { nome: "asc" } } },
     }),

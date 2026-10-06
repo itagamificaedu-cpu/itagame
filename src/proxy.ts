@@ -15,6 +15,8 @@ const AREAS: Record<string, { inicio: string; permitidas: RegExp[] }> = {
     inicio: "/painel/spaece",
     permitidas: [
       /^\/painel\/spaece(\/.*)?$/,
+      // Turmas próprias dos professores convidados (a lista esconde as do CEITEC)
+      /^\/painel\/turmas(\/nova|\/[^/]+(\/pins)?)?$/,
       /^\/painel\/trilhas\/gerar-ia$/,
       /^\/painel\/trilhas\/(?!nova$|gerar-ia$|usar-modelo)[^/]+$/,
       /^\/painel\/atividades\/(?!nova$)[^/]+$/,

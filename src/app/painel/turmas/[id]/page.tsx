@@ -23,7 +23,7 @@ export default async function PaginaDetalheTurma({
     include: { alunos: { orderBy: { nome: "asc" } } },
   });
 
-  if (!turma || turma.professorId !== sessao.userId) {
+  if (!turma || turma.professorId !== sessao.userId || (sessao.colaborador && turma.acessoAlunosBloqueado)) {
     notFound();
   }
 

@@ -14,7 +14,7 @@ export default async function PaginaPinsTurma({ params }: { params: Promise<{ id
     where: { id },
     include: { alunos: { orderBy: { nome: "asc" } } },
   });
-  if (!turma || turma.professorId !== sessao.userId) notFound();
+  if (!turma || turma.professorId !== sessao.userId || (sessao.colaborador && turma.acessoAlunosBloqueado)) notFound();
 
   return (
     <main className="min-h-screen bg-white px-6 py-8">

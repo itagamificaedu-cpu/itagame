@@ -69,7 +69,7 @@ export async function gerarPinAluno(turmaId: string, alunoId: string): Promise<R
   const sessao = await exigirAssinaturaAtiva();
 
   const turma = await prisma.turma.findUnique({ where: { id: turmaId } });
-  if (!turma || turma.professorId !== sessao.userId) {
+  if (!turma || turma.professorId !== sessao.userId || (sessao.colaborador && turma.acessoAlunosBloqueado)) {
     return { ok: false, erro: "Turma não encontrada." };
   }
 
@@ -96,7 +96,7 @@ export async function gerarPinsDaTurma(turmaId: string): Promise<ResultadoGerarP
   const sessao = await exigirAssinaturaAtiva();
 
   const turma = await prisma.turma.findUnique({ where: { id: turmaId } });
-  if (!turma || turma.professorId !== sessao.userId) {
+  if (!turma || turma.professorId !== sessao.userId || (sessao.colaborador && turma.acessoAlunosBloqueado)) {
     return { ok: false, erro: "Turma não encontrada." };
   }
 
