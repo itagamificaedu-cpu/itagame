@@ -19,7 +19,11 @@ export type ResultadoVerificarPin =
   | { ok: false; erro: string };
 
 export async function verificarPinAluno(alunoId: string, pin: string): Promise<ResultadoVerificarPin> {
-  const aluno = await prisma.aluno.findUnique({ where: { id: alunoId } });
+  const aluno = await prisma.aluno.findUnique({ where: { id: alunoId }, include: { turma: { select: { acessoAlunosBloqueado: true } } } });
+
+  if (aluno?.turma.acessoAlunosBloqueado) {
+    return { ok: false, erro: "O acesso desta turma está desativado. Fale com o professor." };
+  }
 
   if (!aluno || !aluno.pinHash) {
     return {

@@ -256,6 +256,9 @@ model Turma {
   // aluno usa junto com o PIN pra acessar as trilhas da turma sem precisar
   // de e-mail/conta.
   codigoAcesso String?  @unique
+  // Quando true, nenhum aluno da turma consegue entrar (PIN recusado e
+  // sessões já abertas deixam de valer). Reversível: basta voltar a false.
+  acessoAlunosBloqueado Boolean @default(false)
   criadaEm     DateTime @default(now())
 
   professorId  String

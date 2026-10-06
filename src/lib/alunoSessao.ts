@@ -1,6 +1,7 @@
 import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { prisma } from "@/lib/prisma";
 
 // Sessão do ALUNO nas Trilhas — diferente da sessão do professor (sessao.ts)
 // e da sessão de participante de sala ao vivo (salaSessao.ts), que dura só
@@ -42,7 +43,11 @@ export async function obterSessaoAluno(): Promise<DadosAluno | null> {
 
   try {
     const { payload } = await jwtVerify(cookie, chaveCodificada, { algorithms: ["HS256"] });
-    return payload as unknown as DadosAluno;
+    const dados = payload as unknown as DadosAluno;
+    // Turma com acesso desativado: a sessão de 30 dias deixa de valer na hora.
+    const turma = await prisma.turma.findUnique({ where: { id: dados.turmaId }, select: { acessoAlunosBloqueado: true } });
+    if (!turma || turma.acessoAlunosBloqueado) return null;
+    return dados;
   } catch {
     return null;
   }
