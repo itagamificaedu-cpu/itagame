@@ -2,6 +2,7 @@ import Link from "next/link";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
 import { VERDE_SPAECE } from "@/lib/spaece";
+import { AvisoCriarTurma } from "@/components/AvisoCriarTurma";
 import { NovaProvaCliente } from "@/components/prova/NovaProvaCliente";
 
 const ROTULO_STATUS: Record<string, string> = {
@@ -47,6 +48,7 @@ export default async function PaginaNovaProva() {
 
   return (
     <main className="min-h-screen bg-neutral-50 px-4 py-10 sm:px-6">
+      {sessao.colaborador && turmas.length === 0 && <AvisoCriarTurma />}
       <div className="mx-auto max-w-2xl">
         <Link href="/painel/spaece" className="text-sm font-semibold" style={{ color: VERDE_SPAECE }}>
           ← Voltar ao SPAECE 9º ano

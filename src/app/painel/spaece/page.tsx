@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AvisoCriarTurma } from "@/components/AvisoCriarTurma";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { sair } from "@/app/actions/autenticacao";
 import { prisma } from "@/lib/prisma";
@@ -47,6 +48,7 @@ export default async function PaginaSpaece() {
 
   return (
     <main className="min-h-screen bg-neutral-50 px-6 py-10">
+      {sessao.colaborador && turmas.length === 0 && <AvisoCriarTurma />}
       <div className="mx-auto max-w-5xl">
         {sessao.colaborador ? (
           // Colaborador só tem esta aba — no lugar do "voltar", o botão de sair.
