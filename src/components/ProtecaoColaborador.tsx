@@ -40,7 +40,7 @@ export default function ProtecaoColaborador() {
     };
   }, []);
 
-  const texto = `CEITEC · uso restrito · ${hora}`;
+  const texto = `SPAECE · uso restrito · ${hora}`;
 
   return (
     <>

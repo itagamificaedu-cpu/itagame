@@ -19,12 +19,12 @@ export default async function PaginaSpaece() {
 
   const [trilhas, turmas, atividades] = await Promise.all([
     prisma.trilha.findMany({
-      where: { professorId: sessao.userId, eixoSpaece: { not: null } },
+      where: { professorId: sessao.userId, eixoSpaece: { not: null }, ...(sessao.colaborador ? { turma: { acessoAlunosBloqueado: false } } : {}) },
       include: { turma: true, _count: { select: { missoes: true } } },
       orderBy: { criadaEm: "desc" },
     }),
     prisma.turma.findMany({
-      where: { professorId: sessao.userId },
+      where: { professorId: sessao.userId, ...(sessao.colaborador ? { acessoAlunosBloqueado: false } : {}) },
       orderBy: { nome: "asc" },
       select: { id: true, nome: true },
     }),

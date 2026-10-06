@@ -24,7 +24,7 @@ export default async function PaginaGerarTrilhaIa({
   }
 
   const turmas = await prisma.turma.findMany({
-    where: { professorId: sessao.userId },
+    where: { professorId: sessao.userId, ...(sessao.colaborador ? { acessoAlunosBloqueado: false } : {}) },
     orderBy: { nome: "asc" },
   });
 

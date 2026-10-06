@@ -18,7 +18,7 @@ export default async function PaginaCaboDeGuerraPersonalizado({
   }
 
   const turmas = await prisma.turma.findMany({
-    where: { professorId: sessao.userId },
+    where: { professorId: sessao.userId, ...(sessao.colaborador ? { acessoAlunosBloqueado: false } : {}) },
     orderBy: { nome: "asc" },
     include: { alunos: { orderBy: { nome: "asc" } } },
   });

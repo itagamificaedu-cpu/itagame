@@ -9,8 +9,9 @@ export default async function PaginaControleProva({ params }: { params: Promise<
   const { codigo } = await params;
   const sessao = await exigirAssinaturaAtiva();
 
-  const prova = await prisma.provaCronometrada.findUnique({ where: { codigo }, select: { professorId: true } });
+  const prova = await prisma.provaCronometrada.findUnique({ where: { codigo }, select: { professorId: true, turma: { select: { acessoAlunosBloqueado: true } } } });
   if (!prova || prova.professorId !== sessao.userId) notFound();
+  if (sessao.colaborador && prova.turma.acessoAlunosBloqueado) notFound();
 
   return (
     <main className="min-h-screen bg-neutral-50 px-4 py-8 sm:px-6">

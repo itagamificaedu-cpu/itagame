@@ -26,7 +26,7 @@ export async function iniciarSala(atividadeId: string, formData: FormData) {
   let turmaId: string | null = null;
   if (turmaIdInformada) {
     const turma = await prisma.turma.findUnique({ where: { id: turmaIdInformada } });
-    if (turma && turma.professorId === sessao.userId) {
+    if (turma && turma.professorId === sessao.userId && !(sessao.colaborador && turma.acessoAlunosBloqueado)) {
       turmaId = turma.id;
     }
   }

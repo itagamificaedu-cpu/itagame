@@ -23,7 +23,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ codigo:
       participantes: { include: { aluno: { select: { nome: true } } } },
     },
   });
-  if (!provaBruta || !donoId || provaBruta.professorId !== donoId) {
+  const colaboradorSemAcesso = sessao?.userId !== donoId && provaBruta?.turma.acessoAlunosBloqueado;
+  if (!provaBruta || !donoId || provaBruta.professorId !== donoId || colaboradorSemAcesso) {
     return NextResponse.json({ erro: "nao_autorizado" }, { status: 401 });
   }
 

@@ -22,12 +22,12 @@ export default async function PaginaNovaProva() {
       select: { id: true, tema: true, disciplina: true, conteudoGerado: true },
     }),
     prisma.turma.findMany({
-      where: { professorId: sessao.userId },
+      where: { professorId: sessao.userId, ...(sessao.colaborador ? { acessoAlunosBloqueado: false } : {}) },
       orderBy: { nome: "asc" },
       select: { id: true, nome: true },
     }),
     prisma.provaCronometrada.findMany({
-      where: { professorId: sessao.userId },
+      where: { professorId: sessao.userId, ...(sessao.colaborador ? { turma: { acessoAlunosBloqueado: false } } : {}) },
       orderBy: { criadaEm: "desc" },
       take: 8,
       select: { codigo: true, titulo: true, status: true, criadaEm: true, turma: { select: { nome: true } } },

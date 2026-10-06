@@ -34,7 +34,7 @@ export default async function PaginaDetalheTrilha({
     },
   });
 
-  if (!trilha || trilha.professorId !== sessao.userId) {
+  if (!trilha || trilha.professorId !== sessao.userId || (sessao.colaborador && trilha.turma.acessoAlunosBloqueado)) {
     notFound();
   }
 

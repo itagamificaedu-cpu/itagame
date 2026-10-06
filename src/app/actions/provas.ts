@@ -44,7 +44,7 @@ export async function criarProva(input: {
   }
 
   const turma = await prisma.turma.findUnique({ where: { id: input.turmaId } });
-  if (!turma || turma.professorId !== sessao.userId) return { ok: false, erro: "Turma não encontrada." };
+  if (!turma || turma.professorId !== sessao.userId || (sessao.colaborador && turma.acessoAlunosBloqueado)) return { ok: false, erro: "Turma não encontrada." };
 
   const blocos: BlocoProva[] = [];
   for (const atividadeId of input.atividadeIds) {
