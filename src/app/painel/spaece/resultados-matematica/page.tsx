@@ -129,7 +129,7 @@ export default async function ResultadosSispaiMatematica({
   );
 
   const avaliacoes = Array.from(porAtividade.values())
-    .map((a) => ({ tema: a.tema, turma: a.turma, alunos: a.alunos.size, corretas: a.corretas, total: a.total }))
+    .map((a) => ({ tema: a.tema.replace(/CEITEC\s*/gi, "").replace(/\s+/g, " ").trim(), turma: a.turma, alunos: a.alunos.size, corretas: a.corretas, total: a.total }))
     .sort((a, b) => a.tema.localeCompare(b.tema) || a.turma.localeCompare(b.turma));
 
   return (
@@ -142,7 +142,7 @@ export default async function ResultadosSispaiMatematica({
         {/* Cabeçalho no mesmo formato do "Relatório de Desempenho Consolidado" do SISPAI */}
         <div className="mt-6 border-b-2 border-[#0d6efd] pb-4 text-center">
           <h1 className="text-2xl font-bold text-[#0d6efd] sm:text-3xl">Relatório de Desempenho Consolidado</h1>
-          <p className="mt-2 text-xs uppercase tracking-widest text-neutral-500">CEITEC</p>
+          <p className="mt-2 text-xs uppercase tracking-widest text-neutral-500">Teste SPAECE</p>
         </div>
 
         <div className="mt-4 flex justify-center gap-2 text-sm font-semibold">
@@ -162,8 +162,8 @@ export default async function ResultadosSispaiMatematica({
 
         <div className="mt-6 rounded-md border border-neutral-200 bg-neutral-50 p-4 text-sm text-neutral-800">
           <p className="border-b border-neutral-200 pb-2">
-            <strong>Escola:</strong>{" "}
-            <span className="font-bold text-[#0d6efd]">CENTRO EDUCAÇÃO INTEGRAL, INOVAÇÃO E TECNOLOGIA - CEITEC</span>
+            <strong>Teste:</strong>{" "}
+            <span className="font-bold text-[#0d6efd]">Teste SPAECE</span>
           </p>
           <div className="mt-2 flex flex-wrap gap-x-8 gap-y-1">
             <p>
