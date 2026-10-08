@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
+import { finalizarSeNecessario } from "@/lib/provas";
 import { ResultadosMatematicaCliente } from "./ResultadosMatematicaCliente";
 
 // Relatório de Desempenho do 9º ano no formato do SISPAI, mas só com o que
@@ -25,6 +26,13 @@ export default async function ResultadosSispaiMatematica({
   if (sessao.papel !== "ita_owner" && !sessao.colaborador) {
     notFound();
   }
+
+  // Prova encerrada cujos resultados ainda não foram gravados (ex: encerrada
+  // por fora): grava agora para o relatório já sair completo.
+  const provasPendentes = await prisma.provaCronometrada.findMany({
+    where: { professorId: sessao.userId, status: "encerrada", resultadosGravadosEm: null },
+  });
+  for (const prova of provasPendentes) await finalizarSeNecessario(prova);
 
   const [turmas, respostas, progressos, missoesPorTrilha] = await Promise.all([
     prisma.turma.findMany({

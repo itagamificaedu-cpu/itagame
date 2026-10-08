@@ -49,6 +49,8 @@ export function ControleProvaCliente({ codigo }: { codigo: string }) {
   const [agora, setAgora] = useState(() => Date.now());
   const [erro, setErro] = useState<string | null>(null);
   const [confirmarFim, setConfirmarFim] = useState(false);
+  const [mostrarFaltas, setMostrarFaltas] = useState(false);
+  const [copiado, setCopiado] = useState(false);
   const [pendente, iniciar] = useTransition();
   const origem = typeof window === "undefined" ? "" : window.location.origin;
   const ultimo = useRef(0);
@@ -268,10 +270,40 @@ export function ControleProvaCliente({ codigo }: { codigo: string }) {
           </div>
         )}
         {estado.ausentes.length > 0 && (
-          <p className="mt-4 text-xs text-neutral-500">
-            <strong>{estado.status === "encerrada" ? "Não fizeram" : "Ainda não entraram"} ({estado.ausentes.length}):</strong>{" "}
-            {estado.ausentes.join(", ")}
-          </p>
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={() => setMostrarFaltas((v) => !v)}
+              className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm font-bold text-neutral-800 hover:bg-neutral-50"
+            >
+              🙋 {estado.status === "encerrada" ? "Quem faltou" : "Quem ainda não entrou"} ({estado.ausentes.length})
+            </button>
+            {mostrarFaltas && (
+              <div className="mt-3 rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+                <ol className="list-decimal space-y-0.5 pl-5 text-sm text-neutral-800">
+                  {estado.ausentes.map((nome) => (
+                    <li key={nome}>{nome}</li>
+                  ))}
+                </ol>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard
+                      ?.writeText(estado.ausentes.join("\n"))
+                      .then(() => {
+                        setCopiado(true);
+                        setTimeout(() => setCopiado(false), 2500);
+                      })
+                      .catch(() => {});
+                  }}
+                  className="mt-3 text-xs font-bold underline"
+                  style={{ color: VERDE_SPAECE }}
+                >
+                  {copiado ? "Lista copiada!" : "Copiar lista"}
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
