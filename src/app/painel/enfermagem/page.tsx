@@ -17,9 +17,9 @@ export default async function PaginaEnfermagem() {
   return (
     <main className="min-h-screen bg-neutral-50 px-4 py-10 sm:px-6">
       <div className="mx-auto max-w-2xl">
-        <h1 className="text-2xl font-extrabold text-neutral-900">Enfermagem · acesso temporário</h1>
+        <h1 className="text-2xl font-extrabold text-neutral-900">Acesso temporário</h1>
         <p className="mt-2 text-sm text-neutral-600">
-          Aqui você pode criar atividades com a ajuda da IA e usar o Simulador de Prontuário Eletrônico com a turma.
+          Aqui você pode criar atividades com a ajuda da IA.
         </p>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -41,11 +41,7 @@ export default async function PaginaEnfermagem() {
               <p className="mt-2 text-lg font-bold text-neutral-900">Prontuário Eletrônico</p>
               <p className="mt-1 text-sm text-neutral-600">Cadastre casos clínicos e acompanhe quem já registrou.</p>
             </Link>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-6 text-sm text-neutral-500">
-              A turma de Enfermagem ainda não foi criada.
-            </div>
-          )}
+          ) : null}
         </div>
 
         {turma && (
