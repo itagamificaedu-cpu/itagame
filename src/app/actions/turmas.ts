@@ -72,6 +72,9 @@ export async function criarTurma(
 
 export async function excluirTurma(turmaId: string) {
   const sessao = await exigirAssinaturaAtiva();
+  if (sessao.colaborador?.acessoRestrito === "enfermagem") {
+    throw new Error("Este acesso não pode excluir turmas.");
+  }
   await verificarDonoTurma(turmaId, sessao.userId, sessao);
 
   // Apaga a turma com tudo que depende dela (alunos, progresso nas trilhas,

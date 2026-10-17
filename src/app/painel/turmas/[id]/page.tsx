@@ -71,14 +71,16 @@ export default async function PaginaDetalheTurma({
               {turma.alunos.length === 1 ? "aluno" : "alunos"}
             </p>
           </div>
-          <form action={excluirTurma.bind(null, turma.id)}>
-            <button
-              type="submit"
-              className="whitespace-nowrap rounded-lg border border-red-200 px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-50"
-            >
-              Excluir turma
-            </button>
-          </form>
+          {sessao.colaborador?.acessoRestrito !== "enfermagem" && (
+            <form action={excluirTurma.bind(null, turma.id)}>
+              <button
+                type="submit"
+                className="whitespace-nowrap rounded-lg border border-red-200 px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-50"
+              >
+                Excluir turma
+              </button>
+            </form>
+          )}
         </div>
 
         <div className="mt-8 rounded-2xl border border-[#1a3fd4]/20 bg-[#1a3fd4]/5 p-6">
