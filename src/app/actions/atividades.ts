@@ -58,7 +58,8 @@ export async function gerarAtividade(
   let atividadeGerada;
   try {
     atividadeGerada = await gerarAtividadeComIa({ tipo, disciplina, serie, tema, quantidadeQuestoes });
-  } catch {
+  } catch (erro) {
+    console.error("[gerarAtividade] falha ao gerar com IA:", erro);
     return { mensagem: "Não consegui gerar a atividade agora. Tente novamente em instantes." };
   }
 
