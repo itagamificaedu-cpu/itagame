@@ -16,7 +16,7 @@ export const verificarSessao = cache(async () => {
 
   const usuario = await prisma.usuario.findUnique({
     where: { id: sessao.userId },
-    select: { sessaoAtual: true, contaPrincipalId: true, acessoRestrito: true },
+    select: { sessaoAtual: true, contaPrincipalId: true, acessoRestrito: true, acessoExpiraEm: true },
   });
 
   // A conta foi acessada em outro aparelho depois desse login — o carimbo
@@ -27,6 +27,10 @@ export const verificarSessao = cache(async () => {
   // essa mesma checagem barra ele de novo até a pessoa logar de verdade.
   if (!usuario) {
     redirect("/login?erro=outro-acesso");
+  }
+
+  if (usuario.acessoExpiraEm && usuario.acessoExpiraEm <= new Date()) {
+    redirect("/login?erro=expirado");
   }
 
   if (usuario.acessoRestrito) {
@@ -73,9 +77,10 @@ export async function idDonoDaSessao(userIdDoCookie: string | undefined): Promis
   if (!userIdDoCookie) return null;
   const usuario = await prisma.usuario.findUnique({
     where: { id: userIdDoCookie },
-    select: { contaPrincipalId: true },
+    select: { contaPrincipalId: true, acessoExpiraEm: true },
   });
   if (!usuario) return null;
+  if (usuario.acessoExpiraEm && usuario.acessoExpiraEm <= new Date()) return null;
   return usuario.contaPrincipalId ?? userIdDoCookie;
 }
 

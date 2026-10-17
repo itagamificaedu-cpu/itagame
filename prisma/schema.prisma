@@ -153,6 +153,8 @@ model Usuario {
   contaPrincipal   Usuario?  @relation("Colaboradores", fields: [contaPrincipalId], references: [id])
   colaboradores    Usuario[] @relation("Colaboradores")
   acessoRestrito   String?
+  // Acesso temporário: depois dessa data o login não entra mais e a sessão cai.
+  acessoExpiraEm   DateTime?
   sessoesColaborador SessaoColaborador[]
   provasCronometradas ProvaCronometrada[]
 

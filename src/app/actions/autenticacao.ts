@@ -79,6 +79,9 @@ export async function entrar(_estado: EstadoFormulario, formData: FormData): Pro
   }
 
   const senhaConfere = await bcrypt.compare(senha, usuario.senhaHash);
+  if (senhaConfere && usuario.acessoExpiraEm && usuario.acessoExpiraEm <= new Date()) {
+    return { mensagem: "Este acesso temporário expirou. Peça um novo ao organizador." };
+  }
   if (!senhaConfere) {
     const tentativas = usuario.tentativasLoginFalhas + 1;
     const bloqueado = tentativas >= LIMITE_TENTATIVAS_LOGIN;
