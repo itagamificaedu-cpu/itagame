@@ -40,7 +40,7 @@ export default function ProtecaoColaborador() {
     };
   }, []);
 
-  const texto = `SPAECE · uso restrito · ${hora}`;
+  const texto = `ItaGame · uso restrito · ${hora}`;
 
   return (
     <>

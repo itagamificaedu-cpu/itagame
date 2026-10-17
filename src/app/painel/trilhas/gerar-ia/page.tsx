@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { exigirAssinaturaAtiva, temAcessoBnccComputacao } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
+import { filtroTurmas } from "@/lib/turmasColaborador";
 import { eixoBnccPorChave } from "@/lib/bnccComputacao";
 import { eixoSpaecePorChave, VERDE_SPAECE } from "@/lib/spaece";
 import FormularioGerarTrilhaIa from "./FormularioGerarTrilhaIa";
@@ -24,7 +25,7 @@ export default async function PaginaGerarTrilhaIa({
   }
 
   const turmas = await prisma.turma.findMany({
-    where: { professorId: sessao.userId, ...(sessao.colaborador ? { acessoAlunosBloqueado: false } : {}) },
+    where: { professorId: sessao.userId, ...filtroTurmas(sessao) },
     orderBy: { nome: "asc" },
   });
 

@@ -5,6 +5,7 @@ import crypto from "node:crypto";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { turmaOculta } from "@/lib/turmasColaborador";
 import { criarSessaoAluno, excluirSessaoAluno } from "@/lib/alunoSessao";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { verificarPinAluno } from "@/lib/alunoPin";
@@ -69,7 +70,7 @@ export async function gerarPinAluno(turmaId: string, alunoId: string): Promise<R
   const sessao = await exigirAssinaturaAtiva();
 
   const turma = await prisma.turma.findUnique({ where: { id: turmaId } });
-  if (!turma || turma.professorId !== sessao.userId || (sessao.colaborador && turma.acessoAlunosBloqueado)) {
+  if (!turma || turma.professorId !== sessao.userId || turmaOculta(sessao, turma)) {
     return { ok: false, erro: "Turma não encontrada." };
   }
 
@@ -96,7 +97,7 @@ export async function gerarPinsDaTurma(turmaId: string): Promise<ResultadoGerarP
   const sessao = await exigirAssinaturaAtiva();
 
   const turma = await prisma.turma.findUnique({ where: { id: turmaId } });
-  if (!turma || turma.professorId !== sessao.userId || (sessao.colaborador && turma.acessoAlunosBloqueado)) {
+  if (!turma || turma.professorId !== sessao.userId || turmaOculta(sessao, turma)) {
     return { ok: false, erro: "Turma não encontrada." };
   }
 

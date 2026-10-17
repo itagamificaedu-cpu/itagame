@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
+import { filtroTurmas } from "@/lib/turmasColaborador";
 
 export default async function PaginaTurmas() {
   const sessao = await exigirAssinaturaAtiva();
 
   const turmas = await prisma.turma.findMany({
-    where: { professorId: sessao.userId, ...(sessao.colaborador ? { acessoAlunosBloqueado: false } : {}) },
+    where: { professorId: sessao.userId, ...filtroTurmas(sessao) },
     orderBy: { criadaEm: "desc" },
     include: { _count: { select: { alunos: true } } },
   });

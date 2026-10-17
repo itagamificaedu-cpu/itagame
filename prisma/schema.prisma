@@ -261,6 +261,8 @@ model Turma {
   // Quando true, nenhum aluno da turma consegue entrar (PIN recusado e
   // sessões já abertas deixam de valer). Reversível: basta voltar a false.
   acessoAlunosBloqueado Boolean @default(false)
+  // Turma que só um tipo de professor colaborador enxerga (ex.: "enfermagem").
+  areaExclusiva String?
   criadaEm     DateTime @default(now())
 
   professorId  String

@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as XLSX from "xlsx";
 import { prisma } from "@/lib/prisma";
+import { turmaOculta } from "@/lib/turmasColaborador";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { chaveDeNome, extrairNomesDaLista } from "@/lib/listaAlunos";
 import {
@@ -14,9 +15,13 @@ import {
   EstadoAdicionarAluno,
 } from "@/lib/definicoes";
 
-async function verificarDonoTurma(turmaId: string, professorId: string, colaborador = false) {
+async function verificarDonoTurma(
+  turmaId: string,
+  professorId: string,
+  sessao?: { colaborador: { acessoRestrito: string | null } | null }
+) {
   const turma = await prisma.turma.findUnique({ where: { id: turmaId } });
-  if (!turma || turma.professorId !== professorId || (colaborador && turma.acessoAlunosBloqueado)) {
+  if (!turma || turma.professorId !== professorId || (sessao && turmaOculta(sessao, turma))) {
     throw new Error("Turma não encontrada.");
   }
   return turma;
@@ -67,7 +72,7 @@ export async function criarTurma(
 
 export async function excluirTurma(turmaId: string) {
   const sessao = await exigirAssinaturaAtiva();
-  await verificarDonoTurma(turmaId, sessao.userId, Boolean(sessao.colaborador));
+  await verificarDonoTurma(turmaId, sessao.userId, sessao);
 
   // Apaga a turma com tudo que depende dela (alunos, progresso nas trilhas,
   // XP, loja, prontuário, gincana etc.). As salas ao vivo e de cabo de guerra
@@ -115,7 +120,7 @@ export async function adicionarAluno(
   formData: FormData
 ): Promise<EstadoAdicionarAluno> {
   const sessao = await exigirAssinaturaAtiva();
-  await verificarDonoTurma(turmaId, sessao.userId, Boolean(sessao.colaborador));
+  await verificarDonoTurma(turmaId, sessao.userId, sessao);
 
   const camposValidados = EsquemaAdicionarAluno.safeParse({
     nome: formData.get("nome"),
@@ -151,7 +156,7 @@ export async function importarAlunosXls(
   formData: FormData
 ): Promise<ResultadoImportarAlunosXls> {
   const sessao = await exigirAssinaturaAtiva();
-  await verificarDonoTurma(turmaId, sessao.userId, Boolean(sessao.colaborador));
+  await verificarDonoTurma(turmaId, sessao.userId, sessao);
 
   const arquivo = formData.get("arquivo");
   if (!(arquivo instanceof File) || arquivo.size === 0) {
@@ -209,7 +214,7 @@ export async function colarListaDeAlunos(turmaId: string, texto: string): Promis
   if (sessao.papel !== "ita_owner") {
     return { ok: false, erro: "Recurso disponível só para o administrador." };
   }
-  await verificarDonoTurma(turmaId, sessao.userId, Boolean(sessao.colaborador));
+  await verificarDonoTurma(turmaId, sessao.userId, sessao);
 
   const nomes = extrairNomesDaLista(texto);
   if (nomes.length === 0) {
@@ -233,7 +238,7 @@ export async function colarListaDeAlunos(turmaId: string, texto: string): Promis
 
 export async function removerAluno(turmaId: string, alunoId: string) {
   const sessao = await exigirAssinaturaAtiva();
-  await verificarDonoTurma(turmaId, sessao.userId, Boolean(sessao.colaborador));
+  await verificarDonoTurma(turmaId, sessao.userId, sessao);
 
   await prisma.aluno.deleteMany({ where: { id: alunoId, turmaId } });
 

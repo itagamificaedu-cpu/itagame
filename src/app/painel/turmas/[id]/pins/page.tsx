@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
+import { turmaOculta } from "@/lib/turmasColaborador";
 import BotaoImprimir from "./BotaoImprimir";
 
 // Lista de nomes + PIN da turma, pronta pra imprimir e recortar ou colar na
@@ -14,7 +15,7 @@ export default async function PaginaPinsTurma({ params }: { params: Promise<{ id
     where: { id },
     include: { alunos: { orderBy: { nome: "asc" } } },
   });
-  if (!turma || turma.professorId !== sessao.userId || (sessao.colaborador && turma.acessoAlunosBloqueado)) notFound();
+  if (!turma || turma.professorId !== sessao.userId || turmaOculta(sessao, turma)) notFound();
 
   return (
     <main className="min-h-screen bg-white px-6 py-8">

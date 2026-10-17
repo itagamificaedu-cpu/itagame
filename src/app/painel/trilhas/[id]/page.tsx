@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
+import { turmaOculta } from "@/lib/turmasColaborador";
 import { excluirTrilha } from "@/app/actions/trilhas";
 import { AdicionarMissaoCliente } from "@/components/trilhas/AdicionarMissaoCliente";
 import { PublicarTrilhaCliente } from "@/components/trilhas/PublicarTrilhaCliente";
@@ -34,7 +35,7 @@ export default async function PaginaDetalheTrilha({
     },
   });
 
-  if (!trilha || trilha.professorId !== sessao.userId || (sessao.colaborador && trilha.turma.acessoAlunosBloqueado)) {
+  if (!trilha || trilha.professorId !== sessao.userId || turmaOculta(sessao, trilha.turma)) {
     notFound();
   }
 

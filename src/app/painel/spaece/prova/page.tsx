@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
+import { filtroTurmas } from "@/lib/turmasColaborador";
 import { VERDE_SPAECE } from "@/lib/spaece";
 import { AvisoCriarTurma } from "@/components/AvisoCriarTurma";
 import { NovaProvaCliente } from "@/components/prova/NovaProvaCliente";
@@ -23,12 +24,12 @@ export default async function PaginaNovaProva() {
       select: { id: true, tema: true, disciplina: true, conteudoGerado: true },
     }),
     prisma.turma.findMany({
-      where: { professorId: sessao.userId, ...(sessao.colaborador ? { acessoAlunosBloqueado: false } : {}) },
+      where: { professorId: sessao.userId, ...filtroTurmas(sessao) },
       orderBy: { nome: "asc" },
       select: { id: true, nome: true },
     }),
     prisma.provaCronometrada.findMany({
-      where: { professorId: sessao.userId, ...(sessao.colaborador ? { turma: { acessoAlunosBloqueado: false } } : {}) },
+      where: { professorId: sessao.userId, ...(sessao.colaborador ? { turma: filtroTurmas(sessao) } : {}) },
       orderBy: { criadaEm: "desc" },
       take: 8,
       select: { codigo: true, titulo: true, status: true, criadaEm: true, turma: { select: { nome: true } } },

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { turmaOculta } from "@/lib/turmasColaborador";
 import { exigirAssinaturaAtiva, verificarSessaoAluno } from "@/lib/acessoDados";
 
 // Simulador de Prontuário Eletrônico — pensado pra disciplina de Informática
@@ -14,9 +15,13 @@ import { exigirAssinaturaAtiva, verificarSessaoAluno } from "@/lib/acessoDados";
 
 export type ResultadoAcaoProntuario = { ok: true } | { ok: false; erro: string };
 
-async function verificarDonoTurma(turmaId: string, professorId: string) {
+async function verificarDonoTurma(
+  turmaId: string,
+  professorId: string,
+  sessao?: { colaborador: { acessoRestrito: string | null } | null }
+) {
   const turma = await prisma.turma.findUnique({ where: { id: turmaId } });
-  if (!turma || turma.professorId !== professorId) {
+  if (!turma || turma.professorId !== professorId || (sessao && turmaOculta(sessao, turma))) {
     throw new Error("Turma não encontrada.");
   }
   return turma;
@@ -28,7 +33,7 @@ export async function criarCasoClinico(input: {
   enunciado: string;
 }): Promise<ResultadoAcaoProntuario> {
   const sessao = await exigirAssinaturaAtiva();
-  await verificarDonoTurma(input.turmaId, sessao.userId);
+  await verificarDonoTurma(input.turmaId, sessao.userId, sessao);
 
   const titulo = input.titulo.trim();
   const enunciado = input.enunciado.trim();

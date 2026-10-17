@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
+import { filtroTurmas } from "@/lib/turmasColaborador";
 import { iniciarSala } from "@/app/actions/salas";
 import { SeletorTurmaSala } from "@/components/comum/SeletorTurmaSala";
 import { IniciarCaboGuerraPersonalizadoCliente } from "@/components/caboGuerraOnline/IniciarCaboGuerraPersonalizadoCliente";
@@ -37,7 +38,7 @@ export default async function PaginaDetalheAtividade({
   }
 
   const turmas = await prisma.turma.findMany({
-    where: { professorId: sessao.userId, ...(sessao.colaborador ? { acessoAlunosBloqueado: false } : {}) },
+    where: { professorId: sessao.userId, ...filtroTurmas(sessao) },
     orderBy: { nome: "asc" },
     select: { id: true, nome: true },
   });

@@ -25,6 +25,18 @@ const AREAS: Record<string, { inicio: string; permitidas: RegExp[] }> = {
       /^\/painel\/cabo-de-guerra-online\/(?!nova$)[^/]+$/,
     ],
   },
+  // Turma de Enfermagem (curso presencial): só criar atividade com IA e o
+  // Simulador de Prontuário da turma dela. Nada mais do painel abre.
+  enfermagem: {
+    inicio: "/painel/enfermagem",
+    permitidas: [
+      /^\/painel\/enfermagem$/,
+      /^\/painel\/atividades\/nova$/,
+      /^\/painel\/atividades\/(?!nova$)[^/]+$/,
+      /^\/painel\/turmas$/,
+      /^\/painel\/turmas\/(?!nova$)[^/]+(\/pins|\/prontuario)?$/,
+    ],
+  },
 };
 
 export default async function proxy(req: NextRequest) {

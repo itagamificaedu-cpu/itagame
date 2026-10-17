@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
+import { turmaOculta } from "@/lib/turmasColaborador";
 import { VERDE_SPAECE } from "@/lib/spaece";
 import { ControleProvaCliente } from "@/components/prova/ControleProvaCliente";
 
@@ -9,9 +10,9 @@ export default async function PaginaControleProva({ params }: { params: Promise<
   const { codigo } = await params;
   const sessao = await exigirAssinaturaAtiva();
 
-  const prova = await prisma.provaCronometrada.findUnique({ where: { codigo }, select: { professorId: true, turma: { select: { acessoAlunosBloqueado: true } } } });
+  const prova = await prisma.provaCronometrada.findUnique({ where: { codigo }, select: { professorId: true, turma: { select: { acessoAlunosBloqueado: true, areaExclusiva: true } } } });
   if (!prova || prova.professorId !== sessao.userId) notFound();
-  if (sessao.colaborador && prova.turma.acessoAlunosBloqueado) notFound();
+  if (turmaOculta(sessao, prova.turma)) notFound();
 
   return (
     <main className="min-h-screen bg-neutral-50 px-4 py-8 sm:px-6">

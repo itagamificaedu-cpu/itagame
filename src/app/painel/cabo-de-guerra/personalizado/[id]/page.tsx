@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
+import { filtroTurmas } from "@/lib/turmasColaborador";
 import { prepararPerguntasPersonalizadas } from "@/lib/caboGuerraPersonalizado";
 import { CaboDeGuerraPersonalizadoCliente } from "@/components/caboGuerraPersonalizado/CaboDeGuerraPersonalizadoCliente";
 
@@ -18,7 +19,7 @@ export default async function PaginaCaboDeGuerraPersonalizado({
   }
 
   const turmas = await prisma.turma.findMany({
-    where: { professorId: sessao.userId, ...(sessao.colaborador ? { acessoAlunosBloqueado: false } : {}) },
+    where: { professorId: sessao.userId, ...filtroTurmas(sessao) },
     orderBy: { nome: "asc" },
     include: { alunos: { orderBy: { nome: "asc" } } },
   });

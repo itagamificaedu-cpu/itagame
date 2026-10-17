@@ -3,6 +3,7 @@ import { AvisoCriarTurma } from "@/components/AvisoCriarTurma";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { sair } from "@/app/actions/autenticacao";
 import { prisma } from "@/lib/prisma";
+import { filtroTurmas } from "@/lib/turmasColaborador";
 import { DISCIPLINAS_SPAECE, VERDE_SPAECE, VERDE_SPAECE_ESCURO } from "@/lib/spaece";
 import { BotaoGerarAtividadeSpaece } from "@/components/spaece/BotaoGerarAtividadeSpaece";
 import { BotaoCriarConteudoSpaeceMatematica } from "@/components/spaece/BotaoCriarConteudoSpaeceMatematica";
@@ -20,12 +21,12 @@ export default async function PaginaSpaece() {
 
   const [trilhas, turmas, atividades] = await Promise.all([
     prisma.trilha.findMany({
-      where: { professorId: sessao.userId, eixoSpaece: { not: null }, ...(sessao.colaborador ? { turma: { acessoAlunosBloqueado: false } } : {}) },
+      where: { professorId: sessao.userId, eixoSpaece: { not: null }, ...(sessao.colaborador ? { turma: filtroTurmas(sessao) } : {}) },
       include: { turma: true, _count: { select: { missoes: true } } },
       orderBy: { criadaEm: "desc" },
     }),
     prisma.turma.findMany({
-      where: { professorId: sessao.userId, ...(sessao.colaborador ? { acessoAlunosBloqueado: false } : {}) },
+      where: { professorId: sessao.userId, ...filtroTurmas(sessao) },
       orderBy: { nome: "asc" },
       select: { id: true, nome: true },
     }),

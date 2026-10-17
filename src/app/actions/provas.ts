@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { turmaOculta } from "@/lib/turmasColaborador";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { verificarPinAluno } from "@/lib/alunoPin";
 import { criarSessaoProva, obterSessaoProva } from "@/lib/provaSessao";
@@ -44,7 +45,7 @@ export async function criarProva(input: {
   }
 
   const turma = await prisma.turma.findUnique({ where: { id: input.turmaId } });
-  if (!turma || turma.professorId !== sessao.userId || (sessao.colaborador && turma.acessoAlunosBloqueado)) return { ok: false, erro: "Turma não encontrada." };
+  if (!turma || turma.professorId !== sessao.userId || turmaOculta(sessao, turma)) return { ok: false, erro: "Turma não encontrada." };
 
   const blocos: BlocoProva[] = [];
   for (const atividadeId of input.atividadeIds) {

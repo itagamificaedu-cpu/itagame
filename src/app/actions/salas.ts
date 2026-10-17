@@ -4,6 +4,7 @@ import crypto from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { turmaOculta } from "@/lib/turmasColaborador";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { verificarPinAluno } from "@/lib/alunoPin";
 import { criarSessaoParticipante, obterSessaoParticipante } from "@/lib/salaSessao";
@@ -26,7 +27,7 @@ export async function iniciarSala(atividadeId: string, formData: FormData) {
   let turmaId: string | null = null;
   if (turmaIdInformada) {
     const turma = await prisma.turma.findUnique({ where: { id: turmaIdInformada } });
-    if (turma && turma.professorId === sessao.userId && !(sessao.colaborador && turma.acessoAlunosBloqueado)) {
+    if (turma && turma.professorId === sessao.userId && !turmaOculta(sessao, turma)) {
       turmaId = turma.id;
     }
   }

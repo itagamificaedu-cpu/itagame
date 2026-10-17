@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
+import { turmaOculta } from "@/lib/turmasColaborador";
 import { excluirTurma, removerAluno } from "@/app/actions/turmas";
 import FormularioAdicionarAluno from "./FormularioAdicionarAluno";
 import FormularioImportarAlunosXls from "./FormularioImportarAlunosXls";
@@ -23,7 +24,7 @@ export default async function PaginaDetalheTurma({
     include: { alunos: { orderBy: { nome: "asc" } } },
   });
 
-  if (!turma || turma.professorId !== sessao.userId || (sessao.colaborador && turma.acessoAlunosBloqueado)) {
+  if (!turma || turma.professorId !== sessao.userId || turmaOculta(sessao, turma)) {
     notFound();
   }
 

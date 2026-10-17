@@ -4,6 +4,7 @@ import crypto from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { turmaOculta } from "@/lib/turmasColaborador";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { verificarPinAluno } from "@/lib/alunoPin";
 import {
@@ -23,10 +24,14 @@ function gerarCodigo() {
   return String(crypto.randomInt(100000, 999999));
 }
 
-async function validarTurmaDoProfessor(turmaId: string | undefined, professorId: string, colaborador = false) {
+async function validarTurmaDoProfessor(
+  turmaId: string | undefined,
+  professorId: string,
+  sessao?: { colaborador: { acessoRestrito: string | null } | null }
+) {
   if (!turmaId) return null;
   const turma = await prisma.turma.findUnique({ where: { id: turmaId } });
-  if (!turma || turma.professorId !== professorId || (colaborador && turma.acessoAlunosBloqueado)) return null;
+  if (!turma || turma.professorId !== professorId || (sessao && turmaOculta(sessao, turma))) return null;
   return turma.id;
 }
 
@@ -51,7 +56,7 @@ export async function criarSalaCaboGuerra(
   const nomeEquipe1 = camposValidados.data.nomeEquipe1?.trim() || "Equipe Azul";
   const nomeEquipe2 = camposValidados.data.nomeEquipe2?.trim() || "Equipe Vermelha";
 
-  const turmaValidada = await validarTurmaDoProfessor(turmaId, sessao.userId, Boolean(sessao.colaborador));
+  const turmaValidada = await validarTurmaDoProfessor(turmaId, sessao.userId, sessao);
 
   let sala = null;
   for (let tentativa = 0; tentativa < 5 && !sala; tentativa++) {
@@ -109,7 +114,7 @@ export async function criarSalaCaboGuerraPersonalizada(atividadeId: string, form
   const turmaValidada = await validarTurmaDoProfessor(
     (formData.get("turmaId") as string) || undefined,
     sessao.userId,
-    Boolean(sessao.colaborador)
+    sessao
   );
 
   let sala = null;

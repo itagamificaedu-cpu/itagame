@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { exigirAssinaturaAtiva } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
+import { filtroTurmas } from "@/lib/turmasColaborador";
 import { finalizarSeNecessario } from "@/lib/provas";
 import { ResultadosMatematicaCliente } from "./ResultadosMatematicaCliente";
 
@@ -37,7 +38,7 @@ export default async function ResultadosSispaiMatematica({
   const [turmas, respostas, progressos, missoesPorTrilha] = await Promise.all([
     prisma.turma.findMany({
       where: sessao.colaborador
-        ? { professorId: sessao.userId, acessoAlunosBloqueado: false }
+        ? { professorId: sessao.userId, ...filtroTurmas(sessao) }
         : { professorId: sessao.userId, nome: { startsWith: "9º Ano" } },
       orderBy: { nome: "asc" },
       select: { id: true, nome: true, alunos: { select: { id: true, nome: true }, orderBy: { nome: "asc" } } },

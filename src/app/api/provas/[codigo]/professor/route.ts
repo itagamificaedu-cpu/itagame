@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { descriptografar } from "@/lib/sessao";
 import { idDonoDaSessao } from "@/lib/acessoDados";
 import { prisma } from "@/lib/prisma";
+import { turmaOculta } from "@/lib/turmasColaborador";
 import { blocosDaProva, corrigir, finalizarSeNecessario, respostasDoParticipante } from "@/lib/provas";
 import { duracaoTotalSegundos, restanteSegundos } from "@/lib/provaTempo";
 
@@ -23,7 +24,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ codigo:
       participantes: { include: { aluno: { select: { nome: true } } } },
     },
   });
-  const colaboradorSemAcesso = sessao?.userId !== donoId && provaBruta?.turma.acessoAlunosBloqueado;
+  const colaboradorSemAcesso = Boolean(
+    sessao?.restrito && provaBruta && turmaOculta({ colaborador: { acessoRestrito: sessao.restrito } }, provaBruta.turma)
+  );
   if (!provaBruta || !donoId || provaBruta.professorId !== donoId || colaboradorSemAcesso) {
     return NextResponse.json({ erro: "nao_autorizado" }, { status: 401 });
   }
